@@ -72,12 +72,12 @@ def init_db():
         )
         if conn.execute("SELECT COUNT(*) FROM products").fetchone()[0] == 0:
             products = [
-                ("Castrol EDGE 5W-30", "Castrol", "5W-30", 299.00, 150, "castrol.jpg", "Aceite sintético para protección y desempeño en motores modernos."),
-                ("Mobil 1 Advanced 5W-30", "Mobil 1", "5W-30", 319.00, 200, "mobil.jpg", "Aceite sintético de alto desempeño para uso diario."),
-                ("Shell Helix Ultra 5W-40", "Shell", "5W-40", 359.00, 120, "shell.jpg", "Protección sintética para limpieza y desempeño del motor."),
-                ("Valvoline Advanced 5W-20", "Valvoline", "5W-20", 279.00, 180, "valvoline.jpg", "Aceite sintético para protección contra el desgaste."),
-                ("Castrol GTX 10W-40", "Castrol", "10W-40", 189.00, 250, "castrol.jpg", "Aceite para protección confiable en el uso cotidiano."),
-                ("Mobil 1 Extended Performance 0W-20", "Mobil 1", "0W-20", 389.00, 100, "mobil.jpg", "Aceite sintético de alto desempeño para motores compatibles."),
+                ("Castrol EDGE 5W-30", "Castrol", "5W-30", 299.00, 150, "aceite-1.jpg", "Aceite sintético para protección y desempeño en motores modernos."),
+                ("Mobil 1 Advanced 5W-30", "Mobil 1", "5W-30", 319.00, 200, "aceite-2.jpg", "Aceite sintético de alto desempeño para uso diario."),
+                ("Shell Helix Ultra 5W-40", "Shell", "5W-40", 359.00, 120, "aceite-3.jpg", "Protección sintética para limpieza y desempeño del motor."),
+                ("Valvoline Advanced 5W-20", "Valvoline", "5W-20", 279.00, 180, "aceite-4.jpg", "Aceite sintético para protección contra el desgaste."),
+                ("Castrol GTX 10W-40", "Castrol", "10W-40", 189.00, 250, "aceite-5.jpg", "Aceite para protección confiable en el uso cotidiano."),
+                ("Mobil 1 Extended Performance 0W-20", "Mobil 1", "0W-20", 389.00, 100, "aceite-1.jpg", "Aceite sintético de alto desempeño para motores compatibles."),
             ]
             conn.executemany(
                 "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
