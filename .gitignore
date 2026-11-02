@@ -6,3 +6,5 @@ alfa_lubes.db
 alfa_lubes.db-shm
 alfa_lubes.db-wal
 .env
+
+.vercel
