@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Proveedores | ALFA LUBES{% endblock %}
+{% block content %}
+<section class="py-10"><div class="max-w-7xl mx-auto px-6">
+    <div class="flex justify-between items-center mb-8"><div><p class="gold text-sm font-bold tracking-widest mb-2">ADMINISTRACIÓN</p><h1 class="text-3xl font-bold">Proveedores</h1></div><a href="{{ url_for('dashboard') }}" class="text-sky-300 hover:underline">← Panel de ventas</a></div>
+    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 mb-8"><h2 class="font-bold mb-4">Registrar proveedor</h2><form method="post" action="{{ url_for('add_supplier') }}" class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <input name="name" placeholder="Nombre o empresa *" required maxlength="120" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-3">
+        <input name="contact" placeholder="Persona de contacto" maxlength="120" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-3">
+        <input name="email" type="email" placeholder="Correo" maxlength="254" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-3">
+        <input name="phone" placeholder="Teléfono" maxlength="40" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-3">
+        <input name="products" placeholder="Marcas o productos" maxlength="250" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-3">
+        <button class="sm:col-span-2 lg:col-span-5 bg-gold text-slate-950 py-3 rounded-lg font-bold">Guardar proveedor</button>
+    </form></div>
+    <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-x-auto"><table class="w-full min-w-[700px] text-sm"><thead class="bg-slate-800 text-left text-slate-300"><tr><th class="px-5 py-4">Empresa</th><th>Contacto</th><th>Correo</th><th>Teléfono</th><th>Marcas / productos</th></tr></thead><tbody>
+        {% for s in suppliers %}<tr class="border-t border-slate-800"><td class="px-5 py-4 font-medium">{{ s.name }}</td><td>{{ s.contact or '—' }}</td><td>{{ s.email or '—' }}</td><td>{{ s.phone or '—' }}</td><td>{{ s.products or '—' }}</td></tr>{% else %}<tr><td colspan="5" class="px-5 py-10 text-center text-slate-400">Todavía no hay proveedores registrados.</td></tr>{% endfor %}
+    </tbody></table></div>
+</div></section>
+{% endblock %}

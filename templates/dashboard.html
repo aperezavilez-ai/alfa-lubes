@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Panel de ventas | ALFA LUBES{% endblock %}
+{% block content %}
+<section class="py-10"><div class="max-w-7xl mx-auto px-6">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8"><div><p class="gold text-sm font-bold tracking-widest mb-2">ADMINISTRACIÓN</p><h1 class="text-3xl font-bold">Resumen de ventas</h1></div><div class="flex gap-3"><a href="{{ url_for('clients') }}" class="border border-slate-700 px-4 py-2 rounded-lg hover:bg-slate-800">Clientes</a><a href="{{ url_for('suppliers') }}" class="border border-slate-700 px-4 py-2 rounded-lg hover:bg-slate-800">Proveedores</a><a href="{{ url_for('products') }}" class="bg-sky-800 px-4 py-2 rounded-lg hover:bg-sky-700">Catálogo</a></div></div>
+    <div class="grid sm:grid-cols-3 gap-5 mb-8">
+        {% for label, value, icon in [('Ventas registradas', total_sales|mxn, 'fa-sack-dollar'), ('Pedidos', total_orders, 'fa-receipt'), ('Clientes', total_clients, 'fa-users')] %}
+        <article class="bg-slate-900 p-6 rounded-2xl border border-slate-800"><div class="flex justify-between items-center"><p class="text-slate-400 text-sm">{{ label }}</p><i class="fa-solid {{ icon }} text-sky-400"></i></div><p class="text-3xl font-bold gold mt-3">{{ value }}</p></article>
+        {% endfor %}
+    </div>
+    {% if low_stock %}<div class="bg-amber-950/50 border border-amber-800 rounded-2xl p-5 mb-8"><h2 class="font-bold text-amber-200 mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Inventario bajo</h2><ul class="text-sm text-amber-100 flex flex-wrap gap-x-6 gap-y-1">{% for p in low_stock %}<li>{{ p.name }}: {{ p.stock }} unidades</li>{% endfor %}</ul></div>{% endif %}
+    <div class="grid lg:grid-cols-2 gap-6">
+        <article class="bg-slate-900 p-6 rounded-2xl border border-slate-800"><h2 class="font-bold text-xl mb-5">Pedidos recientes</h2><div class="overflow-x-auto"><table class="w-full text-sm min-w-[440px]"><thead class="text-slate-400 text-left"><tr><th class="pb-3">Pedido</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead><tbody>{% for o in recent %}<tr class="border-t border-slate-800"><td class="py-3">#{{ o.id }}</td><td>{{ o.name }}</td><td class="gold">{{ o.total|mxn }}</td><td>{{ o.status }}</td><td class="text-slate-400">{{ o.created_at[:10] }}</td></tr>{% else %}<tr><td colspan="5" class="py-5 text-slate-500">Aún no hay pedidos.</td></tr>{% endfor %}</tbody></table></div></article>
+        <article class="bg-slate-900 p-6 rounded-2xl border border-slate-800"><h2 class="font-bold text-xl mb-5">Ventas por marca</h2>{% if brands %}<canvas id="brandChart" height="220" aria-label="Gráfico de ventas agrupadas por marca"></canvas>{% else %}<p class="text-slate-400 py-10 text-center">El gráfico aparecerá cuando se registren ventas.</p>{% endif %}</article>
+    </div>
+</div></section>
+{% if brands %}<script>
+const brands = {{ brands | tojson }};
+new Chart(document.getElementById('brandChart'), {type:'doughnut',data:{labels:brands.map(b=>b.brand),datasets:[{data:brands.map(b=>b.revenue),backgroundColor:['#e4aa24','#0879ca','#10345e','#49a6e9','#9c7a32'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#dbe5ef'}}},cutout:'64%'}});
+</script>{% endif %}
+{% endblock %}

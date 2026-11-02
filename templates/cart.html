@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Carrito de compra | ALFA LUBES{% endblock %}
+{% block content %}
+<section class="py-12 sm:py-16"><div class="max-w-5xl mx-auto px-6">
+    <p class="gold text-sm font-bold tracking-widest mb-2">TU PEDIDO</p><h1 class="text-4xl font-bold mb-8">Carrito de compra</h1>
+    {% if items %}
+    <form action="{{ url_for('update_cart') }}" method="post">
+        <div class="space-y-4">
+            {% for item in items %}
+            <article class="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800">
+                <div class="w-20 h-20 shrink-0 bg-white rounded-xl p-2"><img src="{{ url_for('static', filename='images/' + item.product.image) }}" alt="{{ item.product.name }}" class="w-full h-full object-contain"></div>
+                <div class="flex-1 min-w-[170px]"><h2 class="font-bold">{{ item.product.name }}</h2><p class="text-sm text-slate-400">{{ item.product.brand }} · {{ item.product.price|mxn }} por unidad</p></div>
+                <label class="text-sm text-slate-400">Cantidad <input type="number" name="qty_{{ item.product.id }}" value="{{ item.qty }}" min="0" max="{{ item.product.stock }}" class="block w-24 mt-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-center text-white"></label>
+                <p class="w-full sm:w-auto sm:min-w-32 sm:text-right font-bold gold">{{ item.subtotal|mxn }}</p>
+            </article>
+            {% endfor %}
+        </div>
+        <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-6 mt-8">
+            <button type="submit" class="self-start border border-slate-600 px-5 py-3 rounded-lg hover:bg-slate-800">Actualizar cantidades</button>
+            <div class="sm:text-right"><p class="text-slate-400">Total de productos</p><p class="text-3xl font-bold gold mt-1">{{ total|mxn }}</p><p class="text-xs text-slate-500 mt-2">El pago y la entrega se coordinan al confirmar el pedido.</p><a href="{{ url_for('checkout_page') }}" class="inline-block mt-5 bg-gold text-slate-950 px-8 py-3 rounded-lg font-bold hover:brightness-110">Continuar</a></div>
+        </div>
+    </form>
+    {% else %}
+    <div class="text-center py-16 bg-slate-900 rounded-2xl border border-slate-800"><i class="fa-solid fa-cart-shopping text-5xl text-slate-600 mb-4"></i><p class="text-xl">Tu carrito está vacío.</p><a href="{{ url_for('products') }}" class="inline-block mt-6 bg-gold text-slate-950 px-7 py-3 rounded-lg font-bold">Explorar productos</a></div>
+    {% endif %}
+</div></section>
+{% endblock %}

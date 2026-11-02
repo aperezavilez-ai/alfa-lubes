@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Confirmar pedido | ALFA LUBES{% endblock %}
+{% block content %}
+<section class="py-12 sm:py-16"><div class="max-w-3xl mx-auto px-6">
+    <p class="gold text-sm font-bold tracking-widest mb-2">ÚLTIMO PASO</p><h1 class="text-4xl font-bold mb-2">Datos de contacto</h1>
+    <p class="text-slate-400 mb-8">Total del pedido: <span class="gold font-bold text-xl">{{ total|mxn }}</span></p>
+    {% if preview_mode %}<div class="bg-sky-950 border border-sky-800 rounded-xl p-4 mb-5 text-sky-100">Esta es una vista previa visual. El envío de pedidos está disponible al ejecutar la aplicación localmente.</div>{% endif %}
+    <form method="post" action="{{ url_for('checkout') }}" class="space-y-5 bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-800">
+        <div class="grid sm:grid-cols-2 gap-5">
+            <div><label for="name" class="block text-sm mb-2">Nombre completo *</label><input id="name" name="name" autocomplete="name" required maxlength="120" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500"></div>
+            <div><label for="email" class="block text-sm mb-2">Correo electrónico *</label><input id="email" type="email" name="email" autocomplete="email" required maxlength="254" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500"></div>
+            <div><label for="phone" class="block text-sm mb-2">Teléfono</label><input id="phone" type="tel" name="phone" autocomplete="tel" maxlength="40" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500"></div>
+            <div><label for="company" class="block text-sm mb-2">Taller o empresa</label><input id="company" name="company" autocomplete="organization" maxlength="120" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500"></div>
+        </div>
+        <div><label for="address" class="block text-sm mb-2">Dirección o zona de entrega</label><textarea id="address" name="address" autocomplete="street-address" rows="3" maxlength="500" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500"></textarea></div>
+        <p class="text-sm text-slate-400">Al confirmar, registraremos tu pedido y nos pondremos en contacto para acordar pago y entrega. Este formulario no procesa pagos.</p>
+        <button type="submit" {% if preview_mode %}disabled{% endif %} class="w-full bg-gold text-slate-950 py-4 rounded-lg font-bold text-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed">{{ 'Pedido disponible en la versión local' if preview_mode else 'Enviar pedido' }}</button>
+        <a href="{{ url_for('cart') }}" class="block text-center text-sky-300 hover:underline">← Volver al carrito</a>
+    </form>
+</div></section>
+{% endblock %}

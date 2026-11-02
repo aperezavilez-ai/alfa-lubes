@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+alfa_lubes.db
+alfa_lubes.db-shm
+alfa_lubes.db-wal
+.env
