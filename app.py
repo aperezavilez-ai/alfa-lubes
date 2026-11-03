@@ -5,7 +5,9 @@ from contextlib import contextmanager
 import os
 import secrets
 import sqlite3
+import hashlib
 from pathlib import Path
+from functools import wraps
 
 from flask import Flask, abort, flash, jsonify, redirect, render_template, request, session, url_for
 
@@ -68,6 +70,12 @@ def init_db():
                 FOREIGN KEY(order_id) REFERENCES orders(id),
                 FOREIGN KEY(product_id) REFERENCES products(id)
             );
+            CREATE TABLE IF NOT EXISTS admins (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL,
+                name TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'admin',
+                active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL
+            );
             """
         )
         if conn.execute("SELECT COUNT(*) FROM products").fetchone()[0] == 0:
@@ -82,6 +90,13 @@ def init_db():
             conn.executemany(
                 "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 products,
+            )
+        if conn.execute("SELECT COUNT(*) FROM admins").fetchone()[0] == 0:
+            conn.execute(
+                "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                ("alfonsoavilery@icloud.com",
+                 hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest(),
+                 "Alfonso Avilery", "super", 1, datetime.now().isoformat(timespec="seconds")),
             )
 
 
@@ -98,6 +113,49 @@ def inject_cart_count():
 @app.template_filter("mxn")
 def format_mxn(amount):
     return f"${float(amount):,.2f} MXN"
+
+
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+
+def verify_password(password: str, password_hash: str) -> bool:
+    return hash_password(password) == password_hash
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "admin_id" not in session:
+            return redirect(url_for("admin_login", next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "admin_id" not in session:
+            return redirect(url_for("admin_login", next=request.url))
+        with get_db() as conn:
+            admin = conn.execute("SELECT role FROM admins WHERE id = ?", (session["admin_id"],)).fetchone()
+            if not admin or admin["role"] not in ("admin", "super"):
+                abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def super_admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "admin_id" not in session:
+            return redirect(url_for("admin_login", next=request.url))
+        with get_db() as conn:
+            admin = conn.execute("SELECT role FROM admins WHERE id = ?", (session["admin_id"],)).fetchone()
+            if not admin or admin["role"] != "super":
+                abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 @app.route("/")
