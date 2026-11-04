@@ -158,6 +158,41 @@ def super_admin_required(f):
     return decorated_function
 
 
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        next_url = request.form.get("next") or request.args.get("next") or url_for("dashboard")
+        if not email or not password:
+            flash("Ingresa correo y contraseña.", "error")
+            return redirect(url_for("admin_login", next=next_url))
+        with get_db() as conn:
+            admin = conn.execute(
+                "SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?",
+                (email,),
+            ).fetchone()
+        if not admin or not admin["active"] or not verify_password(password, admin["password_hash"]):
+            flash("Credenciales inválidas o cuenta inactiva.", "error")
+            return redirect(url_for("admin_login", next=next_url))
+        session.clear()
+        session["admin_id"] = admin["id"]
+        session["admin_name"] = admin["name"]
+        session["admin_role"] = admin["role"]
+        return redirect(next_url)
+    return render_template("admin_login.html")
+
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop("admin_id", None)
+    session.pop("admin_name", None)
+    session.pop("admin_role", None)
+    flash("Sesión cerrada.", "success")
+    return redirect(url_for("home"))
+
+
+
 @app.route("/")
 def home():
     with get_db() as conn:
@@ -315,6 +350,7 @@ def checkout_page():
     return render_template("checkout.html", total=total)
 
 
+@admin_required
 @app.route("/dashboard")
 def dashboard():
     if PREVIEW_MODE:
@@ -337,6 +373,7 @@ def dashboard():
                            low_stock=low_stock)
 
 
+@admin_required
 @app.route("/clients")
 def clients():
     if PREVIEW_MODE:
@@ -346,6 +383,7 @@ def clients():
     return render_template("clients.html", clients=rows)
 
 
+@admin_required
 @app.route("/suppliers")
 def suppliers():
     if PREVIEW_MODE:
