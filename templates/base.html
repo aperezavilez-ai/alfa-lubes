@@ -32,7 +32,7 @@
                     <a href="{{ url_for('home') }}" class="hover:text-sky-700">Inicio</a>
                     <a href="{{ url_for('products') }}" class="hover:text-sky-700">Productos</a>
                     <a href="{{ url_for('ai_agent') }}" class="hover:text-sky-700">Asesor</a>
-                    {% if session.get('admin_id') %}<a href="{{ url_for('admin_logout') }}" class="hover:text-sky-700">Salir ({{ session.get('admin_name') }})</a>{% endif %}
+                    {% if session.get('admin_id') %}<a href="{{ url_for('admin_logout') }}" class="hover:text-sky-700">Salir ({{ session.get('admin_name') }})</a>{% else %}<a href="{{ url_for('admin_login') }}" class="hover:text-sky-700">Administración</a>{% endif %}
                     <a href="{{ url_for('cart') }}" class="rounded-full bg-slate-900 text-white px-4 py-2 hover:bg-sky-800">
                         <i class="fa-solid fa-cart-shopping mr-2"></i>Carrito <span class="ml-1 rounded-full bg-amber-400 text-slate-950 px-2 py-0.5">{{ cart_count }}</span>
                     </a>
