@@ -158,12 +158,27 @@ def super_admin_required(f):
     return decorated_function
 
 
+@app.route("/admin")
+@admin_required
+def admin_panel():
+    with get_db() as conn:
+        stats = {
+            "products": conn.execute("SELECT COUNT(*) FROM products").fetchone()[0],
+            "clients": conn.execute("SELECT COUNT(*) FROM clients").fetchone()[0],
+            "suppliers": conn.execute("SELECT COUNT(*) FROM suppliers").fetchone()[0],
+            "orders": conn.execute("SELECT COUNT(*) FROM orders").fetchone()[0],
+        }
+    return render_template("admin_panel.html", stats=stats)
+
+
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
+    if "admin_id" in session:
+        return redirect(url_for("admin_panel"))
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
-        next_url = request.form.get("next") or request.args.get("next") or url_for("dashboard")
+        next_url = request.form.get("next") or request.args.get("next") or url_for("admin_panel")
         if not email or not password:
             flash("Ingresa correo y contraseña.", "error")
             return redirect(url_for("admin_login", next=next_url))
@@ -351,6 +366,12 @@ def checkout_page():
 
 
 @admin_required
+@app.route("/admin")
+@login_required
+def admin_panel():
+    return render_template("admin_panel.html")
+
+
 @app.route("/dashboard")
 def dashboard():
     if PREVIEW_MODE:

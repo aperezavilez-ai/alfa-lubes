@@ -32,6 +32,7 @@
                     <a href="{{ url_for('home') }}" class="hover:text-sky-700">Inicio</a>
                     <a href="{{ url_for('products') }}" class="hover:text-sky-700">Productos</a>
                     <a href="{{ url_for('ai_agent') }}" class="hover:text-sky-700">Asesor</a>
+                    {% if session.get('admin_id') %}<a href="{{ url_for('admin_panel') }}" class="hover:text-sky-700">Panel Admin</a>{% endif %}
                     {% if session.get('admin_id') %}<a href="{{ url_for('admin_logout') }}" class="hover:text-sky-700">Salir ({{ session.get('admin_name') }})</a>{% else %}<a href="{{ url_for('admin_login') }}" class="hover:text-sky-700">Administración</a>{% endif %}
                     <a href="{{ url_for('cart') }}" class="rounded-full bg-slate-900 text-white px-4 py-2 hover:bg-sky-800">
                         <i class="fa-solid fa-cart-shopping mr-2"></i>Carrito <span class="ml-1 rounded-full bg-amber-400 text-slate-950 px-2 py-0.5">{{ cart_count }}</span>
@@ -45,8 +46,15 @@
                 <a href="{{ url_for('home') }}" class="block px-3 py-3">Inicio</a>
                 <a href="{{ url_for('products') }}" class="block px-3 py-3">Productos</a>
                 <a href="{{ url_for('ai_agent') }}" class="block px-3 py-3">Asesor de lubricantes</a>
-                {% if not preview_mode %}<a href="{{ url_for('dashboard') }}" class="block px-3 py-3">Ventas</a>{% endif %}
-                <a href="{{ url_for('cart') }}" class="block px-3 py-3">Carrito ({{ cart_count }})</a>
+                {% if session.get('admin_id') %}
+                <a href="{{ url_for('admin_panel') }}" class="block px-3 py-3">Panel Admin</a>
+                <a href="{{ url_for('dashboard') }}" class="block px-3 py-3">Ventas</a>
+                <a href="{{ url_for('clients') }}" class="block px-3 py-3">Clientes</a>
+                <a href="{{ url_for('suppliers') }}" class="block px-3 py-3">Proveedores</a>
+                <a href="{{ url_for('admin_logout') }}" class="block px-3 py-3">Salir ({{ session.get('admin_name') }})</a>
+                {% else %}
+                <a href="{{ url_for('admin_login') }}" class="block px-3 py-3">Administración</a>
+                {% endif %}
             </div>
         </nav>
     </header>

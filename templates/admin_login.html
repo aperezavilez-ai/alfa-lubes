@@ -14,11 +14,35 @@
         </div>
         <div>
           <label class="block text-sm text-slate-300 mb-1">Contraseña</label>
-          <input name="password" type="password" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-3">
+          <div class="relative">
+            <input id="admin-password" name="password" type="password" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-3 pr-10">
+            <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-slate-200" aria-label="Mostrar u ocultar contraseña">
+              <i class="fa-regular fa-eye" id="toggle-password-icon"></i>
+            </button>
+          </div>
         </div>
         <button class="w-full bg-sky-800 hover:bg-sky-700 rounded-lg py-3 font-semibold">Entrar</button>
       </form>
     </div>
   </div>
 </section>
+<script>
+  const toggleBtn = document.getElementById('toggle-password');
+  const pwdInput = document.getElementById('admin-password');
+  const pwdIcon = document.getElementById('toggle-password-icon');
+  if (toggleBtn && pwdInput && pwdIcon) {
+    toggleBtn.addEventListener('click', function() {
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        pwdIcon.classList.remove('fa-eye');
+        pwdIcon.classList.add('fa-eye-slash');
+      } else {
+        pwdInput.type = 'password';
+        pwdIcon.classList.remove('fa-eye-slash');
+        pwdIcon.classList.add('fa-eye');
+      }
+      pwdInput.focus();
+    });
+  }
+</script>
 {% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Panel de administración | ALFA LUBES{% endblock %}
+{% block content %}
+<section class="py-10">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <p class="gold text-sm font-bold tracking-widest mb-1">ADMINISTRACIÓN</p>
+        <h1 class="text-3xl font-bold">Panel de administración</h1>
+        <p class="text-slate-400 mt-1">Bienvenido, {{ session.get('admin_name') }} ({{ session.get('admin_role') }})</p>
+      </div>
+      <a href="{{ url_for('admin_logout') }}" class="bg-slate-800 hover:bg-slate-700 rounded-lg px-4 py-2 text-sm font-semibold">Cerrar sesión</a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <p class="text-slate-400 text-sm">Productos</p>
+        <p class="text-3xl font-bold mt-1">{{ stats.products }}</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <p class="text-slate-400 text-sm">Clientes</p>
+        <p class="text-3xl font-bold mt-1">{{ stats.clients }}</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <p class="text-slate-400 text-sm">Proveedores</p>
+        <p class="text-3xl font-bold mt-1">{{ stats.suppliers }}</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <p class="text-slate-400 text-sm">Pedidos</p>
+        <p class="text-3xl font-bold mt-1">{{ stats.orders }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <a href="{{ url_for('dashboard') }}" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 card-hover block">
+        <i class="fa-solid fa-chart-line text-2xl gold mb-3"></i>
+        <h2 class="text-lg font-bold">Ventas / Dashboard</h2>
+        <p class="text-slate-400 text-sm mt-1">Resumen de ventas y métricas.</p>
+      </a>
+      <a href="{{ url_for('clients') }}" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 card-hover block">
+        <i class="fa-solid fa-users text-2xl gold mb-3"></i>
+        <h2 class="text-lg font-bold">Clientes</h2>
+        <p class="text-slate-400 text-sm mt-1">Gestión de clientes.</p>
+      </a>
+      <a href="{{ url_for('suppliers') }}" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 card-hover block">
+        <i class="fa-solid fa-truck text-2xl gold mb-3"></i>
+        <h2 class="text-lg font-bold">Proveedores</h2>
+        <p class="text-slate-400 text-sm mt-1">Gestión de proveedores.</p>
+      </a>
+      <a href="{{ url_for('products') }}" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 card-hover block">
+        <i class="fa-solid fa-box text-2xl gold mb-3"></i>
+        <h2 class="text-lg font-bold">Productos</h2>
+        <p class="text-slate-400 text-sm mt-1">Catálogo y stock.</p>
+      </a>
+      <a href="{{ url_for('ai_agent') }}" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 card-hover block">
+        <i class="fa-solid fa-robot text-2xl gold mb-3"></i>
+        <h2 class="text-lg font-bold">Asesor IA</h2>
+        <p class="text-slate-400 text-sm mt-1">Asistente de lubricantes.</p>
+      </a>
+      <a href="{{ url_for('cart') }}" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 card-hover block">
+        <i class="fa-solid fa-cart-shopping text-2xl gold mb-3"></i>
+        <h2 class="text-lg font-bold">Carrito / Checkout</h2>
+        <p class="text-slate-400 text-sm mt-1">Revisar carrito y checkout.</p>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
