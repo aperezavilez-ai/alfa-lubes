@@ -365,12 +365,6 @@ def checkout_page():
     return render_template("checkout.html", total=total)
 
 
-@admin_required
-@app.route("/admin")
-@login_required
-def admin_panel():
-    return render_template("admin_panel.html")
-
 
 @app.route("/dashboard")
 def dashboard():
