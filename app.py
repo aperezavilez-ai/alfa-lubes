@@ -432,6 +432,94 @@ def ai_agent():
     return render_template("ai_agent.html")
 
 
+@app.post("/api/ai-chat")
+def ai_chat():
+    data = request.get_json(silent=True) or {}
+    message = str(data.get("message", "")).strip().lower()
+    if not message:
+        return jsonify(error="Escribe un mensaje."), 400
+
+    reply = ""
+    suggest = False
+
+    if any(w in message for w in ["hola", "buenas", "buenos", "saludos", "hey"]):
+        reply = "¡Hola! Soy tu asesor ALFA LUBES. Estoy aquí para ayudarte a elegir el aceite ideal para tu vehículo. ¿Cuál es tu auto, marca, modelo y año? También puedes decirme el kilometraje y el clima donde conduces."
+
+    elif any(w in message for w in ["qué aceite", "que aceite", "cuál aceite", "cual aceite", "viscosidad", "5w", "10w", "0w", "20w"]):
+        reply = ("La viscosidad correcta depende del fabricante de tu vehículo. Lo primero es revisar el manual del propietario: ahí encontrarás el grado recomendado (ej. 5W-30, 10W-40, 0W-20).\n\n"
+                 "Regla general:\n"
+                 "• 0W-20 / 5W-20: motores modernos, eficiencia de combustible.\n"
+                 "• 5W-30: el más versátil, ideal para la mayoría de autos y SUVs.\n"
+                 "• 10W-40: motores con más kilometraje o climas cálidos.\n"
+                 "• 5W-40: alto desempeño y protección en carga.\n\n"
+                 "¿Me compartes marca, modelo, año y kilometraje de tu vehículo para orientarte mejor?")
+        suggest = True
+
+    elif any(w in message for w in ["sintético", "sintetico", "mineral", "semisintético", "semisintetico"]):
+        reply = ("Aceite sintético vs mineral:\n\n"
+                 "• Sintético: mayor protección, mejor flujo en frío, intervalos de cambio más largos (hasta 10,000-15,000 km). Ideal para motores modernos y turbo.\n"
+                 "• Mineral: más económico, intervalos cortos (5,000 km). Para motores antiguos o uso ligero.\n"
+                 "• Semisintético: punto medio, buena protección a precio accesible.\n\n"
+                 "En ALFA LUBES recomendamos sintético para la mayoría de vehículos actuales. ¿Qué auto tienes?")
+
+    elif any(w in message for w in ["cada cuánto", "cada cuanto", "cambio", "intervalo", "km", "kilómetros", "kilometros"]):
+        reply = ("Intervalos de cambio recomendados:\n\n"
+                 "• Aceite sintético: cada 8,000 a 12,000 km o 6-12 meses.\n"
+                 "• Semisintético: cada 6,000 a 8,000 km.\n"
+                 "• Mineral: cada 5,000 km.\n\n"
+                 "También cambia el filtro de aceite en cada servicio. Si conduces en tráfico pesado, clima extremo o remolcas, reduce el intervalo un 20-30%.\n\n"
+                 "¿Cuántos km tiene tu vehículo actualmente?")
+
+    elif any(w in message for w in ["alto kilometraje", "muchos km", "viejo", "gastado", "quema aceite"]):
+        reply = ("Para motores con alto kilometraje (+100,000 km):\n\n"
+                 "• Usa aceites formulados para alto kilometraje (contienen acondicionadores de sellos).\n"
+                 "• Viscosidad ligeramente mayor (ej. 10W-40 en lugar de 5W-30) puede ayudar a reducir consumo.\n"
+                 "• Verifica que no haya fugas ni consumo excesivo.\n\n"
+                 "En ALFA LUBES tenemos opciones específicas. ¿Marca y modelo de tu auto?")
+
+    elif any(w in message for w in ["envío", "envio", "domicilio", "entrega", "comprar", "compra", "pedido", "pago"]):
+        reply = ("¡Claro! En ALFA LUBES:\n\n"
+                 "• Compra en línea desde nuestro catálogo.\n"
+                 "• Agrega productos al carrito y finaliza tu pedido.\n"
+                 "• Envíos a domicilio disponibles.\n"
+                 "• Pago seguro.\n\n"
+                 "¿Te gustaría ver el catálogo de productos? Puedo llevarte directamente.")
+        suggest = True
+
+    elif any(w in message for w in ["precio", "costo", "cuánto", "cuanto", "catálogo", "catalogo", "productos"]):
+        reply = ("Tenemos una amplia gama de aceites y lubricantes de marcas reconocidas: Castrol, Mobil 1, Shell, Valvoline y más.\n\n"
+                 "Precios desde $189 MXN hasta $389 MXN según viscosidad y presentación.\n\n"
+                 "¿Buscas algo específico? Puedo recomendarte según tu vehículo.")
+        suggest = True
+
+    elif any(w in message for w in ["frío", "frio", "calor", "clima", "temperatura"]):
+        reply = ("El clima afecta la viscosidad de arranque:\n\n"
+                 "• Clima frío: busca aceites con bajo número W (0W o 5W) para mejor flujo en arranque.\n"
+                 "• Clima cálido: la viscosidad en caliente (segundo número) es clave; 30 o 40 son comunes.\n"
+                 "• Siempre respeta la especificación del fabricante.\n\n"
+                 "¿En qué ciudad conduces?")
+
+    elif any(w in message for w in ["filtro", "mantenimiento", "servicio"]):
+        reply = ("Mantenimiento recomendado:\n\n"
+                 "• Cambia el filtro de aceite en cada servicio.\n"
+                 "• Revisa nivel de aceite cada 1,000 km.\n"
+                 "• Usa el grado recomendado por el fabricante.\n"
+                 "• No mezcles viscosidades diferentes.\n\n"
+                 "¿Necesitas ayuda para elegir el aceite correcto para tu auto?")
+
+    elif any(w in message for w in ["gracias", "adiós", "adios", "bye", "hasta luego"]):
+        reply = "¡Con gusto! Si tienes más dudas, aquí estoy. Recuerda: el aceite correcto protege tu motor y ahorra dinero a largo plazo. ¡Hasta pronto! 🚗💧"
+
+    else:
+        reply = ("Gracias por tu pregunta. Para darte la mejor recomendación necesito saber:\n\n"
+                 "1. Marca, modelo y año de tu vehículo.\n"
+                 "2. Kilometraje actual.\n"
+                 "3. Clima donde conduces.\n\n"
+                 "Con esos datos te oriento sobre la viscosidad ideal y el producto ALFA LUBES que mejor se adapta. ¿Me compartes esa información?")
+
+    return jsonify(reply=reply, suggest_product=suggest)
+
+
 @app.post("/api/ai-recommend")
 def ai_recommend():
     data = request.get_json(silent=True) or {}
