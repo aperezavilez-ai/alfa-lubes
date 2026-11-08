@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "id": "batch_mw8ebucn_3df10f",
+  "task": "QUIERO QUE LA IA FUNCIONE CORRECTAMNTE QUE FALTA PARA QUE FUNCIONE YA TIENE ASIGNADA API Y ENDPOINT FALTA ALGO?",
+  "threadId": "thread_1794176440210_059e16",
+  "createdAt": "2026-11-08T22:20:41.447Z",
+  "status": "open",
+  "jobs": [
+    {
+      "id": "job_mw8ebucn_2f1b",
+      "index": 0,
+      "role": "analyst",
+      "title": "Analizar capa server/API",
+      "goal": "Diagnóstico",
+      "scopePaths": [
+        "src/server",
+        "api",
+        "supabase"
+      ],
+      "status": "running",
+      "result": null,
+      "error": null,
+      "startedAt": "2026-11-08T22:20:41.450Z",
+      "finishedAt": null
+    },
+    {
+      "id": "job_mw8ebucn_f222",
+      "index": 1,
+      "role": "implementer",
+      "title": "Implementar cambios server",
+      "goal": "Cambios acotados al scope",
+      "scopePaths": [
+        "src/server",
+        "api",
+        "supabase"
+      ],
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "startedAt": null,
+      "finishedAt": null
+    },
+    {
+      "id": "job_mw8ebucn_1887",
+      "index": 2,
+      "role": "verifier",
+      "title": "Verificar tipos y contratos",
+      "goal": "Revisión",
+      "scopePaths": [
+        "src/server",
+        "api"
+      ],
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "startedAt": null,
+      "finishedAt": null
+    }
+  ],
+  "overlaps": [],
+  "fanIn": null
+}

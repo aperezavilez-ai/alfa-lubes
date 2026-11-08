@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "workspaceRoot": "D:\\PROGRAMAS IA\\ALFA LUBES",
+  "updatedAt": "2026-11-08T22:52:54.060Z",
+  "fileTree": [
+    {
+      "path": "templates/ai_agent.html",
+      "kind": "file"
+    },
+    {
+      "path": "app.py",
+      "kind": "file"
+    }
+  ],
+  "fileTreeAt": "2026-11-08T22:52:34.512Z",
+  "recentMods": [
+    {
+      "path": "templates/ai_agent.html",
+      "action": "replace_in_file",
+      "summary": "parche aplicado (kernel)",
+      "at": "2026-11-08T22:52:54.059Z"
+    },
+    {
+      "path": "app.py",
+      "action": "replace_in_file",
+      "summary": "parche aplicado (kernel)",
+      "at": "2026-11-08T22:52:34.512Z"
+    }
+  ],
+  "recentReads": [],
+  "task": "",
+  "nextAction": ""
+}

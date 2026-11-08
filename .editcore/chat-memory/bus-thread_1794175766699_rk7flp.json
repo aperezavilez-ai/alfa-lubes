@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "threadId": "thread_1794175766699_rk7flp",
+  "updatedAt": "2026-11-08T22:09:27.955Z",
+  "goal": "",
+  "phase": "routing",
+  "findings": [],
+  "files": [],
+  "skillsUsed": [],
+  "toolsUsed": [],
+  "subagents": [
+    {
+      "t": 1794175767954,
+      "agent": "analyst",
+      "ok": true,
+      "summary": "routed (score 0.80)"
+    }
+  ],
+  "lastResult": ""
+}

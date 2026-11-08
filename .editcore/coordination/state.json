@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "threads": {
+    "thread_1794175766699_rk7flp": {
+      "activeAgent": "supervisor",
+      "activity": [
+        {
+          "at": "2026-11-08T22:09:27.929Z",
+          "type": "active_agent",
+          "agent": "supervisor",
+          "path": null,
+          "op": null,
+          "note": "",
+          "prev": null
+        }
+      ],
+      "updatedAt": "2026-11-08T22:09:27.929Z",
+      "lastMeta": {
+        "task": "QUE FALTA PARA QUE LA IA FUNCIONE COMO DEBE SER?",
+        "phase": null
+      }
+    },
+    "chat-1794176073420-bd55b595e86e48": {
+      "activeAgent": "explorer",
+      "activity": [
+        {
+          "at": "2026-11-08T22:14:35.684Z",
+          "type": "active_agent",
+          "agent": "supervisor",
+          "path": null,
+          "op": null,
+          "note": "",
+          "prev": null
+        },
+        {
+          "at": "2026-11-08T22:14:35.732Z",
+          "type": "active_agent",
+          "agent": "explorer",
+          "path": null,
+          "op": null,
+          "note": "Mapear arquitectura completa y puntos vulnerables",
+          "prev": "supervisor"
+        }
+      ],
+      "updatedAt": "2026-11-08T22:14:35.732Z",
+      "lastMeta": {
+        "task": "Explorar árbol de archivos y dependencias críticas",
+        "phase": "parallel_job"
+      }
+    },
+    "thread_1794176440210_059e16": {
+      "activeAgent": "analyst",
+      "activity": [
+        {
+          "at": "2026-11-08T22:20:41.424Z",
+          "type": "active_agent",
+          "agent": "supervisor",
+          "path": null,
+          "op": null,
+          "note": "",
+          "prev": null
+        },
+        {
+          "at": "2026-11-08T22:20:41.450Z",
+          "type": "active_agent",
+          "agent": "analyst",
+          "path": null,
+          "op": null,
+          "note": "Diagnóstico",
+          "prev": "supervisor"
+        }
+      ],
+      "updatedAt": "2026-11-08T22:20:41.450Z",
+      "lastMeta": {
+        "task": "Analizar capa server/API",
+        "phase": "parallel_job"
+      }
+    },
+    "chat-1794178172368-903f7b6f4815e": {
+      "activeAgent": "explorer",
+      "activity": [
+        {
+          "at": "2026-11-08T22:49:34.307Z",
+          "type": "active_agent",
+          "agent": "supervisor",
+          "path": null,
+          "op": null,
+          "note": "",
+          "prev": null
+        },
+        {
+          "at": "2026-11-08T22:49:34.344Z",
+          "type": "active_agent",
+          "agent": "explorer",
+          "path": null,
+          "op": null,
+          "note": "Mapear arquitectura completa y puntos vulnerables",
+          "prev": "supervisor"
+        }
+      ],
+      "updatedAt": "2026-11-08T22:49:34.344Z",
+      "lastMeta": {
+        "task": "Explorar árbol de archivos y dependencias críticas",
+        "phase": "parallel_job"
+      }
+    }
+  },
+  "locks": {},
+  "updatedAt": "2026-11-08T22:49:34.344Z"
+}

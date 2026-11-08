@@ -64,6 +64,8 @@ const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 
+let history = [];
+
 function addMessage(text, isUser) {
   const wrapper = document.createElement('div');
   wrapper.className = 'flex gap-3' + (isUser ? ' justify-end' : '');
@@ -73,6 +75,16 @@ function addMessage(text, isUser) {
   const bubble = `<div class="${isUser ? 'bg-sky-600 text-white rounded-2xl rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-2xl rounded-tl-none'} px-4 py-3 max-w-[85%] text-sm whitespace-pre-line">${text}</div>`;
   wrapper.innerHTML = avatar + bubble;
   chatMessages.appendChild(wrapper);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function addSourceBadge(source) {
+  const label = source === 'meai' ? 'IA real (meai)' : 'Respuesta local';
+  const color = source === 'meai' ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30' : 'text-slate-400 bg-slate-700 border-slate-700/30';
+  const el = document.createElement('div');
+  el.className = 'flex gap-3';
+  el.innerHTML = '<div class="w-8 h-8 shrink-0"></div><div class="flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider ' + color + '"><span class="w-1.5 h-1.5 rounded-full ' + (source === 'meai' ? 'bg-emerald-400' : 'bg-slate-400') + '"></span>' + label + '</div>';
+  chatMessages.appendChild(el);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
@@ -93,18 +105,21 @@ function removeTyping() {
 async function sendMessage(text) {
   if (!text.trim()) return;
   addMessage(text, true);
+  history.push({role: 'user', content: text});
   chatInput.value = '';
   showTyping();
   try {
     const res = await fetch('{{ url_for("ai_chat") }}', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({message: text})
+      body: JSON.stringify({message: text, history: history})
     });
     const data = await res.json();
     removeTyping();
     if (!res.ok) throw new Error(data.error || 'Error');
     addMessage(data.reply, false);
+    history.push({role: 'assistant', content: data.reply});
+    if (data.source) addSourceBadge(data.source);
     if (data.suggest_product) {
       const link = document.createElement('div');
       link.className = 'flex gap-3';

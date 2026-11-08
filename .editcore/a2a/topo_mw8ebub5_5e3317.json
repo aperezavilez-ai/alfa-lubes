@@ -1,0 +1,27 @@
+{
+  "id": "topo_mw8ebub5_5e3317",
+  "task": "QUIERO QUE LA IA FUNCIONE CORRECTAMNTE QUE FALTA PARA QUE FUNCIONE YA TIENE ASIGNADA API Y ENDPOINT FALTA ALGO?",
+  "createdAt": 1794176441394,
+  "status": "running",
+  "pipeline": [
+    "supervisor",
+    "explorer",
+    "analyst",
+    "implementer",
+    "verifier",
+    "supervisor"
+  ],
+  "currentRole": "supervisor",
+  "hopCount": 0,
+  "visits": {
+    "supervisor": 1
+  },
+  "activeDebate": null,
+  "debates": [],
+  "findings": [],
+  "proposals": [],
+  "results": [],
+  "history": [],
+  "startedAt": "2026-11-08T22:20:41.394Z",
+  "meta": {}
+}
