@@ -2,20 +2,46 @@
 
 from datetime import datetime
 from contextlib import contextmanager
+import json
 import os
 import secrets
 import sqlite3
 import hashlib
 from pathlib import Path
 from functools import wraps
+from urllib import request as urlrequest
+from urllib.error import HTTPError, URLError
 
 from flask import Flask, abort, flash, jsonify, redirect, render_template, request, session, url_for
 
 
 BASE_DIR = Path(__file__).resolve().parent
+
+
+def _load_env(path: Path) -> None:
+    """Carga variables de un archivo .env simple (KEY=VALUE) sin dependencias extra."""
+    if not path.exists():
+        return
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+_load_env(BASE_DIR / ".env")
+
 PREVIEW_MODE = os.environ.get("VERCEL") == "1"
 DEFAULT_DB_PATH = Path("/tmp/alfa_lubes.db") if PREVIEW_MODE else BASE_DIR / "alfa_lubes.db"
 DB_PATH = Path(os.environ.get("ALFA_LUBES_DB", DEFAULT_DB_PATH))
+
+MEAI_API_KEY = os.environ.get("MEAI_API_KEY", "").strip()
+MEAI_BASE_URL = os.environ.get("MEAI_BASE_URL", "https://api.meai.cloud/v1").strip().rstrip("/")
+MEAI_MODEL = os.environ.get("MEAI_MODEL", "claude-haiku-4.5").strip()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("ALFA_LUBES_SECRET_KEY") or secrets.token_hex(32)
