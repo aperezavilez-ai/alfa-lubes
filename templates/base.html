@@ -4,7 +4,65 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#071a32">
-    <meta name="description" content="ALFA LUBES: aceites y lubricantes para tu vehículo, con atención personalizada.">
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="ALFA LUBES: Especialistas en aceites de motor y lubricantes automotrices en México. Castrol, Mobil 1, Shell Helix, Valvoline. Asesoría técnica con IA, compras en línea y envíos seguros.">
+    <meta name="keywords" content="aceite de motor, lubricantes automotrices, castrol, mobil 1, shell helix, valvoline, 5w-30, 0w-20, sintético, alto kilometraje, alfalubes">
+    <link rel="canonical" href="{{ site_url }}{{ request.path }}">
+    {% if google_site_verification %}<meta name="google-site-verification" content="{{ google_site_verification }}">{% endif %}
+
+    <!-- Open Graph / Redes Sociales (Facebook, Instagram, WhatsApp, etc.) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="ALFA LUBES">
+    <meta property="og:title" content="{% block og_title %}ALFA LUBES | Aceites y Lubricantes Automotrices{% endblock %}">
+    <meta property="og:description" content="{% block og_desc %}Protección premium para tu motor con asesoría inteligente y catálogo de aceites 100% originales.{% endblock %}">
+    <meta property="og:image" content="{{ site_url }}{{ url_for('static', filename='images/alfa-lubes-logo.jpg') }}">
+    <meta property="og:url" content="{{ site_url }}{{ request.path }}">
+    <meta property="og:locale" content="es_MX">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ALFA LUBES | Aceites y Lubricantes">
+    <meta name="twitter:description" content="Catálogo y asesoría técnica experta en aceites de motor para tu vehículo.">
+    <meta name="twitter:image" content="{{ site_url }}{{ url_for('static', filename='images/alfa-lubes-logo.jpg') }}">
+
+    <!-- Schema.org JSON-LD para Google Search & SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "AutoPartsStore",
+      "name": "{{ brand_name }}",
+      "url": "{{ site_url }}",
+      "logo": "{{ site_url }}{{ url_for('static', filename='images/alfa-lubes-logo.jpg') }}",
+      "description": "Distribución y venta de aceites y lubricantes automotrices con asesoría técnica especializada.",
+      "email": "{{ contact_email }}",
+      "telephone": "{{ whatsapp_number }}",
+      "sameAs": [
+        "{{ social_facebook }}",
+        "{{ social_instagram }}",
+        "{{ social_tiktok }}",
+        "{{ social_youtube }}",
+        "{{ whatsapp_url }}"
+      ],
+      "priceRange": "$$",
+      "currenciesAccepted": "MXN",
+      "paymentAccepted": "Transferencia, Efectivo, Tarjeta"
+    }
+    </script>
+
+    {% if ga_measurement_id and ga_measurement_id != 'G-XXXXXXXXXX' %}
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_measurement_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ ga_measurement_id }}', {
+        'page_title': document.title,
+        'page_path': window.location.pathname
+      });
+    </script>
+    {% endif %}
+
     <title>{% block title %}ALFA LUBES | Aceites y lubricantes{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -19,10 +77,35 @@
         .card-hover { transition:transform .2s ease,border-color .2s ease; }
         .card-hover:hover { transform:translateY(-3px); border-color:rgba(228,170,36,.6); }
         input,select,textarea { color-scheme:dark; }
+        .social-pill { transition:all .2s ease; }
+        .social-pill:hover { transform:translateY(-2px); filter:brightness(1.15); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
-    <header class="sticky top-0 z-50 bg-white shadow-md">
+
+    <!-- Barra Superior de Contacto y Redes -->
+    <div class="bg-slate-950 border-b border-slate-800 text-xs text-slate-300 py-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center gap-4">
+                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 flex items-center gap-1">
+                    <i class="fa-brands fa-whatsapp text-emerald-400 text-sm"></i> WhatsApp: <span class="font-semibold">{{ whatsapp_number }}</span>
+                </a>
+                <span class="text-slate-600 hidden sm:inline">|</span>
+                <a href="mailto:{{ contact_email }}" class="hover:text-amber-300 hidden sm:flex items-center gap-1">
+                    <i class="fa-solid fa-envelope text-amber-400"></i> {{ contact_email }}
+                </a>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-slate-400 hidden md:inline">Síguenos:</span>
+                <a href="{{ social_facebook }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook ALFA LUBES" class="hover:text-sky-400 text-sm"><i class="fa-brands fa-facebook"></i></a>
+                <a href="{{ social_instagram }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram ALFA LUBES" class="hover:text-pink-400 text-sm"><i class="fa-brands fa-instagram"></i></a>
+                <a href="{{ social_tiktok }}" target="_blank" rel="noopener noreferrer" aria-label="TikTok ALFA LUBES" class="hover:text-slate-100 text-sm"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="{{ social_youtube }}" target="_blank" rel="noopener noreferrer" aria-label="YouTube ALFA LUBES" class="hover:text-red-500 text-sm"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-40 bg-white shadow-md">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between min-h-[76px] items-center gap-4">
                 <a href="{{ url_for('home') }}" aria-label="ALFA LUBES, inicio" class="shrink-0">
@@ -31,29 +114,49 @@
                 <div class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-800">
                     <a href="{{ url_for('home') }}" class="hover:text-sky-700">Inicio</a>
                     <a href="{{ url_for('products') }}" class="hover:text-sky-700">Productos</a>
-                    <a href="{{ url_for('ai_agent') }}" class="hover:text-sky-700">Asesor</a>
-                    {% if session.get('admin_id') %}<a href="{{ url_for('admin_panel') }}" class="hover:text-sky-700">Panel Admin</a>{% endif %}
-                    {% if session.get('admin_id') %}<a href="{{ url_for('admin_logout') }}" class="hover:text-sky-700">Salir ({{ session.get('admin_name') }})</a>{% else %}<a href="{{ url_for('admin_login') }}" class="hover:text-sky-700">Administración</a>{% endif %}
-                    <a href="{{ url_for('cart') }}" class="rounded-full bg-slate-900 text-white px-4 py-2 hover:bg-sky-800">
-                        <i class="fa-solid fa-cart-shopping mr-2"></i>Carrito <span class="ml-1 rounded-full bg-amber-400 text-slate-950 px-2 py-0.5">{{ cart_count }}</span>
+                    <a href="{{ url_for('pallets') }}" class="text-amber-700 hover:text-amber-600 font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-boxes-stacked text-amber-500"></i> Pallets & Mayoreo
+                    </a>
+                    <a href="{{ url_for('ai_agent') }}" class="hover:text-sky-700 flex items-center gap-1.5 text-sky-800">
+                        <i class="fa-solid fa-robot text-amber-500"></i> Asesor IA
+                    </a>
+                    {% if session.get('admin_id') %}
+                        <a href="{{ url_for('admin_panel') }}" class="hover:text-sky-700">Panel Admin</a>
+                        <a href="{{ url_for('admin_logout') }}" class="hover:text-sky-700 text-red-600">Salir ({{ session.get('admin_name') }})</a>
+                    {% else %}
+                        <a href="{{ url_for('admin_login') }}" class="hover:text-sky-700 text-slate-600">Administración</a>
+                    {% endif %}
+                    <a href="{{ url_for('cart') }}" class="rounded-full bg-slate-900 text-white px-4 py-2 hover:bg-sky-800 transition">
+                        <i class="fa-solid fa-cart-shopping mr-2"></i>Carrito <span class="ml-1 rounded-full bg-amber-400 text-slate-950 px-2 py-0.5 font-bold">{{ cart_count }}</span>
                     </a>
                 </div>
                 <button type="button" aria-label="Abrir menú" aria-expanded="false" onclick="const menu=document.getElementById('mobile-menu');menu.classList.toggle('hidden');this.setAttribute('aria-expanded',!menu.classList.contains('hidden'))" class="md:hidden text-slate-900 p-3">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
             </div>
-            <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 py-2 text-slate-800 font-medium">
-                <a href="{{ url_for('home') }}" class="block px-3 py-3">Inicio</a>
-                <a href="{{ url_for('products') }}" class="block px-3 py-3">Productos</a>
-                <a href="{{ url_for('ai_agent') }}" class="block px-3 py-3">Asesor de lubricantes</a>
+            <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 py-3 text-slate-800 font-medium space-y-1">
+                <a href="{{ url_for('home') }}" class="block px-3 py-2 hover:bg-slate-100 rounded">Inicio</a>
+                <a href="{{ url_for('products') }}" class="block px-3 py-2 hover:bg-slate-100 rounded">Productos</a>
+                <a href="{{ url_for('pallets') }}" class="block px-3 py-2 text-amber-600 font-bold hover:bg-slate-100 rounded flex items-center gap-2">
+                    <i class="fa-solid fa-boxes-stacked"></i> Pallets & Mayoreo Importados
+                </a>
+                <a href="{{ url_for('ai_agent') }}" class="block px-3 py-2 text-sky-700 font-bold hover:bg-slate-100 rounded flex items-center gap-2">
+                    <i class="fa-solid fa-robot text-amber-500"></i> Asesor IA de lubricantes
+                </a>
+                <a href="{{ url_for('cart') }}" class="block px-3 py-2 hover:bg-slate-100 rounded">
+                    Carrito ({{ cart_count }})
+                </a>
+                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="block px-3 py-2 text-emerald-600 font-semibold hover:bg-slate-100 rounded flex items-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Asistencia por WhatsApp
+                </a>
                 {% if session.get('admin_id') %}
-                <a href="{{ url_for('admin_panel') }}" class="block px-3 py-3">Panel Admin</a>
-                <a href="{{ url_for('dashboard') }}" class="block px-3 py-3">Ventas</a>
-                <a href="{{ url_for('clients') }}" class="block px-3 py-3">Clientes</a>
-                <a href="{{ url_for('suppliers') }}" class="block px-3 py-3">Proveedores</a>
-                <a href="{{ url_for('admin_logout') }}" class="block px-3 py-3">Salir ({{ session.get('admin_name') }})</a>
+                <a href="{{ url_for('admin_panel') }}" class="block px-3 py-2 hover:bg-slate-100 rounded">Panel Admin</a>
+                <a href="{{ url_for('dashboard') }}" class="block px-3 py-2 hover:bg-slate-100 rounded">Ventas</a>
+                <a href="{{ url_for('clients') }}" class="block px-3 py-2 hover:bg-slate-100 rounded">Clientes</a>
+                <a href="{{ url_for('suppliers') }}" class="block px-3 py-2 hover:bg-slate-100 rounded">Proveedores</a>
+                <a href="{{ url_for('admin_logout') }}" class="block px-3 py-2 text-red-600 hover:bg-slate-100 rounded">Salir ({{ session.get('admin_name') }})</a>
                 {% else %}
-                <a href="{{ url_for('admin_login') }}" class="block px-3 py-3">Administración</a>
+                <a href="{{ url_for('admin_login') }}" class="block px-3 py-2 text-slate-600 hover:bg-slate-100 rounded">Administración</a>
                 {% endif %}
             </div>
         </nav>
@@ -62,19 +165,281 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}<div class="max-w-7xl w-full mx-auto px-4 mt-4" aria-live="polite">
             {% for category, message in messages %}
-                <div class="{{ 'bg-red-950 border-red-800 text-red-100' if category == 'error' else 'bg-emerald-950 border-emerald-800 text-emerald-100' }} border px-4 py-3 rounded-lg mb-2">{{ message }}</div>
+                <div class="{{ 'bg-red-950 border-red-800 text-red-100' if category == 'error' else 'bg-emerald-950 border-emerald-800 text-emerald-100' }} border px-4 py-3 rounded-lg mb-2 text-sm">{{ message }}</div>
             {% endfor %}
         </div>{% endif %}
     {% endwith %}
 
     <main class="flex-1">{% block content %}{% endblock %}</main>
 
-    <footer class="bg-slate-950 border-t border-slate-800 mt-16 py-10">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-5 text-sm text-slate-400">
-            <img src="{{ url_for('static', filename='images/alfa-lubes-logo.jpg') }}" alt="ALFA LUBES" class="w-44 rounded bg-white p-2">
-            <p class="text-center">© {{ current_year }} ALFA LUBES · Aceites y lubricantes para tu camino.</p>
-            <a href="{{ url_for('products') }}" class="hover:text-amber-300">Explorar catálogo <span aria-hidden="true">→</span></a>
+    <!-- Footer Completo ALFA LUBES -->
+    <footer class="bg-slate-950 border-t border-slate-800 mt-20 pt-14 pb-8 text-slate-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+                <!-- Columna 1: Marca -->
+                <div>
+                    <img src="{{ url_for('static', filename='images/alfa-lubes-logo.jpg') }}" alt="ALFA LUBES" class="w-48 rounded bg-white p-2 mb-4">
+                    <p class="text-sm text-slate-400 leading-relaxed mb-4">
+                        Especialistas en lubricación automotriz e industrial en México. Aceites 100% garantizados para la máxima protección y vida útil de tu motor.
+                    </p>
+                    <p class="text-xs text-amber-400 font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-certificate"></i> Distribuidores y Asesoría Técnica
+                    </p>
+                </div>
+
+                <!-- Columna 2: Redes Sociales Oficiales -->
+                <div>
+                    <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-share-nodes text-amber-400"></i> Redes Sociales
+                    </h3>
+                    <p class="text-xs text-slate-400 mb-3">Síguenos para videos, tips de mantenimiento y ofertas:</p>
+                    <div class="space-y-2 text-sm">
+                        <a href="{{ social_facebook }}" target="_blank" rel="noopener noreferrer" class="social-pill flex items-center gap-3 p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-sky-500 hover:text-sky-400">
+                            <i class="fa-brands fa-facebook text-sky-500 text-lg w-5 text-center"></i>
+                            <div>
+                                <div class="font-semibold text-xs text-slate-200">Facebook</div>
+                                <div class="text-[11px] text-slate-400">@alfalubes</div>
+                            </div>
+                        </a>
+                        <a href="{{ social_instagram }}" target="_blank" rel="noopener noreferrer" class="social-pill flex items-center gap-3 p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-pink-500 hover:text-pink-400">
+                            <i class="fa-brands fa-instagram text-pink-500 text-lg w-5 text-center"></i>
+                            <div>
+                                <div class="font-semibold text-xs text-slate-200">Instagram</div>
+                                <div class="text-[11px] text-slate-400">@alfalubes</div>
+                            </div>
+                        </a>
+                        <a href="{{ social_tiktok }}" target="_blank" rel="noopener noreferrer" class="social-pill flex items-center gap-3 p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-400 hover:text-white">
+                            <i class="fa-brands fa-tiktok text-white text-lg w-5 text-center"></i>
+                            <div>
+                                <div class="font-semibold text-xs text-slate-200">TikTok</div>
+                                <div class="text-[11px] text-slate-400">@alfalubes</div>
+                            </div>
+                        </a>
+                        <a href="{{ social_youtube }}" target="_blank" rel="noopener noreferrer" class="social-pill flex items-center gap-3 p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-red-500 hover:text-red-400">
+                            <i class="fa-brands fa-youtube text-red-500 text-lg w-5 text-center"></i>
+                            <div>
+                                <div class="font-semibold text-xs text-slate-200">YouTube</div>
+                                <div class="text-[11px] text-slate-400">@alfalubes</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Columna 3: Correos Propios y WhatsApp -->
+                <div>
+                    <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-headset text-amber-400"></i> Contacto Oficial
+                    </h3>
+                    <p class="text-xs text-slate-400 mb-3">Correos institucionales de la marca alfalubes.com:</p>
+                    <ul class="space-y-2.5 text-xs text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-envelope text-amber-400 mt-0.5"></i>
+                            <div>
+                                <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Atención General:</span>
+                                <a href="mailto:{{ contact_email }}" class="hover:text-amber-300 font-medium">{{ contact_email }}</a>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-file-invoice-dollar text-emerald-400 mt-0.5"></i>
+                            <div>
+                                <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Ventas y Pedidos:</span>
+                                <a href="mailto:{{ sales_email }}" class="hover:text-emerald-300 font-medium">{{ sales_email }}</a>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-screwdriver-wrench text-sky-400 mt-0.5"></i>
+                            <div>
+                                <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Soporte Técnico:</span>
+                                <a href="mailto:{{ support_email }}" class="hover:text-sky-300 font-medium">{{ support_email }}</a>
+                            </div>
+                        </li>
+                        <li class="pt-2">
+                            <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition">
+                                <i class="fa-brands fa-whatsapp text-sm"></i> Chatear por WhatsApp
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Columna 4: Enlaces Rápidos y Asesor IA -->
+                <div>
+                    <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-compass text-amber-400"></i> Navegación
+                    </h3>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li><a href="{{ url_for('home') }}" class="hover:text-amber-300 transition">Inicio</a></li>
+                        <li><a href="{{ url_for('products') }}" class="hover:text-amber-300 transition">Catálogo de Aceites</a></li>
+                        <li><a href="{{ url_for('ai_agent') }}" class="hover:text-amber-300 text-sky-300 transition font-medium flex items-center gap-1.5"><i class="fa-solid fa-robot text-amber-400 text-xs"></i> Asesor IA Autónomo</a></li>
+                        <li><a href="{{ url_for('cart') }}" class="hover:text-amber-300 transition">Ver Carrito de Compra</a></li>
+                        <li><a href="{{ url_for('admin_login') }}" class="hover:text-amber-300 text-xs text-slate-500 transition">Acceso Administrador</a></li>
+                    </ul>
+                    <div class="mt-4 p-3 rounded-lg bg-slate-900 border border-slate-800">
+                        <p class="text-[11px] text-slate-400 leading-snug">
+                            ¿Dudas sobre la viscosidad adecuada? Consulta con nuestro <strong class="text-slate-200">Asesor IA</strong> disponible 24/7.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+                <p>© {{ current_year }} {{ brand_name }} (alfalubes.com) · Todos los derechos reservados.</p>
+                <div class="flex items-center gap-4">
+                    <a href="{{ url_for('robots_txt') }}" class="hover:text-slate-400">robots.txt</a>
+                    <a href="{{ url_for('sitemap_xml') }}" class="hover:text-slate-400">sitemap.xml</a>
+                    <a href="{{ url_for('products') }}" class="hover:text-amber-400">Explorar Catálogo →</a>
+                </div>
+            </div>
         </div>
     </footer>
+
+    <!-- Botones Flotantes: WhatsApp y Asesor IA -->
+    <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+        <!-- Botón flotante WhatsApp -->
+        <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-xl flex items-center justify-center text-2xl transition transform hover:scale-110">
+            <i class="fa-brands fa-whatsapp"></i>
+        </a>
+
+        <!-- Botón para abrir el Widget Flotante del Asesor IA -->
+        <button id="ai-widget-toggle" type="button" aria-label="Abrir Asesor IA ALFA LUBES" class="px-4 py-3 rounded-full bg-gold text-slate-950 font-bold shadow-xl flex items-center gap-2 hover:brightness-110 transition transform hover:scale-105 border border-amber-300">
+            <i class="fa-solid fa-robot text-lg"></i>
+            <span class="text-xs hidden sm:inline">Asesor IA</span>
+        </button>
+    </div>
+
+    <!-- Modal / Ventana Emergente del Widget de IA Flotante -->
+    <div id="ai-widget-modal" class="hidden fixed bottom-24 right-4 sm:right-6 z-50 w-[94vw] sm:w-[420px] h-[520px] max-h-[80vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        <!-- Header Widget -->
+        <div class="bg-slate-950 border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center text-gold text-xs">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-white leading-tight">Asesor ALFA LUBES</h4>
+                    <p class="text-[10px] text-emerald-400 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> IA autónoma en línea
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ url_for('ai_agent') }}" title="Abrir en pantalla completa" class="text-slate-400 hover:text-white text-xs p-1">
+                    <i class="fa-solid fa-expand"></i>
+                </a>
+                <button id="ai-widget-close" type="button" aria-label="Cerrar chat" class="text-slate-400 hover:text-white text-base p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mensajes del Widget -->
+        <div id="widget-messages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
+            <div class="flex gap-2">
+                <div class="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center text-gold text-[10px] shrink-0 mt-0.5">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="bg-slate-800 text-slate-200 rounded-2xl rounded-tl-none p-3 max-w-[85%] whitespace-pre-line leading-relaxed">
+                    ¡Hola! Soy tu Asesor IA de <strong>ALFA LUBES</strong>. ¿Qué vehículo tienes o qué aceite buscas hoy?
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Widget -->
+        <div class="p-3 bg-slate-950 border-t border-slate-800">
+            <form id="widget-form" class="flex gap-2">
+                <input id="widget-input" type="text" placeholder="Escribe tu consulta sobre aceites..." class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold" autocomplete="off">
+                <button type="submit" class="bg-gold text-slate-950 px-3.5 py-2 rounded-xl font-bold text-xs hover:brightness-110 transition">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+            <div class="flex justify-between items-center mt-2 text-[10px] text-slate-500">
+                <span>Respaldo oficial alfalubes.com</span>
+                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:underline flex items-center gap-1">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script del Widget Flotante de IA -->
+    <script>
+    (function(){
+        const toggleBtn = document.getElementById('ai-widget-toggle');
+        const closeBtn = document.getElementById('ai-widget-close');
+        const modal = document.getElementById('ai-widget-modal');
+        const form = document.getElementById('widget-form');
+        const input = document.getElementById('widget-input');
+        const messagesBox = document.getElementById('widget-messages');
+        let widgetHistory = [];
+
+        if (toggleBtn && modal) {
+            toggleBtn.addEventListener('click', () => {
+                modal.classList.toggle('hidden');
+                if (!modal.classList.contains('hidden') && input) {
+                    input.focus();
+                }
+            });
+        }
+        if (closeBtn && modal) {
+            closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+        }
+
+        function appendWidgetMsg(text, isUser) {
+            const wrap = document.createElement('div');
+            wrap.className = 'flex gap-2' + (isUser ? ' justify-end' : '');
+            const avatar = isUser
+                ? '<div class="w-6 h-6 rounded-full bg-sky-500/20 flex items-center justify-center text-sky-400 text-[10px] shrink-0 mt-0.5 order-2"><i class="fa-solid fa-user"></i></div>'
+                : '<div class="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center text-gold text-[10px] shrink-0 mt-0.5"><i class="fa-solid fa-robot"></i></div>';
+            const bubble = `<div class="${isUser ? 'bg-sky-600 text-white rounded-2xl rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-2xl rounded-tl-none'} p-3 max-w-[85%] whitespace-pre-line leading-relaxed">${text}</div>`;
+            wrap.innerHTML = avatar + bubble;
+            messagesBox.appendChild(wrap);
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+
+        function showWidgetTyping() {
+            const el = document.createElement('div');
+            el.id = 'widget-typing';
+            el.className = 'flex gap-2';
+            el.innerHTML = '<div class="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center text-gold text-[10px] shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-slate-800 text-slate-400 rounded-2xl rounded-tl-none px-3 py-2 text-xs"><span class="animate-pulse">Escribiendo respuesta...</span></div>';
+            messagesBox.appendChild(el);
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+
+        function removeWidgetTyping() {
+            const el = document.getElementById('widget-typing');
+            if (el) el.remove();
+        }
+
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const q = input.value.trim();
+                if (!q) return;
+                appendWidgetMsg(q, true);
+                widgetHistory.push({role: 'user', content: q});
+                input.value = '';
+                showWidgetTyping();
+                try {
+                    const res = await fetch('{{ url_for("ai_chat") }}', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({message: q, history: widgetHistory})
+                    });
+                    const data = await res.json();
+                    removeWidgetTyping();
+                    if (data.reply) {
+                        appendWidgetMsg(data.reply, false);
+                        widgetHistory.push({role: 'assistant', content: data.reply});
+                    } else {
+                        appendWidgetMsg('Disculpa, ocurrió un error temporal. Puedes contactarnos por WhatsApp o a {{ contact_email }}.', false);
+                    }
+                } catch(err) {
+                    removeWidgetTyping();
+                    appendWidgetMsg('No se pudo conectar con el servidor. Por favor contáctanos por WhatsApp al {{ whatsapp_number }}.', false);
+                }
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

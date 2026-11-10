@@ -1,58 +1,89 @@
 {% extends "base.html" %}
-{% block title %}Asesor ALFA LUBES | Chat de IA{% endblock %}
+{% block title %}Asesor ALFA LUBES | Asistencia Técnica Inteligente{% endblock %}
 {% block content %}
 <section class="py-6 sm:py-10">
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
     <div class="text-center mb-6">
-      <p class="gold tracking-widest text-sm font-bold mb-2">ASESOR ALFA</p>
-      <h1 class="text-3xl sm:text-4xl font-bold mb-2">Chat de asesoría automotriz y lubricantes</h1>
-      <p class="text-slate-400 max-w-2xl mx-auto text-sm">Resuelve tus dudas sobre aceites, viscosidades, compatibilidad y mantenimiento. Te guío hasta el producto ideal y el cierre de tu compra.</p>
+      <p class="gold tracking-widest text-xs sm:text-sm font-bold mb-2 uppercase flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-microchip"></i> ASESOR AUTÓNOMO ALFA LUBES
+      </p>
+      <h1 class="text-3xl sm:text-4xl font-bold mb-2">Asesoría de Lubricación y Aceites</h1>
+      <p class="text-slate-400 max-w-2xl mx-auto text-sm">Resuelve dudas sobre viscosidades SAE, compatibilidad OEM, sintético vs mineral y catálogo disponible. Te asistimos en tiempo real hasta el producto ideal.</p>
     </div>
 
     <div class="grid lg:grid-cols-4 gap-4">
-      <!-- Sidebar de sugerencias -->
-      <aside class="hidden lg:block bg-slate-900/60 border border-slate-800 rounded-2xl p-4 h-fit">
-        <h3 class="font-bold text-sm mb-3 text-slate-200">Preguntas frecuentes</h3>
-        <ul class="space-y-2 text-xs text-slate-400">
-          <li><button class="quick-btn w-full text-left hover:text-gold transition" data-q="¿Qué aceite uso para mi auto?">¿Qué aceite uso para mi auto?</button></li>
-          <li><button class="quick-btn w-full text-left hover:text-gold transition" data-q="Diferencia entre 5W-30 y 10W-40">Diferencia 5W-30 vs 10W-40</button></li>
-          <li><button class="quick-btn w-full text-left hover:text-gold transition" data-q="¿Cada cuánto cambio el aceite?">¿Cada cuánto cambio el aceite?</button></li>
-          <li><button class="quick-btn w-full text-left hover:text-gold transition" data-q="Aceite sintético vs mineral">Sintético vs mineral</button></li>
-          <li><button class="quick-btn w-full text-left hover:text-gold transition" data-q="¿Qué es la viscosidad?">¿Qué es la viscosidad?</button></li>
-          <li><button class="quick-btn w-full text-left hover:text-gold transition" data-q="Aceite para motor con alto kilometraje">Alto kilometraje</button></li>
-          <li><button class="quick-btn w-full text-left hover:text-gold transition" data-q="¿Tienen envío a domicilio?">¿Tienen envío a domicilio?</button></li>
-          <li><button class="quick-btn w-full text-left hover:text-gold transition" data-q="¿Cómo compro?">¿Cómo compro?</button></li>
-        </ul>
-        <div class="mt-4 pt-4 border-t border-slate-800">
-          <a href="{{ url_for('products') }}" class="block text-center bg-gold text-slate-950 py-2 rounded-lg font-bold text-xs">Ver catálogo</a>
+      <!-- Sidebar de sugerencias y canales -->
+      <aside class="hidden lg:block bg-slate-900/70 border border-slate-800 rounded-2xl p-4 h-fit space-y-4">
+        <div>
+          <h3 class="font-bold text-xs uppercase tracking-wider mb-3 text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-gold"></i> Preguntas Frecuentes
+          </h3>
+          <ul class="space-y-1.5 text-xs text-slate-400">
+            <li><button class="quick-btn w-full text-left p-2 rounded-lg hover:bg-slate-800 hover:text-gold transition" data-q="¿Qué aceite uso para mi vehículo?">¿Qué aceite uso para mi vehículo?</button></li>
+            <li><button class="quick-btn w-full text-left p-2 rounded-lg hover:bg-slate-800 hover:text-gold transition" data-q="Diferencia entre 5W-30 y 10W-40">Diferencia 5W-30 vs 10W-40</button></li>
+            <li><button class="quick-btn w-full text-left p-2 rounded-lg hover:bg-slate-800 hover:text-gold transition" data-q="Aceite sintético vs mineral">Sintético vs mineral</button></li>
+            <li><button class="quick-btn w-full text-left p-2 rounded-lg hover:bg-slate-800 hover:text-gold transition" data-q="¿Qué aceites Castrol y Mobil 1 tienen disponibles?">Castrol y Mobil 1 disponibles</button></li>
+            <li><button class="quick-btn w-full text-left p-2 rounded-lg hover:bg-slate-800 hover:text-gold transition text-amber-300 font-semibold" data-q="¿Qué precio tienen los pallets de aceites importados?">📦 Venta por Pallets Importados</button></li>
+            <li><button class="quick-btn w-full text-left p-2 rounded-lg hover:bg-slate-800 hover:text-gold transition" data-q="¿Cuáles son sus redes sociales y videos?">Redes sociales y videos</button></li>
+            <li><button class="quick-btn w-full text-left p-2 rounded-lg hover:bg-slate-800 hover:text-gold transition" data-q="¿Cómo compro y cuáles son los correos oficiales?">Correos oficiales y compra</button></li>
+          </ul>
+        </div>
+
+        <div class="pt-4 border-t border-slate-800 space-y-2">
+          <a href="{{ url_for('pallets') }}" class="block text-center bg-amber-500 hover:bg-amber-400 text-slate-950 py-2.5 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow">
+            <i class="fa-solid fa-boxes-stacked"></i> Ver Tarimas y Pallets
+          </a>
+          <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="block text-center bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 shadow">
+            <i class="fa-brands fa-whatsapp text-sm"></i> Chatear por WhatsApp
+          </a>
+          <a href="{{ url_for('products') }}" class="block text-center bg-gold text-slate-950 py-2.5 rounded-xl font-bold text-xs hover:brightness-110 transition">
+            Ver catálogo completo
+          </a>
         </div>
       </aside>
 
       <!-- Chat principal -->
-      <div class="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col h-[70vh] min-h-[500px]">
-        <div class="flex items-center gap-3 px-5 py-4 border-b border-slate-800">
-          <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold"><i class="fa-solid fa-robot"></i></div>
-          <div>
-            <p class="font-bold text-sm">Asesor ALFA</p>
-            <p class="text-xs text-emerald-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>En línea · Especialista en lubricantes</p>
+      <div class="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col h-[72vh] min-h-[520px]">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800 bg-slate-950/40 rounded-t-2xl">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold"><i class="fa-solid fa-robot text-lg"></i></div>
+            <div>
+              <p class="font-bold text-sm text-white">Asesor IA ALFA LUBES</p>
+              <p class="text-xs text-emerald-400 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Respuesta autónoma en tiempo real
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="text-xs text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 bg-emerald-950/60 border border-emerald-800/80 px-3 py-1.5 rounded-lg">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp
+            </a>
           </div>
         </div>
 
         <div id="chat-messages" class="flex-1 overflow-y-auto p-5 space-y-4">
           <div class="flex gap-3">
             <div class="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center text-gold text-xs shrink-0"><i class="fa-solid fa-robot"></i></div>
-            <div class="bg-slate-800 rounded-2xl rounded-tl-none px-4 py-3 max-w-[85%] text-sm text-slate-200">
-              ¡Hola! Soy tu asesor ALFA LUBES. Estoy aquí para ayudarte a elegir el aceite ideal para tu vehículo, resolver dudas sobre viscosidades, mantenimiento y llevarte al mejor producto. ¿Cuál es tu vehículo y qué necesitas?
+            <div class="bg-slate-800 rounded-2xl rounded-tl-none px-4 py-3 max-w-[85%] text-sm text-slate-200 leading-relaxed">
+              ¡Hola! Soy tu <strong>Asesor Técnico ALFA LUBES</strong>.<br><br>
+              Puedo responderte de manera autónoma sobre viscosidades (0W-20, 5W-30, 10W-40, etc.), sintéticos vs minerales, catálogo disponible, precios en México o contacto oficial.<br><br>
+              ¿Qué auto tienes (marca, modelo, año y kilometraje) o sobre qué producto deseas consultar?
             </div>
           </div>
         </div>
 
-        <div class="px-5 py-4 border-t border-slate-800">
+        <div class="px-5 py-4 border-t border-slate-800 bg-slate-950/30 rounded-b-2xl">
           <form id="chat-form" class="flex gap-2">
-            <input id="chat-input" type="text" placeholder="Escribe tu pregunta..." class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold" autocomplete="off">
-            <button type="submit" class="bg-gold text-slate-950 px-5 py-3 rounded-xl font-bold text-sm hover:opacity-90 transition"><i class="fa-solid fa-paper-plane"></i></button>
+            <input id="chat-input" type="text" placeholder="Ej: ¿Qué aceite le pongo a un Corolla 2018 con 90,000 km?" class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-gold" autocomplete="off">
+            <button type="submit" class="bg-gold text-slate-950 px-5 py-3 rounded-xl font-bold text-sm hover:brightness-110 transition flex items-center gap-2">
+              <span>Enviar</span>
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
           </form>
-          <p class="text-[10px] text-slate-500 mt-2 text-center">El asesor orienta con base en especificaciones generales. Verifica siempre el manual del fabricante.</p>
+          <div class="flex flex-wrap justify-between items-center text-[10px] text-slate-500 mt-2">
+            <span>Orientación basada en especificaciones generales. Verifica siempre el manual OEM de tu vehículo.</span>
+            <span>Dominio oficial: alfalubes.com</span>
+          </div>
         </div>
       </div>
     </div>
@@ -66,24 +97,46 @@ const chatInput = document.getElementById('chat-input');
 
 let history = [];
 
+function formatMarkdown(text) {
+  if (!text) return '';
+  // Escapar HTML básico
+  let escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // Reemplazar enlaces Markdown [texto](url)
+  escaped = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-amber-400 font-semibold underline hover:text-amber-300">$1</a>');
+
+  // Negritas **texto**
+  escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+  // Viñetas simples
+  escaped = escaped.replace(/^\s*-\s+(.+)$/gm, '• $1');
+
+  return escaped;
+}
+
 function addMessage(text, isUser) {
   const wrapper = document.createElement('div');
   wrapper.className = 'flex gap-3' + (isUser ? ' justify-end' : '');
   const avatar = isUser
     ? '<div class="w-8 h-8 rounded-full bg-sky-500/20 flex items-center justify-center text-sky-400 text-xs shrink-0 order-2"><i class="fa-solid fa-user"></i></div>'
     : '<div class="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center text-gold text-xs shrink-0"><i class="fa-solid fa-robot"></i></div>';
-  const bubble = `<div class="${isUser ? 'bg-sky-600 text-white rounded-2xl rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-2xl rounded-tl-none'} px-4 py-3 max-w-[85%] text-sm whitespace-pre-line">${text}</div>`;
+  const formattedContent = isUser ? text : formatMarkdown(text);
+  const bubble = `<div class="${isUser ? 'bg-sky-600 text-white rounded-2xl rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-2xl rounded-tl-none'} px-4 py-3 max-w-[85%] text-sm whitespace-pre-line leading-relaxed">${formattedContent}</div>`;
   wrapper.innerHTML = avatar + bubble;
   chatMessages.appendChild(wrapper);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 function addSourceBadge(source) {
-  const label = source === 'meai' ? 'IA real (meai)' : 'Respuesta local';
-  const color = source === 'meai' ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30' : 'text-slate-400 bg-slate-700 border-slate-700/30';
+  const isMeai = source === 'meai';
+  const label = isMeai ? 'IA meai (en línea)' : 'IA autónoma ALFA (local)';
+  const color = isMeai ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30' : 'text-amber-400 bg-amber-400/10 border-amber-400/30';
   const el = document.createElement('div');
   el.className = 'flex gap-3';
-  el.innerHTML = '<div class="w-8 h-8 shrink-0"></div><div class="flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider ' + color + '"><span class="w-1.5 h-1.5 rounded-full ' + (source === 'meai' ? 'bg-emerald-400' : 'bg-slate-400') + '"></span>' + label + '</div>';
+  el.innerHTML = '<div class="w-8 h-8 shrink-0"></div><div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider ' + color + '"><span class="w-1.5 h-1.5 rounded-full ' + (isMeai ? 'bg-emerald-400' : 'bg-amber-400') + '"></span>' + label + '</div>';
   chatMessages.appendChild(el);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
@@ -92,7 +145,7 @@ function showTyping() {
   const el = document.createElement('div');
   el.id = 'typing';
   el.className = 'flex gap-3';
-  el.innerHTML = '<div class="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center text-gold text-xs shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-slate-800 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-slate-400"><span class="animate-pulse">Escribiendo...</span></div>';
+  el.innerHTML = '<div class="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center text-gold text-xs shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-slate-800 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-slate-400"><span class="animate-pulse">Consultando especificaciones...</span></div>';
   chatMessages.appendChild(el);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
@@ -123,13 +176,13 @@ async function sendMessage(text) {
     if (data.suggest_product) {
       const link = document.createElement('div');
       link.className = 'flex gap-3';
-      link.innerHTML = '<div class="w-8 h-8 shrink-0"></div><a href="{{ url_for("products") }}" class="inline-block bg-gold text-slate-950 px-4 py-2 rounded-lg font-bold text-xs hover:opacity-90 transition">Ver productos recomendados →</a>';
+      link.innerHTML = '<div class="w-8 h-8 shrink-0"></div><a href="{{ url_for("products") }}" class="inline-flex items-center gap-2 bg-gold text-slate-950 px-4 py-2 rounded-xl font-bold text-xs hover:brightness-110 transition shadow"><i class="fa-solid fa-cart-shopping"></i> Ver catálogo de productos →</a>';
       chatMessages.appendChild(link);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   } catch (e) {
     removeTyping();
-    addMessage('Lo siento, hubo un error. Intenta de nuevo.', false);
+    addMessage('Ocurrió un error al procesar tu mensaje. Puedes escribirnos por WhatsApp al {{ whatsapp_number }} o al correo {{ contact_email }}.', false);
   }
 }
 

@@ -1,23 +1,33 @@
 {% extends "base.html" %}
-{% block title %}ALFA LUBES | Aceites y lubricantes{% endblock %}
+{% block title %}ALFA LUBES | Aceites y lubricantes para tu vehículo{% endblock %}
 {% block content %}
 <section class="relative min-h-[570px] lg:min-h-[680px] flex items-center overflow-hidden">
-    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Selección de aceites para motor" class="absolute inset-0 w-full h-full object-cover">
+    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Selección de aceites para motor ALFA LUBES" class="absolute inset-0 w-full h-full object-cover">
     <div class="hero-overlay absolute inset-0"></div>
     <div class="relative z-10 max-w-7xl mx-auto w-full px-6 py-20">
         <div class="max-w-2xl">
-            <p class="gold tracking-[.22em] text-xs sm:text-sm font-bold mb-5">PROTECCIÓN PARA CADA CAMINO</p>
+            <p class="gold tracking-[.22em] text-xs sm:text-sm font-bold mb-5 flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved"></i> PROTECCIÓN PARA CADA CAMINO
+            </p>
             <h1 class="text-5xl md:text-7xl font-extrabold leading-[1.03] mb-6">El cuidado de tu motor empieza <span class="text-sky-400">aquí.</span></h1>
-            <p class="text-lg sm:text-xl text-slate-200 max-w-xl mb-8">Encuentra aceites y lubricantes de marcas reconocidas. Compra en línea o recibe orientación para elegir la viscosidad indicada por el fabricante.</p>
-            <div class="flex flex-wrap gap-4">
-                <a href="{{ url_for('products') }}" class="bg-gold text-slate-950 px-7 py-4 rounded-lg font-bold hover:brightness-110">Ver catálogo</a>
-                <a href="{{ url_for('ai_agent') }}" class="border border-white/70 px-7 py-4 rounded-lg font-bold hover:bg-white/10">Asesor de lubricantes</a>
+            <p class="text-lg sm:text-xl text-slate-200 max-w-xl mb-8">Encuentra aceites y lubricantes originales de marcas líderes. Consulta a nuestro <strong>Asesor IA autónomo</strong> o comunícate vía WhatsApp para elegir la viscosidad aprobada por tu fabricante.</p>
+            <div class="flex flex-wrap gap-4 items-center">
+                <a href="{{ url_for('products') }}" class="bg-gold text-slate-950 px-7 py-4 rounded-xl font-bold hover:brightness-110 shadow-lg transition">Ver catálogo</a>
+                <a href="{{ url_for('ai_agent') }}" class="border border-amber-400/80 bg-slate-900/60 px-7 py-4 rounded-xl font-bold hover:bg-amber-400/10 text-white flex items-center gap-2 transition">
+                    <i class="fa-solid fa-robot text-gold"></i> Asesor IA de lubricantes
+                </a>
+                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-4 rounded-xl font-bold flex items-center gap-2 shadow-lg transition">
+                    <i class="fa-brands fa-whatsapp text-xl"></i> WhatsApp
+                </a>
             </div>
-            <p class="mt-7 text-sm text-slate-300"><i class="fa-solid fa-truck-fast text-sky-300 mr-2"></i>Atención para clientes particulares, talleres y flotillas.</p>
+            <p class="mt-7 text-sm text-slate-300 flex items-center gap-2">
+                <i class="fa-solid fa-truck-fast text-sky-300"></i> Envíos a todo México para clientes particulares, talleres y flotillas.
+            </p>
         </div>
     </div>
 </section>
 
+<!-- Beneficios ALFA LUBES -->
 <section class="py-16 sm:py-20">
     <div class="max-w-7xl mx-auto px-6">
         <div class="max-w-2xl mb-10">
@@ -26,10 +36,10 @@
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {% for icon, title, text in [
-                ('fa-oil-can','Marcas reconocidas','Opciones para distintos motores, usos y presupuestos.'),
-                ('fa-boxes-stacked','Inventario visible','Consulta existencias antes de agregar productos al carrito.'),
-                ('fa-clipboard-check','Pedido claro','Revisa tus productos y datos antes de enviar el pedido.'),
-                ('fa-headset','Atención personal','Coordinamos contigo el pago y la entrega de tu compra.')
+                ('fa-oil-can','Marcas originales','Castrol, Mobil 1, Shell, Valvoline y opciones para cada requerimiento técnico.'),
+                ('fa-robot','Asesor IA autónomo','Resuelve al instante qué viscosidad y especificación requiere tu vehículo 24/7.'),
+                ('fa-boxes-stacked','Inventario visible','Consulta existencias y precios transparentes en pesos mexicanos.'),
+                ('fa-headset','Atención institucional','Atención por WhatsApp y correos oficiales @alfalubes.com para compras y facturación.')
             ] %}
             <article class="bg-slate-900 p-6 rounded-2xl border border-slate-800 card-hover">
                 <i class="fa-solid {{ icon }} text-2xl text-sky-400 mb-4"></i>
@@ -41,24 +51,203 @@
     </div>
 </section>
 
-<section class="py-16 bg-slate-900/50">
+<!-- Catálogo Destacado -->
+<section class="py-16 bg-slate-900/50 border-y border-slate-800/80">
     <div class="max-w-7xl mx-auto px-6">
         <div class="flex justify-between items-end gap-4 mb-8">
-            <div><p class="gold text-sm font-bold tracking-widest mb-2">SELECCIÓN ALFA</p><h2 class="text-3xl font-bold">Productos destacados</h2></div>
-            <a href="{{ url_for('products') }}" class="text-sky-300 hover:underline">Ver catálogo →</a>
+            <div>
+                <p class="gold text-sm font-bold tracking-widest mb-2">SELECCIÓN ALFA</p>
+                <h2 class="text-3xl font-bold">Productos destacados</h2>
+            </div>
+            <a href="{{ url_for('products') }}" class="text-sky-300 hover:underline font-semibold flex items-center gap-1">Ver catálogo completo <span aria-hidden="true">→</span></a>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {% for p in products %}
-            <article class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 card-hover">
-                <div class="h-56 bg-white flex items-center justify-center p-5"><img src="{{ url_for('static', filename='images/' + p.image) }}" alt="{{ p.name }}" class="h-full w-full object-contain" loading="lazy"></div>
-                <div class="p-5">
-                    <p class="text-xs text-sky-300 font-bold tracking-wider">{{ p.brand }} · {{ p.viscosity }}</p>
-                    <h3 class="font-bold mt-2 min-h-12">{{ p.name }}</h3>
-                    <p class="text-xl font-bold gold mt-3">{{ p.price|mxn }}</p>
-                    <form action="{{ url_for('add_to_cart', pid=p.id) }}" method="post"><button class="mt-4 w-full bg-gold text-slate-950 py-2.5 rounded-lg font-bold hover:brightness-110">Agregar al carrito</button></form>
+            <article class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 card-hover flex flex-col justify-between">
+                <div>
+                    <div class="h-56 bg-white flex items-center justify-center p-5">
+                        <img src="{{ url_for('static', filename='images/' + p.image) }}" alt="{{ p.name }}" class="h-full w-full object-contain" loading="lazy">
+                    </div>
+                    <div class="p-5">
+                        <p class="text-xs text-sky-300 font-bold tracking-wider uppercase">{{ p.brand }} · {{ p.viscosity }}</p>
+                        <h3 class="font-bold mt-2 text-base text-white min-h-[48px]">{{ p.name }}</h3>
+                        <p class="text-xs text-slate-400 line-clamp-2 mt-1">{{ p.description }}</p>
+                        <p class="text-xl font-bold gold mt-3">{{ p.price|mxn }}</p>
+                    </div>
+                </div>
+                <div class="p-5 pt-0">
+                    <form action="{{ url_for('add_to_cart', pid=p.id) }}" method="post">
+                        <button class="w-full bg-gold text-slate-950 py-2.5 rounded-xl font-bold hover:brightness-110 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                    </form>
                 </div>
             </article>
-            {% else %}<p class="text-slate-400">Pronto agregaremos productos al catálogo.</p>{% endfor %}
+            {% else %}
+            <p class="text-slate-400 col-span-4">Pronto agregaremos más productos al catálogo.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- SECCIÓN DESTACADA: LOS MEJORES ACEITES IMPORTADOS (VENTA POR PALLETS) -->
+<section class="py-16 sm:py-24 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-amber-500/20 relative overflow-hidden">
+    <!-- Luz de fondo decorativa -->
+    <div class="absolute -top-40 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 left-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+        <!-- Encabezado Llamativo -->
+        <div class="text-center max-w-3xl mx-auto mb-14">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-300 text-xs font-black uppercase tracking-widest mb-4 shadow-lg">
+                <i class="fa-solid fa-plane-arrival"></i> IMPORTACIÓN DIRECTA DE ALTA GAMA
+            </div>
+            <h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight mb-4 tracking-tight">
+                LOS MEJORES ACEITES <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">IMPORTADOS</span>
+            </h2>
+            <p class="text-lg sm:text-xl font-bold text-amber-400 mb-3">Venta Directa por Pallets y Tarimas para Talleres y Mayoristas</p>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                Adquiere cajas cerradas y tarimas completas selladas de fábrica. Fluidos sintéticos para transmisiones DCT/DSG, aceites de motor premium de grado internacional y tambores con precios preferenciales de importador directo.
+            </p>
+        </div>
+
+        <!-- Grid de Fotos y Ofertas de Pallets -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+            {% for pallet in pallets[:3] %}
+            <article class="bg-slate-900/90 rounded-3xl overflow-hidden border border-slate-800 card-hover flex flex-col justify-between shadow-2xl backdrop-blur">
+                <div>
+                    <!-- Foto del Pallet de Aceite Importado -->
+                    <div class="relative h-64 bg-slate-950 overflow-hidden group">
+                        <img src="{{ url_for('static', filename='images/' + pallet.image) }}" alt="{{ pallet.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-3 left-3">
+                            <span class="bg-amber-500 text-slate-950 text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
+                                <i class="fa-solid fa-plane-arrival mr-1"></i> {{ pallet.origin }}
+                            </span>
+                        </div>
+                        <div class="absolute bottom-3 right-3 bg-slate-950/90 border border-slate-700/80 px-2.5 py-1 rounded-lg text-xs text-slate-200 font-semibold">
+                            {{ pallet.units_per_pallet }} piezas por tarima
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="flex items-center justify-between text-xs mb-2">
+                            <span class="font-bold text-sky-400 uppercase tracking-wider">{{ pallet.brand }} · {{ pallet.viscosity }}</span>
+                            <span class="text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded text-[11px]">Tarima Lista</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 leading-snug">{{ pallet.title }}</h3>
+                        <p class="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">{{ pallet.description }}</p>
+
+                        <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 flex justify-between items-center">
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Por tarima:</span>
+                                <span class="text-xl font-black gold">{{ pallet.pallet_price|mxn }}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Costo unitario:</span>
+                                <span class="text-sm font-bold text-white">{{ pallet.unit_price_approx|mxn }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 pt-0">
+                    <a href="https://wa.me/{{ whatsapp_number|replace('+','')|replace(' ','') }}?text=Hola%20ALFA%20LUBES,%20me%20interesa%20cotizar%20el%20pallet%20de%20{{ pallet.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fa-brands fa-whatsapp text-base"></i> Cotizar Tarima por WhatsApp
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        <!-- Botones de Acción al pie de la sección -->
+        <div class="mt-12 text-center flex flex-wrap justify-center items-center gap-4">
+            <a href="{{ url_for('pallets') }}" class="bg-gold text-slate-950 px-8 py-4 rounded-xl font-bold text-sm hover:brightness-110 shadow-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-boxes-stacked"></i> Ver Todas las Tarimas y Pallets de Aceites Importados
+            </a>
+            <a href="mailto:{{ sales_email }}?subject=Lista%20de%20Precios%20Pallets%20Importados" class="border border-slate-700 bg-slate-900 text-slate-200 px-7 py-4 rounded-xl font-bold text-sm hover:bg-slate-800 transition">
+                <i class="fa-solid fa-envelope text-amber-400 mr-1.5"></i> Contactar a Ventas Mayoristas
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- SECCIÓN: Redes Sociales y Comunidad ALFA LUBES -->
+<section class="py-16 sm:py-20 bg-slate-950">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <p class="gold text-sm font-bold tracking-widest mb-2 uppercase">COMUNIDAD & REDES SOCIALES</p>
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-3">Encuéntranos en todas nuestras plataformas</h2>
+            <p class="text-slate-400 text-sm">Aprende sobre cuidado del motor, tutoriales de cambio de aceite, mitos de lubricación y entérate de nuestras ofertas exclusivas.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- TikTok -->
+            <a href="{{ social_tiktok }}" target="_blank" rel="noopener noreferrer" class="group bg-slate-900 border border-slate-800 hover:border-slate-400 p-6 rounded-2xl transition transform hover:-translate-y-1 block">
+                <div class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-white text-2xl mb-4 group-hover:scale-110 transition">
+                    <i class="fa-brands fa-tiktok"></i>
+                </div>
+                <h3 class="font-bold text-lg text-white mb-1">TikTok</h3>
+                <p class="text-xs text-sky-400 font-semibold mb-2">@alfalubes</p>
+                <p class="text-xs text-slate-400 leading-relaxed">Tips rápidos en video, mitos sobre el kilometraje y demostraciones de lubricación automotriz.</p>
+                <span class="inline-flex items-center gap-1 text-xs text-amber-400 font-bold mt-4 group-hover:underline">Ver videos <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+            </a>
+
+            <!-- Instagram -->
+            <a href="{{ social_instagram }}" target="_blank" rel="noopener noreferrer" class="group bg-slate-900 border border-slate-800 hover:border-pink-500 p-6 rounded-2xl transition transform hover:-translate-y-1 block">
+                <div class="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-400 text-2xl mb-4 group-hover:scale-110 transition">
+                    <i class="fa-brands fa-instagram"></i>
+                </div>
+                <h3 class="font-bold text-lg text-white mb-1">Instagram</h3>
+                <p class="text-xs text-pink-400 font-semibold mb-2">@alfalubes</p>
+                <p class="text-xs text-slate-400 leading-relaxed">Fichas técnicas, especificaciones de aceites sintéticos, promociones de temporada y comunidad.</p>
+                <span class="inline-flex items-center gap-1 text-xs text-pink-400 font-bold mt-4 group-hover:underline">Seguir cuenta <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+            </a>
+
+            <!-- YouTube -->
+            <a href="{{ social_youtube }}" target="_blank" rel="noopener noreferrer" class="group bg-slate-900 border border-slate-800 hover:border-red-500 p-6 rounded-2xl transition transform hover:-translate-y-1 block">
+                <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 text-2xl mb-4 group-hover:scale-110 transition">
+                    <i class="fa-brands fa-youtube"></i>
+                </div>
+                <h3 class="font-bold text-lg text-white mb-1">YouTube</h3>
+                <p class="text-xs text-red-400 font-semibold mb-2">@alfalubes</p>
+                <p class="text-xs text-slate-400 leading-relaxed">Tutoriales completos sobre cambio de aceite, comparativa sintético vs mineral y análisis de viscosidades.</p>
+                <span class="inline-flex items-center gap-1 text-xs text-red-400 font-bold mt-4 group-hover:underline">Ver canal <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+            </a>
+
+            <!-- Facebook -->
+            <a href="{{ social_facebook }}" target="_blank" rel="noopener noreferrer" class="group bg-slate-900 border border-slate-800 hover:border-sky-500 p-6 rounded-2xl transition transform hover:-translate-y-1 block">
+                <div class="w-12 h-12 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-400 text-2xl mb-4 group-hover:scale-110 transition">
+                    <i class="fa-brands fa-facebook"></i>
+                </div>
+                <h3 class="font-bold text-lg text-white mb-1">Facebook</h3>
+                <p class="text-xs text-sky-400 font-semibold mb-2">@alfalubes</p>
+                <p class="text-xs text-slate-400 leading-relaxed">Atención a talleres mecánicos, promociones para mayoristas y comunicación directa.</p>
+                <span class="inline-flex items-center gap-1 text-xs text-sky-400 font-bold mt-4 group-hover:underline">Visitar página <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- SECCIÓN: Asesoría IA y Canales Directos -->
+<section class="py-16 sm:py-20 bg-gradient-to-b from-slate-900/60 to-slate-950">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/10 border border-gold/30 text-gold text-xs font-bold mb-4">
+            <i class="fa-solid fa-microchip"></i> TECNOLOGÍA INTELIGENTE
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">¿No estás seguro de qué aceite comprar?</h2>
+        <p class="text-slate-300 text-base max-w-2xl mx-auto mb-8">
+            Nuestro Asesor IA está entrenado para recomendarte la viscosidad y producto ideal con base en la marca, modelo, año y kilometraje de tu vehículo.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="{{ url_for('ai_agent') }}" class="bg-gold text-slate-950 px-8 py-4 rounded-xl font-bold text-base hover:brightness-110 shadow-lg flex items-center gap-2 transition">
+                <i class="fa-solid fa-robot"></i> Iniciar Chat con el Asesor IA
+            </a>
+            <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-xl font-bold text-base shadow-lg flex items-center gap-2 transition">
+                <i class="fa-brands fa-whatsapp text-xl"></i> Hablar por WhatsApp
+            </a>
+            <a href="mailto:{{ sales_email }}" class="border border-slate-700 bg-slate-800 text-slate-200 px-8 py-4 rounded-xl font-bold text-base hover:bg-slate-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-envelope text-amber-400"></i> {{ sales_email }}
+            </a>
         </div>
     </div>
 </section>

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Los Mejores Aceites Importados | Venta por Pallets | ALFA LUBES{% endblock %}
+{% block og_title %}Los Mejores Aceites Importados | Venta por Pallets | ALFA LUBES{% endblock %}
+{% block og_desc %}Importación directa de lubricantes y aceites de motor por tarima y mayoreo. Castrol, Mobil 1, ALFA LUBES DCT/DSG. Precios especiales para talleres y flotillas.{% endblock %}
+
+{% block content %}
+<!-- Banner Hero Llamativo: Los Mejores Aceites Importados -->
+<section class="relative min-h-[460px] flex items-center overflow-hidden border-b border-amber-500/30">
+    <img src="{{ url_for('static', filename='images/pallet-almacen.jpg') }}" alt="Venta de aceites importados por pallets en ALFA LUBES" class="absolute inset-0 w-full h-full object-cover">
+    <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/40"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-16 w-full">
+        <div class="max-w-3xl">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/20 border border-amber-400 text-amber-300 text-xs font-extrabold uppercase tracking-widest mb-4">
+                <i class="fa-solid fa-plane-arrival"></i> IMPORTACIÓN DIRECTA DE ALTA GAMA
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-black text-white leading-tight mb-4 tracking-tight">
+                LOS MEJORES ACEITES <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">IMPORTADOS</span>
+            </h1>
+            <p class="text-xl font-bold text-amber-400 mb-4">Venta por Pallets y Mayoreo para Talleres, Refaccionarias y Flotillas</p>
+            <p class="text-slate-300 text-base leading-relaxed mb-8 max-w-2xl">
+                Accede a precios de importador directo sin intermediarios. Tarimas completas selladas de fábrica con cajas de fluidos de transmisión <strong>DCT/DSG</strong>, aceites sintéticos premium <strong>0W-20, 5W-30</strong> y tambores industriales con flete seguro a todo México.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-7 py-3.5 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2 transition transform hover:scale-105">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Cotizar Pallet por WhatsApp
+                </a>
+                <a href="mailto:{{ sales_email }}?subject=Cotizaci%C3%B3n%20de%20Pallets%20de%20Aceite%20Importado" class="bg-gold text-slate-950 px-7 py-3.5 rounded-xl font-bold text-sm hover:brightness-110 shadow-xl transition">
+                    <i class="fa-solid fa-envelope mr-1.5"></i> Solicitar Lista de Precios
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Ventajas Mayoristas -->
+<section class="py-12 bg-slate-900/80 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+                <i class="fa-solid fa-boxes-packing text-amber-400 text-2xl mb-2"></i>
+                <h4 class="font-bold text-white text-sm">Tarimas Selladas</h4>
+                <p class="text-xs text-slate-400 mt-1">Embalaje con film plástico de alta resistencia y tarimas tratadas.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+                <i class="fa-solid fa-certificate text-sky-400 text-2xl mb-2"></i>
+                <h4 class="font-bold text-white text-sm">100% Originales</h4>
+                <p class="text-xs text-slate-400 mt-1">Pedimentos de importación y trazabilidad directa de fabricante.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+                <i class="fa-solid fa-percent text-emerald-400 text-2xl mb-2"></i>
+                <h4 class="font-bold text-white text-sm">Margen Superior</h4>
+                <p class="text-xs text-slate-400 mt-1">Hasta 40% de ahorro por volumen frente a compras por menudeo.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+                <i class="fa-solid fa-truck-fast text-yellow-400 text-2xl mb-2"></i>
+                <h4 class="font-bold text-white text-sm">Envíos a Todo México</h4>
+                <p class="text-xs text-slate-400 mt-1">Alianzas con paqueterías de carga pesada y entrega garantizada.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Catálogo de Pallets de Aceites Importados -->
+<section class="py-16 sm:py-20">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+            <div>
+                <p class="gold text-sm font-bold tracking-widest uppercase mb-1">INVENTARIO DISPONIBLE</p>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Tarimas y Pallets de Aceites Importados</h2>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Precios especiales para pedidos de 2 o más tarimas</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {% for pallet in pallets %}
+            <article class="bg-slate-900 rounded-3xl overflow-hidden border border-slate-800 card-hover flex flex-col justify-between shadow-2xl">
+                <div>
+                    <!-- Imagen del Pallet -->
+                    <div class="relative h-72 bg-slate-950 overflow-hidden">
+                        <img src="{{ url_for('static', filename='images/' + pallet.image) }}" alt="{{ pallet.title }}" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-amber-500 text-slate-950 text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wider shadow-lg">
+                                <i class="fa-solid fa-plane-arrival mr-1"></i> {{ pallet.origin }}
+                            </span>
+                        </div>
+                        <div class="absolute bottom-4 right-4 bg-slate-950/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs text-slate-200">
+                            <strong>{{ pallet.units_per_pallet }} unidades</strong> por tarima
+                        </div>
+                    </div>
+
+                    <!-- Detalles del Pallet -->
+                    <div class="p-6 sm:p-8">
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="text-xs font-bold text-sky-400 tracking-wider uppercase">{{ pallet.brand }} · {{ pallet.viscosity }}</span>
+                            <span class="text-xs text-emerald-400 font-semibold bg-emerald-950/70 border border-emerald-800/80 px-2.5 py-0.5 rounded-md">Tarima Lista</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3">{{ pallet.title }}</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-6">{{ pallet.description }}</p>
+
+                        <div class="grid grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-950/70 border border-slate-800 mb-6">
+                            <div>
+                                <span class="text-[11px] text-slate-400 uppercase tracking-wider block">Precio por Tarima:</span>
+                                <span class="text-2xl font-black gold">{{ pallet.pallet_price|mxn }}</span>
+                            </div>
+                            <div class="border-l border-slate-800 pl-4">
+                                <span class="text-[11px] text-slate-400 uppercase tracking-wider block">Costo unitario aprox:</span>
+                                <span class="text-lg font-bold text-white">{{ pallet.unit_price_approx|mxn }}</span>
+                                <span class="text-[10px] text-slate-400 block">por envase/unidad</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 sm:p-8 pt-0 flex flex-col sm:flex-row gap-3">
+                    <a href="https://wa.me/{{ whatsapp_number|replace('+','')|replace(' ','') }}?text=Hola%20ALFA%20LUBES,%20me%20interesa%20cotizar%20el%20{{ pallet.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fa-brands fa-whatsapp text-base"></i> Cotizar este Pallet
+                    </a>
+                    <a href="mailto:{{ sales_email }}?subject=Cotizaci%C3%B3n%20{{ pallet.title|urlencode }}" class="border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 py-3.5 px-5 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-file-pdf text-amber-400"></i> Ficha & Factura
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Llamado de Acción Mayorista -->
+<section class="py-16 bg-slate-950 border-t border-slate-800">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+        <h2 class="text-3xl font-extrabold text-white mb-3">¿Requieres un pedido mixto o contenedor completo?</h2>
+        <p class="text-slate-400 text-sm max-w-2xl mx-auto mb-8">
+            Armamos tarimas con combinaciones de viscosidades (5W-30 + 0W-20 + Transmisión DCT/DSG) adaptadas a las necesidades operativas de tu taller o flotilla.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2">
+                <i class="fa-brands fa-whatsapp text-lg"></i> Asesor Mayorista en WhatsApp
+            </a>
+            <a href="mailto:{{ sales_email }}" class="border border-slate-700 bg-slate-900 text-slate-200 px-8 py-4 rounded-xl font-bold text-sm hover:bg-slate-800">
+                <i class="fa-solid fa-envelope mr-1.5 text-amber-400"></i> {{ sales_email }}
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
