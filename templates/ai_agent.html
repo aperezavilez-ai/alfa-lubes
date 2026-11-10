@@ -30,7 +30,10 @@
         </div>
 
         <div class="pt-4 border-t border-slate-800 space-y-2">
-          <a href="{{ url_for('pallets') }}" class="block text-center bg-amber-500 hover:bg-amber-400 text-slate-950 py-2.5 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow">
+          <button onclick="openPalletModal()" class="w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 py-2.5 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow">
+            <i class="fa-solid fa-file-invoice"></i> Cotizar Tarima a Administración
+          </button>
+          <a href="{{ url_for('pallets') }}" class="block text-center bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 py-2.5 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-boxes-stacked"></i> Ver Tarimas y Pallets
           </a>
           <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="block text-center bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 shadow">
@@ -162,6 +165,31 @@ async function sendMessage(text) {
     if (!res.ok) throw new Error(data.error || 'Error');
     addMessage(data.reply, false);
     history.push({role: 'assistant', content: data.reply});
+    if (data.suggest_pallet_lead) {
+      const palletCard = document.createElement('div');
+      palletCard.className = 'flex gap-3';
+      palletCard.innerHTML = `
+        <div class="w-8 h-8 shrink-0"></div>
+        <div class="bg-gradient-to-r from-amber-500/15 via-slate-800 to-slate-900 border border-amber-500/30 rounded-2xl p-4 text-xs max-w-[85%] space-y-2 shadow-lg">
+          <div class="flex items-center gap-2 font-bold text-amber-400 text-sm">
+            <i class="fa-solid fa-boxes-stacked"></i> Cotización por Pallets / Tarimas Mayoreo
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            Para brindarte precios de mayoreo, flete consolidado y disponibilidad de tarimas, redireccionamos tu solicitud directamente al área de <strong>Administración ALFA LUBES</strong> para generar tu reporte de captación.
+          </p>
+          <div class="flex flex-wrap gap-2 pt-1">
+            <button onclick="openPalletModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2 rounded-xl font-bold transition flex items-center gap-1.5 shadow">
+              <i class="fa-solid fa-file-invoice"></i> Redireccionar a Administración
+            </button>
+            <a href="{{ url_for('pallets') }}" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3.5 py-2 rounded-xl font-semibold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-eye"></i> Ver Pallets Disponibles
+            </a>
+          </div>
+        </div>
+      `;
+      chatMessages.appendChild(palletCard);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
     if (data.suggest_product) {
       const link = document.createElement('div');
       link.className = 'flex gap-3';
@@ -183,5 +211,157 @@ chatForm.addEventListener('submit', (e) => {
 document.querySelectorAll('.quick-btn').forEach(btn => {
   btn.addEventListener('click', () => sendMessage(btn.dataset.q));
 });
+
+// Modal de Captación de Pallets para Administración
+function openPalletModal(presetInterest) {
+  const modal = document.getElementById('pallet-lead-modal');
+  if (presetInterest) {
+    const sel = document.getElementById('lead-tarima');
+    if (sel) sel.value = presetInterest;
+  }
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closePalletModal() {
+  const modal = document.getElementById('pallet-lead-modal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+document.getElementById('lead-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('lead-submit-btn');
+  const alertBox = document.getElementById('lead-alert');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Registrando en Administración...';
+  alertBox.classList.add('hidden');
+
+  const payload = {
+    client_name: document.getElementById('lead-name').value.trim(),
+    phone: document.getElementById('lead-phone').value.trim(),
+    email: document.getElementById('lead-email').value.trim(),
+    company_name: document.getElementById('lead-company').value.trim(),
+    city: document.getElementById('lead-city').value.trim(),
+    tarima_interest: document.getElementById('lead-tarima').value,
+    quantity_pallets: parseInt(document.getElementById('lead-qty').value) || 1,
+    notes: document.getElementById('lead-notes').value.trim()
+  };
+
+  try {
+    const res = await fetch('{{ url_for("api_create_pallet_lead") }}', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error al registrar solicitud');
+
+    // Cerrar modal
+    closePalletModal();
+    document.getElementById('lead-form').reset();
+
+    // Confirmación en el chat
+    addMessage(`✅ **Solicitud de Cotización Registrada con Éxito (Folio #${data.lead_id})**\n\nTus datos han sido **redireccionados al Sistema de Reportes de Administración de ALFA LUBES**.\n\n• **Cliente:** ${payload.client_name}\n• **Contacto:** ${payload.phone}\n• **Tarima Solicitada:** ${payload.tarima_interest} (${payload.quantity_pallets} tarima(s))\n• **Destino:** ${payload.city || 'Por confirmar'}\n\nUn ejecutivo comercial de Administración se comunicará contigo de inmediato para entregarte la cotización formal con flete consolidado.`, false);
+
+    // Sugerencia para contacto directo
+    const contactDirect = document.createElement('div');
+    contactDirect.className = 'flex gap-3';
+    contactDirect.innerHTML = `
+      <div class="w-8 h-8 shrink-0"></div>
+      <a href="https://wa.me/{{ whatsapp_number }}?text=${encodeURIComponent('Hola Administración ALFA LUBES, acabo de solicitar cotización del Folio #' + data.lead_id + ' para ' + payload.tarima_interest)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-bold text-xs transition shadow">
+        <i class="fa-brands fa-whatsapp text-sm"></i> Notificar a Administración por WhatsApp Folio #${data.lead_id} →
+      </a>
+    `;
+    chatMessages.appendChild(contactDirect);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  } catch (err) {
+    alertBox.textContent = err.message;
+    alertBox.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar a Administración';
+  }
+});
 </script>
+
+<!-- Modal de Captación de Clientes Pallets -->
+<div id="pallet-lead-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-fade-in">
+    <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-amber-500/10 via-slate-900 to-slate-900">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-base text-white">Captación de Cliente - Venta de Pallets</h3>
+          <p class="text-xs text-amber-300/80">Redireccionamiento directo a Administración ALFA LUBES</p>
+        </div>
+      </div>
+      <button onclick="closePalletModal()" class="text-slate-400 hover:text-white p-2">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <form id="lead-form" class="p-5 space-y-4 text-xs">
+      <div id="lead-alert" class="hidden p-3 rounded-xl bg-red-950/60 border border-red-800 text-red-300"></div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Nombre Completo *</label>
+          <input id="lead-name" type="text" required placeholder="Ej. Juan Pérez" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">WhatsApp / Teléfono *</label>
+          <input id="lead-phone" type="tel" required placeholder="Ej. 667 123 4567" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Correo Electrónico</label>
+          <input id="lead-email" type="email" placeholder="cliente@empresa.com" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Taller / Empresa / Refaccionaria</label>
+          <input id="lead-company" type="text" placeholder="Ej. Refaccionaria del Norte" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="sm:col-span-2">
+          <label class="block font-semibold text-slate-300 mb-1">Tarima / Pallet de Interés *</label>
+          <select id="lead-tarima" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+            <option value="Pallet ALFA LUBES 100% Sintético 5W-30 (84 Cajas)">Pallet ALFA LUBES Sintético 5W-30 (84 Cajas)</option>
+            <option value="Pallet Importado 100% Sintético 0W-20 (80 Cajas)">Pallet Importado Sintético 0W-20 (80 Cajas)</option>
+            <option value="Pallet Importado Alto Rendimiento Diesel 15W-40 (72 Cajas)">Pallet Importado Diesel 15W-40 (72 Cajas)</option>
+            <option value="Mix Personalizado de Tarimas ALFA LUBES / Importadas">Mix Personalizado de Tarimas</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">N° de Tarimas</label>
+          <input id="lead-qty" type="number" min="1" max="50" value="1" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-slate-300 mb-1">Ciudad y Estado de Entrega</label>
+        <input id="lead-city" type="text" placeholder="Ej. Culiacán, Sinaloa" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+      </div>
+
+      <div>
+        <label class="block font-semibold text-slate-300 mb-1">Notas / Requerimientos Especiales</label>
+        <textarea id="lead-notes" rows="2" placeholder="Ej. Requiero entrega en bodega o flete ocurre..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-400"></textarea>
+      </div>
+
+      <div class="pt-3 border-t border-slate-800 flex justify-end gap-2">
+        <button type="button" onclick="closePalletModal()" class="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 font-semibold transition">Cancelar</button>
+        <button id="lead-submit-btn" type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow">
+          <i class="fa-solid fa-paper-plane"></i> Enviar a Administración
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

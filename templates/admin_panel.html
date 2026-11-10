@@ -12,26 +12,46 @@
       <a href="{{ url_for('admin_logout') }}" class="bg-slate-800 hover:bg-slate-700 rounded-lg px-4 py-2 text-sm font-semibold">Cerrar sesión</a>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-        <p class="text-slate-400 text-sm">Productos</p>
-        <p class="text-3xl font-bold mt-1">{{ stats.products }}</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+        <p class="text-slate-400 text-xs uppercase tracking-wider">Productos</p>
+        <p class="text-2xl font-bold mt-1 text-white">{{ stats.products }}</p>
       </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-        <p class="text-slate-400 text-sm">Clientes</p>
-        <p class="text-3xl font-bold mt-1">{{ stats.clients }}</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+        <p class="text-slate-400 text-xs uppercase tracking-wider">Clientes</p>
+        <p class="text-2xl font-bold mt-1 text-white">{{ stats.clients }}</p>
       </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-        <p class="text-slate-400 text-sm">Proveedores</p>
-        <p class="text-3xl font-bold mt-1">{{ stats.suppliers }}</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+        <p class="text-slate-400 text-xs uppercase tracking-wider">Pedidos</p>
+        <p class="text-2xl font-bold mt-1 text-white">{{ stats.orders }}</p>
       </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-        <p class="text-slate-400 text-sm">Pedidos</p>
-        <p class="text-3xl font-bold mt-1">{{ stats.orders }}</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+        <p class="text-slate-400 text-xs uppercase tracking-wider">Proveedores</p>
+        <p class="text-2xl font-bold mt-1 text-white">{{ stats.suppliers }}</p>
+      </div>
+      <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-4 shadow">
+        <p class="text-amber-400 text-xs uppercase tracking-wider font-bold">Leads Pallets</p>
+        <div class="flex items-baseline gap-2 mt-1">
+          <p class="text-2xl font-black text-amber-300">{{ stats.leads }}</p>
+          {% if stats.new_leads > 0 %}
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold animate-pulse">{{ stats.new_leads }} nuevos</span>
+          {% endif %}
+        </div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <a href="{{ url_for('admin_reports') }}" class="bg-slate-900 border-2 border-amber-500/40 hover:border-amber-400 rounded-2xl p-6 card-hover block shadow-xl relative overflow-hidden group">
+        <div class="absolute -right-3 -bottom-3 text-amber-500/10 text-7xl font-black group-hover:scale-110 transition"><i class="fa-solid fa-clipboard-user"></i></div>
+        <i class="fa-solid fa-clipboard-user text-2xl text-amber-400 mb-3"></i>
+        <h2 class="text-lg font-bold text-white flex items-center justify-between">
+          <span>Reportes / Captación Pallets</span>
+          {% if stats.new_leads > 0 %}
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black uppercase">¡Nuevos!</span>
+          {% endif %}
+        </h2>
+        <p class="text-slate-400 text-xs mt-1">Sesión de reportes con datos completos de prospectos de tarimas y cotizaciones mayoristas.</p>
+      </a>
       <a href="{{ url_for('dashboard') }}" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 card-hover block">
         <i class="fa-solid fa-chart-line text-2xl gold mb-3"></i>
         <h2 class="text-lg font-bold">Ventas / Dashboard</h2>

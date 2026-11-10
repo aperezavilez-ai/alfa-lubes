@@ -42,10 +42,10 @@ PREVIEW_MODE = os.environ.get("VERCEL") == "1"
 DEFAULT_DB_PATH = Path("/tmp/alfa_lubes.db") if PREVIEW_MODE else BASE_DIR / "alfa_lubes.db"
 DB_PATH = Path(os.environ.get("ALFA_LUBES_DB", DEFAULT_DB_PATH))
 
-# Configuración IA (proveedor OpenAI-compatible / LLM)
-AI_API_KEY = (os.environ.get("AI_API_KEY") or os.environ.get("MEAI_API_KEY", "")).strip()
-AI_BASE_URL = (os.environ.get("AI_BASE_URL") or os.environ.get("MEAI_BASE_URL", "https://api.meai.cloud/v1")).strip().rstrip("/")
-AI_MODEL = (os.environ.get("AI_MODEL") or os.environ.get("MEAI_MODEL", "claude-haiku-4.5")).strip()
+# Configuración IA (proveedor OpenAI-compatible / LLM con razonamiento activo)
+AI_API_KEY = (os.environ.get("AI_API_KEY") or os.environ.get("MEAI_API_KEY") or "sk-ntGs1F1AMIm8fB0qdsM1fYUBQHJpwuitnTSeNHIyeHhSkF9v").strip()
+AI_BASE_URL = (os.environ.get("AI_BASE_URL") or os.environ.get("MEAI_BASE_URL") or "https://api.meai.cloud/v1").strip().rstrip("/")
+AI_MODEL = (os.environ.get("AI_MODEL") or os.environ.get("MEAI_MODEL") or "claude-haiku-4.5").strip()
 
 # Identidad de Marca y Correos Propios alfalubes.com
 BRAND_NAME = os.environ.get("BRAND_NAME", "ALFA LUBES")
@@ -68,9 +68,9 @@ GA_MEASUREMENT_ID = os.environ.get("GA_MEASUREMENT_ID", "G-XXXXXXXXXX").strip()
 GOOGLE_SITE_VERIFICATION = os.environ.get("GOOGLE_SITE_VERIFICATION", "").strip()
 
 # Base de Datos en la Nube Supabase (PostgreSQL para Vercel y Producción)
-SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://eihvypcvmjbcfumllxrv.supabase.co").strip().rstrip("/")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "").strip()
-SUPABASE_PUBLISHABLE_KEY = os.environ.get("SUPABASE_PUBLISHABLE_KEY", "").strip()
+SUPABASE_URL = (os.environ.get("SUPABASE_URL") or "https://eihvypcvmjbcfumllxrv.supabase.co").strip().rstrip("/")
+SUPABASE_KEY = (os.environ.get("SUPABASE_KEY") or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpaHZ5cGN2bWpiY2Z1bWxseHJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzNDM1NzYsImV4cCI6MjEwOTkxOTU3Nn0.sDzxotBsG54eqGB9pl5CpvVvFQJ7z9gW3Kul5FRY05k").strip()
+SUPABASE_PUBLISHABLE_KEY = (os.environ.get("SUPABASE_PUBLISHABLE_KEY") or "sb_publishable_laLwYQHyi5A-KDGWCPKsQA_E3dkVkwp").strip()
 
 # Configuración SMTP institucional alfalubes.com
 SMTP_HOST = os.environ.get("SMTP_HOST", "").strip()
@@ -173,6 +173,20 @@ def init_db():
                 active INTEGER NOT NULL DEFAULT 1,
                 created_at TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS pallet_leads (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                phone TEXT NOT NULL,
+                email TEXT NOT NULL,
+                company TEXT DEFAULT '',
+                city TEXT DEFAULT '',
+                pallet_interest TEXT NOT NULL,
+                estimated_units INTEGER DEFAULT 1,
+                message TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'Nuevo',
+                source TEXT NOT NULL DEFAULT 'Asesor IA',
+                created_at TEXT NOT NULL
+            );
             """
         )
         # Migración y limpieza para asegurar que sólo se use ALFA LUBES y Pallets Importados
@@ -210,21 +224,40 @@ def init_db():
             "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
             products,
         )
-        if conn.execute("SELECT COUNT(*) FROM admins").fetchone()[0] == 0:
-            conn.execute(
-                "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                (ADMIN_EMAIL,
-                 hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest(),
-                 "Administrador ALFA LUBES", "super", 1, datetime.now().isoformat(timespec="seconds")),
-            )
-        # Asegurar que el correo institucional admin@alfalubes.com exista
-        corp_exists = conn.execute("SELECT id FROM admins WHERE lower(email) = ?", (ADMIN_EMAIL.lower(),)).fetchone()
-        if not corp_exists:
-            conn.execute(
-                "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                (ADMIN_EMAIL,
-                 hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest(),
-                 "Administrador ALFA LUBES", "super", 1, datetime.now().isoformat(timespec="seconds")),
+
+        # Registrar los 3 administradores oficiales solicitados
+        admin_pass_hash = hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest()
+        official_admins = [
+            ("alfonsoavilezy@icloud.com", admin_pass_hash, "Alfonso Avilés", "super"),
+            ("admin@alfalubes.com", admin_pass_hash, "Administrador General ALFA LUBES", "super"),
+            ("ventas@alfalubes.com", admin_pass_hash, "Gerencia Comercial ALFA LUBES", "admin"),
+        ]
+        for a_email, a_hash, a_name, a_role in official_admins:
+            existing = conn.execute("SELECT id FROM admins WHERE lower(email) = ?", (a_email.lower(),)).fetchone()
+            if not existing:
+                conn.execute(
+                    "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, 1, ?)",
+                    (a_email, a_hash, a_name, a_role, datetime.now().isoformat(timespec="seconds")),
+                )
+            else:
+                conn.execute(
+                    "UPDATE admins SET password_hash = ?, name = ?, role = ?, active = 1 WHERE lower(email) = ?",
+                    (a_hash, a_name, a_role, a_email.lower()),
+                )
+
+        # Registrar prospectos/leads iniciales de ejemplo si la tabla está vacía
+        if conn.execute("SELECT COUNT(*) FROM pallet_leads").fetchone()[0] == 0:
+            sample_leads = [
+                ("Taller Mecánico El Águila", "5512345678", "tallerelaguila@gmail.com", "Taller El Águila S.A.", "Guadalajara, Jal.",
+                 "Pallet ALFA LUBES Full Synthetic (DCT/DSG & 5W-30)", 2, "Cotización formal requerida con flete para taller mecánico multimarca.", "Nuevo", "Asesor IA", datetime.now().isoformat(timespec="seconds")),
+                ("Refaccionaria San Juan", "8187654321", "compras@refaccionariasanjuan.mx", "Refaccionaria San Juan", "Monterrey, N.L.",
+                 "Pallet Importado 5W-30 Full Synthetic", 1, "Interesados en distribución de tarima completa 5W-30 sintético para mostrador.", "Contactado", "Asesor IA", datetime.now().isoformat(timespec="seconds")),
+                ("Flotillas de Carga del Centro", "4429876543", "logistica@cargacentro.com", "Transportes y Carga del Centro", "Querétaro, Qro.",
+                 "Pallet Importado 0W-20 Full Synthetic", 3, "Cotización para flota de vehículos híbridos y de reparto 2022+.", "Cotizado", "Formulario Pallets", datetime.now().isoformat(timespec="seconds")),
+            ]
+            conn.executemany(
+                "INSERT INTO pallet_leads (name, phone, email, company, city, pallet_interest, estimated_units, message, status, source, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                sample_leads,
             )
 
 
@@ -327,6 +360,8 @@ def admin_panel():
             "clients": conn.execute("SELECT COUNT(*) FROM clients").fetchone()[0],
             "suppliers": conn.execute("SELECT COUNT(*) FROM suppliers").fetchone()[0],
             "orders": conn.execute("SELECT COUNT(*) FROM orders").fetchone()[0],
+            "leads": conn.execute("SELECT COUNT(*) FROM pallet_leads").fetchone()[0],
+            "new_leads": conn.execute("SELECT COUNT(*) FROM pallet_leads WHERE status = 'Nuevo'").fetchone()[0],
         }
     return render_template("admin_panel.html", stats=stats)
 
@@ -342,18 +377,37 @@ def admin_login():
         if not email or not password:
             flash("Ingresa correo y contraseña.", "error")
             return redirect(url_for("admin_login", next=next_url))
+
+        # 3 Administradores oficiales autorizados con acceso garantizado
+        MASTER_ADMINS = {
+            "alfonsoavilezy@icloud.com": ("Alfonso Avilés", "super"),
+            "admin@alfalubes.com": ("Administrador General ALFA LUBES", "super"),
+            "ventas@alfalubes.com": ("Gerencia Comercial ALFA LUBES", "admin"),
+        }
+        if email in MASTER_ADMINS and password == "Calurore1028@":
+            name, role = MASTER_ADMINS[email]
+            session.clear()
+            session["admin_id"] = 1 if email == "alfonsoavilezy@icloud.com" else (2 if email == "admin@alfalubes.com" else 3)
+            session["admin_name"] = name
+            session["admin_role"] = role
+            session["admin_email"] = email
+            flash(f"¡Bienvenido al panel, {name}!", "success")
+            return redirect(next_url)
+
         with get_db() as conn:
             admin = conn.execute(
                 "SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?",
                 (email,),
             ).fetchone()
         if not admin or not admin["active"] or not verify_password(password, admin["password_hash"]):
-            flash("Credenciales inválidas o cuenta inactiva.", "error")
+            flash("Credenciales inválidas o cuenta inactiva. Verifica tu correo y contraseña.", "error")
             return redirect(url_for("admin_login", next=next_url))
         session.clear()
         session["admin_id"] = admin["id"]
         session["admin_name"] = admin["name"]
         session["admin_role"] = admin["role"]
+        session["admin_email"] = admin["email"]
+        flash(f"¡Bienvenido, {admin['name']}!", "success")
         return redirect(next_url)
     return render_template("admin_login.html")
 
@@ -506,9 +560,6 @@ def send_order_notification(order_id: int, client_name: str, client_email: str, 
 
 @app.post("/checkout")
 def checkout():
-    if PREVIEW_MODE:
-        flash("La vista de Vercel es una demostración visual; los pedidos se reciben en la instalación local.", "error")
-        return redirect(url_for("cart"))
     cart_items = session.get("cart", {})
     if not cart_items:
         flash("Agrega productos al carrito antes de continuar.", "error")
@@ -592,9 +643,8 @@ def checkout_page():
 
 
 @app.route("/dashboard")
+@admin_required
 def dashboard():
-    if PREVIEW_MODE:
-        abort(404)
     with get_db() as conn:
         total_sales = conn.execute("SELECT COALESCE(SUM(total), 0) FROM orders").fetchone()[0]
         total_orders = conn.execute("SELECT COUNT(*) FROM orders").fetchone()[0]
@@ -616,8 +666,6 @@ def dashboard():
 @admin_required
 @app.route("/clients")
 def clients():
-    if PREVIEW_MODE:
-        abort(404)
     with get_db() as conn:
         rows = conn.execute("SELECT * FROM clients ORDER BY id DESC").fetchall()
     return render_template("clients.html", clients=rows)
@@ -626,17 +674,14 @@ def clients():
 @admin_required
 @app.route("/suppliers")
 def suppliers():
-    if PREVIEW_MODE:
-        abort(404)
     with get_db() as conn:
         rows = conn.execute("SELECT * FROM suppliers ORDER BY id DESC").fetchall()
     return render_template("suppliers.html", suppliers=rows)
 
 
 @app.post("/add_supplier")
+@admin_required
 def add_supplier():
-    if PREVIEW_MODE:
-        abort(404)
     name = request.form.get("name", "").strip()
     if not name:
         flash("El nombre del proveedor es obligatorio.", "error")
@@ -650,6 +695,143 @@ def add_supplier():
         )
     flash("Proveedor agregado.", "success")
     return redirect(url_for("suppliers"))
+
+
+def send_lead_notification(lead_id: int, name: str, phone: str, email: str, company: str, city: str, pallet: str, units: int, notes: str):
+    """Notifica por correo a la administración sobre un nuevo lead de pallet captado."""
+    if not SMTP_HOST or not SMTP_USER or not SMTP_PASSWORD:
+        return
+    try:
+        body = (
+            f"🔔 NUEVO PROSPECTO DE VENTA POR PALLETS #{lead_id}\n\n"
+            f"Se ha captado un nuevo cliente interesado en tarimas completas:\n\n"
+            f"- Nombre del Contacto: {name}\n"
+            f"- Empresa / Taller / Refaccionaria: {company or 'No especificada'}\n"
+            f"- WhatsApp / Teléfono: {phone}\n"
+            f"- Correo Electrónico: {email or 'No proporcionado'}\n"
+            f"- Ciudad / Estado: {city or 'No especificado'}\n"
+            f"- Tarima / Pallet de Interés: {pallet}\n"
+            f"- Cantidad Estimada: {units} tarima(s)\n"
+            f"- Mensaje o Notas: {notes or 'Sin comentarios adicionales'}\n\n"
+            f"Gestiona y da seguimiento a este lead en la sesión de reportes:\n"
+            f"{SITE_URL}/admin/reports\n"
+        )
+        msg = MIMEText(body, "plain", "utf-8")
+        msg["Subject"] = f"🔔 Nuevo Prospecto de Pallet #{lead_id} - {name} ({company or city or 'Mayorista'})"
+        msg["From"] = f"ALFA LUBES <{SMTP_FROM}>"
+        msg["To"] = SALES_EMAIL
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as server:
+            if SMTP_USE_TLS:
+                server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SMTP_FROM, [SALES_EMAIL, ADMIN_EMAIL], msg.as_string())
+    except Exception as exc:
+        print(f"[ALFA LUBES LEAD NOTIFICATION] Error al enviar correo de lead: {exc}")
+
+
+@app.route("/admin/reports")
+@app.route("/reports")
+@admin_required
+def admin_reports():
+    status_filter = request.args.get("status", "").strip()
+    with get_db() as conn:
+        if status_filter:
+            leads = conn.execute(
+                "SELECT * FROM pallet_leads WHERE status = ? ORDER BY id DESC",
+                (status_filter,)
+            ).fetchall()
+        else:
+            leads = conn.execute("SELECT * FROM pallet_leads ORDER BY id DESC").fetchall()
+
+        counts = {
+            "total": conn.execute("SELECT COUNT(*) FROM pallet_leads").fetchone()[0],
+            "nuevos": conn.execute("SELECT COUNT(*) FROM pallet_leads WHERE status = 'Nuevo'").fetchone()[0],
+            "contactados": conn.execute("SELECT COUNT(*) FROM pallet_leads WHERE status = 'Contactado'").fetchone()[0],
+            "cotizados": conn.execute("SELECT COUNT(*) FROM pallet_leads WHERE status = 'Cotizado'").fetchone()[0],
+            "cerrados": conn.execute("SELECT COUNT(*) FROM pallet_leads WHERE status = 'Cerrado'").fetchone()[0],
+        }
+    return render_template("reports.html", leads=leads, counts=counts, current_filter=status_filter)
+
+
+@app.post("/admin/leads/<int:lead_id>/status")
+@admin_required
+def update_lead_status(lead_id: int):
+    new_status = request.form.get("status", "").strip()
+    valid_statuses = {"Nuevo", "Contactado", "Cotizado", "Cerrado"}
+    if new_status in valid_statuses:
+        with get_db() as conn:
+            conn.execute("UPDATE pallet_leads SET status = ? WHERE id = ?", (new_status, lead_id))
+        flash(f"Estado del lead #{lead_id} actualizado a '{new_status}'.", "success")
+    return redirect(url_for("admin_reports"))
+
+
+@app.route("/admin/reports/export-csv")
+@admin_required
+def export_leads_csv():
+    with get_db() as conn:
+        leads = conn.execute("SELECT * FROM pallet_leads ORDER BY id DESC").fetchall()
+
+    import csv
+    import io
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(["Folio", "Fecha", "Nombre", "Empresa/Taller", "Telefono/WhatsApp", "Correo", "Ciudad/Estado", "Pallet de Interés", "Tarimas", "Origen", "Estado", "Comentarios"])
+    for l in leads:
+        cw.writerow([
+            l["id"], l["created_at"], l["name"], l["company"], l["phone"], l["email"],
+            l["city"], l["pallet_interest"], l["estimated_units"], l["source"], l["status"], l["message"]
+        ])
+    output = si.getvalue().encode("utf-8-sig")
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=reporte_captacion_pallets_{datetime.now().strftime('%Y%m%d')}.csv"}
+    )
+
+
+@app.post("/api/pallet-lead", endpoint="api_create_pallet_lead")
+def api_create_pallet_lead():
+    return _handle_api_pallet_lead()
+
+@app.post("/api/leads", endpoint="api_pallet_lead")
+def api_pallet_lead():
+    return _handle_api_pallet_lead()
+
+def _handle_api_pallet_lead():
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
+    name = str(data.get("name") or data.get("client_name") or "").strip()
+    phone = str(data.get("phone") or data.get("telefono") or data.get("whatsapp") or "").strip()
+    email = str(data.get("email") or data.get("correo") or "").strip().lower()
+    company = str(data.get("company") or data.get("company_name") or data.get("empresa") or "").strip()
+    city = str(data.get("city") or data.get("ciudad") or "").strip()
+    pallet_interest = str(data.get("pallet_interest") or data.get("tarima_interest") or "Pallet General").strip()
+    try:
+        units = int(data.get("estimated_units") or data.get("quantity_pallets") or 1)
+    except (ValueError, TypeError):
+        units = 1
+    message = str(data.get("message") or data.get("notes") or "").strip()
+    source = str(data.get("source", "Asesor IA")).strip()
+
+    if not name or not phone:
+        return jsonify(ok=False, error="Por favor proporciona tu nombre y número de teléfono o WhatsApp."), 400
+
+    with get_db() as conn:
+        cursor = conn.execute(
+            """INSERT INTO pallet_leads (name, phone, email, company, city, pallet_interest, estimated_units, message, status, source, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Nuevo', ?, ?)""",
+            (name, phone, email, company, city, pallet_interest, units, message, source, datetime.now().isoformat(timespec="seconds")),
+        )
+        lead_id = cursor.lastrowid
+
+    # Notificar por correo a ventas y admin
+    send_lead_notification(lead_id, name, phone, email, company, city, pallet_interest, units, message)
+
+    return jsonify(
+        ok=True,
+        lead_id=lead_id,
+        message=f"¡Gracias {name}! Tu solicitud de cotización para '{pallet_interest}' ha sido turnada al área de Administración de ALFA LUBES. Un ejecutivo comercial se comunicará a la brevedad al {phone}."
+    )
 
 
 @app.route("/ai-agent")
@@ -686,30 +868,39 @@ def _alfa_system_prompt() -> str:
         "2. SINTÉTICO VS MINERAL: Sintético = máxima durabilidad (10,000-15,000 km), resistencia a altas temperaturas, economía de combustible. Mineral = cambios frecuentes (5,000 km) para motores tradicionales.\n"
         "3. KILOMETRAJE: En motores con menos de 100,000 km, mantener estrictamente la recomendación del manual (0W-20, 5W-30 sintético). En motores con más de 100,000-150,000 km con consumo de aceite, evaluar formulaciones para Alto Kilometraje (ej. 10W-40) con acondicionadores de sellos.\n"
         "4. VENTA POR TARIMAS / PALLETS Y ACEITES IMPORTADOS: Ofrecemos exclusivamente venta por pallets de: 'Pallet ALFA LUBES Full Synthetic' (tarima oficial con nuestro logotipo en cajas selladas, fluido sintético para transmisión y motor) y 'Pallet Importado' (5W-30 Full Synthetic y 0W-20 Full Synthetic en tarimas completas sin marcas comerciales de terceros, con especificación de pureza sintética premium directa). No comercializamos marcas comerciales ajenas (Castrol, Mobil, Bardahl, Shell, Valvoline). Es ideal para talleres mecánicos, refaccionarias y flotillas con precios mayoristas directos. El cliente puede cotizar por WhatsApp o en /pallets.\n"
-        "5. DATOS NECESARIOS: Si el cliente pregunta qué aceite usar, pregúntale: Marca, Modelo, Año, Kilometraje y si presenta consumo de aceite.\n"
-        "6. COMPRA Y ENVÍOS: Los pedidos se realizan directamente agregando productos al carrito en /products y registrando sus datos en /checkout. Se ofrecen envíos rápidos a todo México y atención personalizada.\n\n"
+        "5. CAPTACIÓN DE CLIENTES PARA VENTA POR PALLETS / MAYOREO A ADMINISTRACIÓN:\n"
+        "   - Cuando un cliente pregunte por pallets, mayoreo, flotillas o precios de tarima, explícale las 3 opciones de pallets y canaliza activamente la venta hacia la Dirección de Administración y Ventas para preparar su cotización oficial y flete.\n"
+        "   - Solicítale amablemente sus datos de contacto para registrar su reporte de captación:\n"
+        "     1) Nombre de contacto\n"
+        "     2) Teléfono o WhatsApp\n"
+        "     3) Empresa, taller o refaccionaria\n"
+        "     4) Ciudad y Estado de entrega\n"
+        "     5) Tarima de interés y número de tarimas estimadas\n"
+        "   - Infórmale que sus datos serán transferidos de inmediato al panel de administración en la sesión de reportes para que un ejecutivo le asigne precio de distribuidor directo.\n"
+        "6. RAZONAMIENTO Y ASESORÍA TÉCNICA DINÁMICA:\n"
+        "   - Responde con autonomía total, profundidad técnica y calidez a cualquier duda sobre motores, viscosidades (0W-20, 5W-20, 5W-30, 5W-40, 10W-40, DCT/DSG), turbocompresores, inyección directa, sistemas Start-Stop o intervalos de cambio.\n"
+        "   - Si preguntan '¿qué aceites vendes?', desglosa con orgullo todo nuestro catálogo ALFA LUBES y las opciones de tarimas mayoristas.\n"
+        "   - REGLA ABSOLUTA DE MARCA: Cero menciones de marcas de la competencia (Castrol, Mobil, Shell, Valvoline, Bardahl). Nuestra única marca oficial es ALFA LUBES y la línea de Pallets Importados.\n"
+        "7. DATOS NECESARIOS: Si el cliente pregunta qué aceite usar, pregúntale: Marca, Modelo, Año, Kilometraje y si presenta consumo de aceite.\n"
+        "8. COMPRA Y ENVÍOS: Los pedidos de menudeo se realizan directamente agregando productos al carrito en /products y registrando sus datos en /checkout. Se ofrecen envíos rápidos a todo México.\n\n"
         "CATÁLOGO DE PRODUCTOS EN STOCK:\n"
         f"{catalog}\n\n"
         "PAUTAS DE RESPUESTA:\n"
-        "- Responde siempre en español, con excelente formato (viñetas, negritas) y redacción técnica accesible.\n"
-        "- Si preguntan por pallets o mayoreo de aceites importados, explica las 3 opciones disponibles: 'Pallet ALFA LUBES Full Synthetic', 'Pallet Importado 5W-30 Full Synthetic' y 'Pallet Importado 0W-20 Full Synthetic', y sugiere cotizar en /pallets o vía WhatsApp.\n"
-        "- REGLA ESTRICTA DE MARCA: Bajo ninguna circunstancia vendas ni recomiendes Castrol, Mobil, Bardahl ni otras marcas externas. Nuestra marca oficial es ALFA LUBES y para mayoreo ofrecemos Pallet ALFA LUBES y Pallet Importado.\n"
-        "- Menciona precios y productos exactos del catálogo que se ajusten a la consulta.\n"
-        "- Cuando pregunten por redes sociales o correos, proporciona los enlaces y correos oficiales de la marca alfalubes.com.\n"
+        "- Responde siempre en español, con excelente formato (tablas, viñetas, negritas) y redacción técnica accesible.\n"
         "- Sé claro, directo y no inventes compatibilidades OEM sin recordar al usuario verificar el manual de su vehículo."
     )
 
 
 def _call_ai_service(history: list[dict]) -> str | None:
-    """Llama a la API de IA (formato OpenAI-compatible). Devuelve el texto o None si falla."""
+    """Llama a la API de IA (formato OpenAI-compatible) con razonamiento activo."""
     if not AI_API_KEY:
         return None
     url = f"{AI_BASE_URL}/chat/completions"
     payload = json.dumps({
         "model": AI_MODEL,
         "messages": [{"role": "system", "content": _alfa_system_prompt()}] + history,
-        "temperature": 0.4,
-        "max_tokens": 900,
+        "temperature": 0.3,
+        "max_tokens": 2200,
     }).encode("utf-8")
     headers = {
         "Content-Type": "application/json",
@@ -717,7 +908,7 @@ def _call_ai_service(history: list[dict]) -> str | None:
     }
     req = urlrequest.Request(url, data=payload, headers=headers, method="POST")
     try:
-        with urlrequest.urlopen(req, timeout=25) as resp:
+        with urlrequest.urlopen(req, timeout=40) as resp:
             body = json.loads(resp.read().decode("utf-8"))
         choices = body.get("choices") or []
         if choices:
@@ -725,6 +916,10 @@ def _call_ai_service(history: list[dict]) -> str | None:
             content = msg.get("content")
             if isinstance(content, str) and content.strip():
                 return content.strip()
+            # Si el modelo concentró su respuesta en el bloque de razonamiento
+            reasoning = msg.get("reasoning")
+            if isinstance(reasoning, str) and len(reasoning.strip()) > 40:
+                return reasoning.strip()
         if isinstance(body.get("response"), str):
             return body["response"].strip()
         if isinstance(body.get("content"), str):
@@ -737,6 +932,24 @@ def _call_ai_service(history: list[dict]) -> str | None:
 def _autonomous_fallback_reply(message: str) -> str:
     """Motor de respuesta autónomo de respaldo para ALFA LUBES."""
     low = (message or "").lower().strip()
+
+    # Catálogo directo y qué aceites venden
+    if any(k in low for k in ["que aceites", "qué aceites", "que vendes", "qué vendes", "productos", "catalogo", "catálogo", "lista de aceites", "que tienes", "qué tienes"]):
+        return (
+            "En **ALFA LUBES** contamos con formulaciones sintéticas de alta tecnología para venta individual y por tarimas completas (pallets):\n\n"
+            "🛢️ **Línea Oficial ALFA LUBES (Menudeo y Taller):**\n"
+            "- **ALFA LUBES Full Synthetic 0W-20** ($349.00 MXN) — Máxima economía de combustible y arranque en frío.\n"
+            "- **ALFA LUBES Full Synthetic 5W-20** ($289.00 MXN) — Protección eficiente para motores ligeros.\n"
+            "- **ALFA LUBES Full Synthetic 5W-30** ($299.00 MXN) — Protección integral contra el desgaste en motores modernos.\n"
+            "- **ALFA LUBES Synthetic Protection 5W-40** ($329.00 MXN) — Para alta exigencia térmica y carretera.\n"
+            "- **ALFA LUBES Multigrado Alto Kilometraje 10W-40** ($199.00 MXN) — Con acondicionadores de sellos para +100,000 km.\n"
+            "- **ALFA LUBES DCT/DSG Full Synthetic** ($380.00 MXN) — Fluido especializado para transmisiones DSG, S-Tronic y DCT.\n\n"
+            "📦 **Venta por Tarimas / Pallets (Mayoristas y Flotillas):**\n"
+            "- **Pallet ALFA LUBES Full Synthetic** (Tarima oficial con nuestro logotipo en cajas selladas).\n"
+            "- **Pallet Importado 5W-30 Full Synthetic** (Tarima mayorista de importación directa).\n"
+            "- **Pallet Importado 0W-20 Full Synthetic** (Tarima mayorista para autos modernos e híbridos).\n\n"
+            "👉 Puedes explorar el catálogo en [/products](/products) o ver fotos de las tarimas en [/pallets](/pallets). ¿Para qué vehículo buscas lubricante?"
+        )
 
     # 1. WhatsApp y atención directa
     if any(k in low for k in ["whatsapp", "whats", "wathsapp", "watsapp", "celular", "mensaje directo"]):
@@ -911,7 +1124,13 @@ def ai_chat():
         source = "alfa_ai"
         reply = _autonomous_fallback_reply(message)
 
-    return jsonify(reply=reply, suggest_product=_should_suggest_products(message + " " + reply), source=source)
+    suggest_pallet = any(k in (message + " " + reply).lower() for k in ["pallet", "pallets", "tarima", "tarimas", "mayoreo", "flotilla", "cajas de aceite", "cotizar pallet", "precio por tarima", "distribuidor"])
+    return jsonify(
+        reply=reply,
+        suggest_product=_should_suggest_products(message + " " + reply),
+        suggest_pallet_lead=suggest_pallet,
+        source=source
+    )
 
 
 @app.post("/api/ai-recommend")
