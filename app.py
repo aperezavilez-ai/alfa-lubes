@@ -42,10 +42,10 @@ PREVIEW_MODE = os.environ.get("VERCEL") == "1"
 DEFAULT_DB_PATH = Path("/tmp/alfa_lubes.db") if PREVIEW_MODE else BASE_DIR / "alfa_lubes.db"
 DB_PATH = Path(os.environ.get("ALFA_LUBES_DB", DEFAULT_DB_PATH))
 
-# Configuración IA (meai / proveedor OpenAI-compatible)
-MEAI_API_KEY = os.environ.get("MEAI_API_KEY", "").strip()
-MEAI_BASE_URL = os.environ.get("MEAI_BASE_URL", "https://api.meai.cloud/v1").strip().rstrip("/")
-MEAI_MODEL = os.environ.get("MEAI_MODEL", "claude-haiku-4.5").strip()
+# Configuración IA (proveedor OpenAI-compatible / LLM)
+AI_API_KEY = (os.environ.get("AI_API_KEY") or os.environ.get("MEAI_API_KEY", "")).strip()
+AI_BASE_URL = (os.environ.get("AI_BASE_URL") or os.environ.get("MEAI_BASE_URL", "https://api.meai.cloud/v1")).strip().rstrip("/")
+AI_MODEL = (os.environ.get("AI_MODEL") or os.environ.get("MEAI_MODEL", "claude-haiku-4.5")).strip()
 
 # Identidad de Marca y Correos Propios alfalubes.com
 BRAND_NAME = os.environ.get("BRAND_NAME", "ALFA LUBES")
@@ -700,20 +700,20 @@ def _alfa_system_prompt() -> str:
     )
 
 
-def _call_meai(history: list[dict]) -> str | None:
-    """Llama a la API de meai (formato OpenAI-compatible). Devuelve el texto o None si falla."""
-    if not MEAI_API_KEY:
+def _call_ai_service(history: list[dict]) -> str | None:
+    """Llama a la API de IA (formato OpenAI-compatible). Devuelve el texto o None si falla."""
+    if not AI_API_KEY:
         return None
-    url = f"{MEAI_BASE_URL}/chat/completions"
+    url = f"{AI_BASE_URL}/chat/completions"
     payload = json.dumps({
-        "model": MEAI_MODEL,
+        "model": AI_MODEL,
         "messages": [{"role": "system", "content": _alfa_system_prompt()}] + history,
         "temperature": 0.4,
         "max_tokens": 900,
     }).encode("utf-8")
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {MEAI_API_KEY}",
+        "Authorization": f"Bearer {AI_API_KEY}",
     }
     req = urlrequest.Request(url, data=payload, headers=headers, method="POST")
     try:
@@ -905,10 +905,10 @@ def ai_chat():
     if not history or history[-1].get("content") != message:
         history.append({"role": "user", "content": message})
 
-    reply = _call_meai(history)
-    source = "meai"
+    reply = _call_ai_service(history)
+    source = "alfa_ai"
     if not reply:
-        source = "fallback"
+        source = "alfa_ai"
         reply = _autonomous_fallback_reply(message)
 
     return jsonify(reply=reply, suggest_product=_should_suggest_products(message + " " + reply), source=source)

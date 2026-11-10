@@ -130,16 +130,6 @@ function addMessage(text, isUser) {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function addSourceBadge(source) {
-  const isMeai = source === 'meai';
-  const label = isMeai ? 'IA meai (en línea)' : 'IA autónoma ALFA (local)';
-  const color = isMeai ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30' : 'text-amber-400 bg-amber-400/10 border-amber-400/30';
-  const el = document.createElement('div');
-  el.className = 'flex gap-3';
-  el.innerHTML = '<div class="w-8 h-8 shrink-0"></div><div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider ' + color + '"><span class="w-1.5 h-1.5 rounded-full ' + (isMeai ? 'bg-emerald-400' : 'bg-amber-400') + '"></span>' + label + '</div>';
-  chatMessages.appendChild(el);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
 
 function showTyping() {
   const el = document.createElement('div');
@@ -172,7 +162,6 @@ async function sendMessage(text) {
     if (!res.ok) throw new Error(data.error || 'Error');
     addMessage(data.reply, false);
     history.push({role: 'assistant', content: data.reply});
-    if (data.source) addSourceBadge(data.source);
     if (data.suggest_product) {
       const link = document.createElement('div');
       link.className = 'flex gap-3';
