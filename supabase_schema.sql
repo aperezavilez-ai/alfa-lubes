@@ -90,62 +90,50 @@ CREATE POLICY "Permitir crear items de pedidos anónimos" ON public.order_items
 INSERT INTO public.pallets (title, brand, oil_type, viscosity, units_per_pallet, pallet_price, unit_price_approx, image, description, origin)
 VALUES
 (
-    'Pallet ALFA LUBES DCT/DSG Full Synthetic',
+    'Pallet ALFA LUBES Full Synthetic',
     'ALFA LUBES',
-    'Transmisión Doble Embrague (DCT/DSG)',
-    'DCT/DSG Fluid',
+    'Transmisión y Motor Full Synthetic',
+    'DCT/DSG & 5W-30',
     60,
     38400.00,
     160.00,
-    'pallet-tarima-cajas.jpg',
-    'Tarima completa de fluido sintético de transmisión DCT/DSG importado. Fórmula de tecnología alemana para transmisiones DSG, S-Tronic y PowerShift.',
-    'Importación Directa USA/Alemania'
+    'pallet-alfalubes.jpg',
+    'Tarima oficial de la marca ALFA LUBES. Fluido y aceite 100% sintético de alto desempeño para máxima protección del motor y transmisiones modernas. Cajas selladas con logo oficial.',
+    'Marca Oficial ALFA LUBES'
 ),
 (
-    'Pallet Castrol EDGE Advanced 5W-30 Full Synthetic',
-    'Castrol',
-    'Motor Sintético Alto Desempeño',
+    'Pallet Importado 5W-30 Full Synthetic',
+    'Pallet Importado',
+    'Motor Sintético Premium',
     '5W-30',
     48,
-    43200.00,
-    225.00,
-    'pallet-almacen.jpg',
-    'Tarima sellada de fábrica con cajas de aceite sintético con tecnología Fluid Titanium. Máxima resistencia a la presión de motor.',
-    'Importación Directa USA'
+    41200.00,
+    214.50,
+    'pallet-importado-5w30.jpg',
+    'Tarima completa de aceite sintético importado para motor a gasolina. Formulación de alta pureza contra el desgaste, fricción y consumo a altas temperaturas.',
+    'Importación Directa'
 ),
 (
-    'Pallet Mobil 1 Extended Performance 0W-20',
-    'Mobil 1',
+    'Pallet Importado 0W-20 Full Synthetic',
+    'Pallet Importado',
     'Motor Sintético Avanzado',
     '0W-20',
     48,
-    52800.00,
-    275.00,
-    'pallet-tarima-cajas.jpg',
-    'Tarima mayorista de Mobil 1 0W-20 para vehículos modernos, híbridos y con arranque Start-Stop. Protección garantizada hasta 20,000 km.',
-    'Importación Directa USA'
-),
-(
-    'Pallet Tambores 208L Castrol GTX 10W-40 / Alto Kilometraje',
-    'Castrol',
-    'Tambores Industriales (55 Gal)',
-    '10W-40',
-    4,
-    58000.00,
-    69.70,
-    'pallet-almacen.jpg',
-    'Tarima de 4 tambores de 208 litros (832 litros totales) ideal para centros de lubricación rápida, refaccionarias y flotillas de transporte.',
-    'Importación Grado Industrial'
+    49800.00,
+    259.30,
+    'pallet-importado-0w20.jpg',
+    'Tarima mayorista de aceite sintético importado de baja viscosidad para vehículos modernos, híbridos y con arranque Start-Stop. Excelente fluidez en frío y ahorro de combustible.',
+    'Importación Directa'
 )
 ON CONFLICT DO NOTHING;
 
--- 8. PRODUCTOS INDIVIDUALES DE CATÁLOGO
+-- 8. PRODUCTOS INDIVIDUALES DE CATÁLOGO (EXCLUSIVOS ALFA LUBES)
 INSERT INTO public.products (name, brand, viscosity, price, stock, image, description)
 VALUES
-('Castrol EDGE 5W-30', 'Castrol', '5W-30', 299.00, 150, 'aceite-1.jpg', 'Aceite sintético para protección y desempeño en motores modernos.'),
-('Mobil 1 Advanced 5W-30', 'Mobil 1', '5W-30', 319.00, 200, 'aceite-2.jpg', 'Aceite sintético de alto desempeño para uso diario.'),
-('Shell Helix Ultra 5W-40', 'Shell', '5W-40', 359.00, 120, 'aceite-3.jpg', 'Protección sintética para limpieza y desempeño del motor.'),
-('Valvoline Advanced 5W-20', 'Valvoline', '5W-20', 279.00, 180, 'aceite-4.jpg', 'Aceite sintético para protección contra el desgaste.'),
-('Castrol GTX 10W-40', 'Castrol', '10W-40', 189.00, 250, 'aceite-5.jpg', 'Aceite para protección confiable en el uso cotidiano.'),
-('Mobil 1 Extended Performance 0W-20', 'Mobil 1', '0W-20', 389.00, 100, 'aceite-1.jpg', 'Aceite sintético de alto desempeño para motores compatibles.')
+('ALFA LUBES DCT/DSG Full Synthetic', 'ALFA LUBES', 'DCT/DSG', 380.00, 150, 'alfa-dct-dsg.jpg', 'Fluido sintético de alta tecnología para transmisiones de doble embrague DCT/DSG.'),
+('ALFA LUBES Full Synthetic 5W-30', 'ALFA LUBES', '5W-30', 299.00, 200, 'aceite-1.jpg', 'Aceite 100% sintético para máxima protección contra el desgaste en motores modernos.'),
+('ALFA LUBES Full Synthetic 0W-20', 'ALFA LUBES', '0W-20', 349.00, 120, 'aceite-2.jpg', 'Aceite sintético avanzado de baja viscosidad para economía de combustible y arranque en frío.'),
+('ALFA LUBES Synthetic Protection 5W-40', 'ALFA LUBES', '5W-40', 329.00, 180, 'aceite-3.jpg', 'Protección sintética superior para alta exigencia térmica en carretera y trabajo pesado.'),
+('ALFA LUBES Multigrado Alto Kilometraje 10W-40', 'ALFA LUBES', '10W-40', 199.00, 250, 'aceite-4.jpg', 'Fórmula con acondicionadores de sellos para motores con más de 100,000 km.'),
+('ALFA LUBES Full Synthetic 5W-20', 'ALFA LUBES', '5W-20', 289.00, 100, 'aceite-5.jpg', 'Aceite sintético para protección confiable y eficiente en vehículos livianos.')
 ON CONFLICT DO NOTHING;

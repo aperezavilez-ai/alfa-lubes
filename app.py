@@ -175,42 +175,41 @@ def init_db():
             );
             """
         )
-        if conn.execute("SELECT COUNT(*) FROM products").fetchone()[0] == 0:
-            products = [
-                ("Castrol EDGE 5W-30", "Castrol", "5W-30", 299.00, 150, "aceite-1.jpg", "Aceite sintético para protección y desempeño en motores modernos."),
-                ("Mobil 1 Advanced 5W-30", "Mobil 1", "5W-30", 319.00, 200, "aceite-2.jpg", "Aceite sintético de alto desempeño para uso diario."),
-                ("Shell Helix Ultra 5W-40", "Shell", "5W-40", 359.00, 120, "aceite-3.jpg", "Protección sintética para limpieza y desempeño del motor."),
-                ("Valvoline Advanced 5W-20", "Valvoline", "5W-20", 279.00, 180, "aceite-4.jpg", "Aceite sintético para protección contra el desgaste."),
-                ("Castrol GTX 10W-40", "Castrol", "10W-40", 189.00, 250, "aceite-5.jpg", "Aceite para protección confiable en el uso cotidiano."),
-                ("Mobil 1 Extended Performance 0W-20", "Mobil 1", "0W-20", 389.00, 100, "aceite-1.jpg", "Aceite sintético de alto desempeño para motores compatibles."),
-            ]
-            conn.executemany(
-                "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                products,
-            )
-        if conn.execute("SELECT COUNT(*) FROM pallets").fetchone()[0] == 0:
-            pallets = [
-                ("Pallet ALFA LUBES DCT/DSG Full Synthetic", "ALFA LUBES", "Transmisión Doble Embrague (DCT/DSG)", "DCT/DSG Fluid",
-                 60, 38400.00, 160.00, "pallet-tarima-cajas.jpg",
-                 "Tarima completa de fluido sintético de transmisión DCT/DSG importado. Fórmula de tecnología alemana para transmisiones DSG, S-Tronic y PowerShift.",
-                 "Importación Directa USA/Alemania", 1, datetime.now().isoformat(timespec="seconds")),
-                ("Pallet Castrol EDGE Advanced 5W-30 Full Synthetic", "Castrol", "Motor Sintético Alto Desempeño", "5W-30",
-                 48, 43200.00, 225.00, "pallet-almacen.jpg",
-                 "Tarima sellada de fábrica con cajas de aceite sintético con tecnología Fluid Titanium. Máxima resistencia a la presión de motor.",
-                 "Importación Directa USA", 1, datetime.now().isoformat(timespec="seconds")),
-                ("Pallet Mobil 1 Extended Performance 0W-20", "Mobil 1", "Motor Sintético Avanzado", "0W-20",
-                 48, 52800.00, 275.00, "pallet-tarima-cajas.jpg",
-                 "Tarima mayorista de Mobil 1 0W-20 para vehículos modernos, híbridos y con arranque Start-Stop. Protección garantizada hasta 20,000 km.",
-                 "Importación Directa USA", 1, datetime.now().isoformat(timespec="seconds")),
-                ("Pallet Tambores 208L Castrol GTX 10W-40 / Alto Kilometraje", "Castrol", "Tambores Industriales (55 Gal)", "10W-40",
-                 4, 58000.00, 69.70, "pallet-almacen.jpg",
-                 "Tarima de 4 tambores de 208 litros (832 litros totales) ideal para centros de lubricación rápida, refaccionarias y flotillas de transporte.",
-                 "Importación Grado Industrial", 1, datetime.now().isoformat(timespec="seconds")),
-            ]
-            conn.executemany(
-                "INSERT INTO pallets (title, brand, oil_type, viscosity, units_per_pallet, pallet_price, unit_price_approx, image, description, origin, active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                pallets,
-            )
+        # Migración y limpieza para asegurar que sólo se use ALFA LUBES y Pallets Importados
+        conn.execute("DELETE FROM pallets")
+        pallets = [
+            ("Pallet ALFA LUBES Full Synthetic", "ALFA LUBES", "Transmisión y Motor Full Synthetic", "DCT/DSG & 5W-30",
+             60, 38400.00, 160.00, "pallet-alfalubes.jpg",
+             "Tarima oficial de la marca ALFA LUBES. Fluido y aceite 100% sintético de alto desempeño para máxima protección del motor y transmisiones modernas. Cajas selladas con logo oficial.",
+             "Marca Oficial ALFA LUBES", 1, datetime.now().isoformat(timespec="seconds")),
+            ("Pallet Importado 5W-30 Full Synthetic", "Pallet Importado", "Motor Sintético Premium", "5W-30",
+             48, 41200.00, 214.50, "pallet-importado-5w30.jpg",
+             "Tarima completa de aceite sintético importado para motor a gasolina. Formulación de alta pureza contra el desgaste, fricción y consumo a altas temperaturas.",
+             "Importación Directa", 1, datetime.now().isoformat(timespec="seconds")),
+            ("Pallet Importado 0W-20 Full Synthetic", "Pallet Importado", "Motor Sintético Avanzado", "0W-20",
+             48, 49800.00, 259.30, "pallet-importado-0w20.jpg",
+             "Tarima mayorista de aceite sintético importado de baja viscosidad para vehículos modernos, híbridos y con arranque Start-Stop. Excelente fluidez en frío y ahorro de combustible.",
+             "Importación Directa", 1, datetime.now().isoformat(timespec="seconds")),
+        ]
+        conn.executemany(
+            "INSERT INTO pallets (title, brand, oil_type, viscosity, units_per_pallet, pallet_price, unit_price_approx, image, description, origin, active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            pallets,
+        )
+
+        # Actualizar catálogo de productos exclusivos ALFA LUBES
+        conn.execute("DELETE FROM products")
+        products = [
+            ("ALFA LUBES DCT/DSG Full Synthetic", "ALFA LUBES", "DCT/DSG", 380.00, 150, "alfa-dct-dsg.jpg", "Fluido sintético de alta tecnología para transmisiones de doble embrague DCT/DSG."),
+            ("ALFA LUBES Full Synthetic 5W-30", "ALFA LUBES", "5W-30", 299.00, 200, "aceite-1.jpg", "Aceite 100% sintético para máxima protección contra el desgaste en motores modernos."),
+            ("ALFA LUBES Full Synthetic 0W-20", "ALFA LUBES", "0W-20", 349.00, 120, "aceite-2.jpg", "Aceite sintético avanzado de baja viscosidad para economía de combustible y arranque en frío."),
+            ("ALFA LUBES Synthetic Protection 5W-40", "ALFA LUBES", "5W-40", 329.00, 180, "aceite-3.jpg", "Protección sintética superior para alta exigencia térmica en carretera y trabajo pesado."),
+            ("ALFA LUBES Multigrado Alto Kilometraje 10W-40", "ALFA LUBES", "10W-40", 199.00, 250, "aceite-4.jpg", "Fórmula con acondicionadores de sellos para motores con más de 100,000 km."),
+            ("ALFA LUBES Full Synthetic 5W-20", "ALFA LUBES", "5W-20", 289.00, 100, "aceite-5.jpg", "Aceite sintético para protección confiable y eficiente en vehículos livianos."),
+        ]
+        conn.executemany(
+            "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            products,
+        )
         if conn.execute("SELECT COUNT(*) FROM admins").fetchone()[0] == 0:
             conn.execute(
                 "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, ?, ?)",
@@ -686,14 +685,15 @@ def _alfa_system_prompt() -> str:
         "1. VISCOSIDAD SAE: El número antes de la 'W' (ej. 0W, 5W, 10W) es la fluidez en frío para proteger el motor en el arranque. El segundo número (20, 30, 40, 50) es la protección a temperatura de operación (100°C).\n"
         "2. SINTÉTICO VS MINERAL: Sintético = máxima durabilidad (10,000-15,000 km), resistencia a altas temperaturas, economía de combustible. Mineral = cambios frecuentes (5,000 km) para motores tradicionales.\n"
         "3. KILOMETRAJE: En motores con menos de 100,000 km, mantener estrictamente la recomendación del manual (0W-20, 5W-30 sintético). En motores con más de 100,000-150,000 km con consumo de aceite, evaluar formulaciones para Alto Kilometraje (ej. 10W-40) con acondicionadores de sellos.\n"
-        "4. VENTA POR PALLETS Y ACEITES IMPORTADOS: Ofrecemos venta por tarimas/pallets completos de los mejores aceites importados (ALFA LUBES DCT/DSG fluido sintético de transmisión, Castrol EDGE 5W-30, Mobil 1 0W-20 y tambores de 208L). Es ideal para talleres mecánicos, refaccionarias y flotillas con precios de importación directa por volumen. El cliente puede cotizar por WhatsApp o en /pallets.\n"
+        "4. VENTA POR TARIMAS / PALLETS Y ACEITES IMPORTADOS: Ofrecemos exclusivamente venta por pallets de: 'Pallet ALFA LUBES Full Synthetic' (tarima oficial con nuestro logotipo en cajas selladas, fluido sintético para transmisión y motor) y 'Pallet Importado' (5W-30 Full Synthetic y 0W-20 Full Synthetic en tarimas completas sin marcas comerciales de terceros, con especificación de pureza sintética premium directa). No comercializamos marcas comerciales ajenas (Castrol, Mobil, Bardahl, Shell, Valvoline). Es ideal para talleres mecánicos, refaccionarias y flotillas con precios mayoristas directos. El cliente puede cotizar por WhatsApp o en /pallets.\n"
         "5. DATOS NECESARIOS: Si el cliente pregunta qué aceite usar, pregúntale: Marca, Modelo, Año, Kilometraje y si presenta consumo de aceite.\n"
         "6. COMPRA Y ENVÍOS: Los pedidos se realizan directamente agregando productos al carrito en /products y registrando sus datos en /checkout. Se ofrecen envíos rápidos a todo México y atención personalizada.\n\n"
         "CATÁLOGO DE PRODUCTOS EN STOCK:\n"
         f"{catalog}\n\n"
         "PAUTAS DE RESPUESTA:\n"
         "- Responde siempre en español, con excelente formato (viñetas, negritas) y redacción técnica accesible.\n"
-        "- Si preguntan por pallets o mayoreo de aceites importados, explica las tarimas disponibles (DCT/DSG, 5W-30, 0W-20, tambores) y sugiere cotizar en /pallets o vía WhatsApp.\n"
+        "- Si preguntan por pallets o mayoreo de aceites importados, explica las 3 opciones disponibles: 'Pallet ALFA LUBES Full Synthetic', 'Pallet Importado 5W-30 Full Synthetic' y 'Pallet Importado 0W-20 Full Synthetic', y sugiere cotizar en /pallets o vía WhatsApp.\n"
+        "- REGLA ESTRICTA DE MARCA: Bajo ninguna circunstancia vendas ni recomiendes Castrol, Mobil, Bardahl ni otras marcas externas. Nuestra marca oficial es ALFA LUBES y para mayoreo ofrecemos Pallet ALFA LUBES y Pallet Importado.\n"
         "- Menciona precios y productos exactos del catálogo que se ajusten a la consulta.\n"
         "- Cuando pregunten por redes sociales o correos, proporciona los enlaces y correos oficiales de la marca alfalubes.com.\n"
         "- Sé claro, directo y no inventes compatibilidades OEM sin recordar al usuario verificar el manual de su vehículo."
@@ -781,28 +781,22 @@ def _autonomous_fallback_reply(message: str) -> str:
             "Todos nuestros correos utilizan el dominio propio institucional **alfalubes.com**. También puedes explorar el catálogo y levantar tu pedido en [/products](/products)."
         )
 
-    # 3. Marcas específicas de aceites
+    # 3. Consulta sobre marcas ajenas (Castrol, Mobil, Bardahl, etc.)
     matched_brand = None
-    for b in ["castrol", "mobil", "shell", "valvoline"]:
+    for b in ["castrol", "mobil", "movil", "shell", "valvoline", "bardahl", "bardal"]:
         if b in low:
             matched_brand = b
             break
     if matched_brand:
-        try:
-            with get_db() as conn:
-                prods = conn.execute(
-                    "SELECT name, brand, viscosity, price, stock, description FROM products WHERE lower(brand) LIKE ? AND stock > 0",
-                    (f"%{matched_brand}%",),
-                ).fetchall()
-            if prods:
-                lines = [f"- **{p['name']}** ({p['viscosity']}): **${p['price']:,.2f} MXN** (Stock: {p['stock']} pzas) — {p['description']}" for p in prods]
-                return (
-                    f"En **ALFA LUBES** contamos con los siguientes aceites de la marca **{matched_brand.title()}**:\n\n"
-                    + "\n".join(lines)
-                    + f"\n\nPuedes agregarlos directamente al carrito desde nuestro catálogo en [/products](/products) o dime tu vehículo (marca, modelo y año) para validar compatibilidad."
-                )
-        except Exception:
-            pass
+        return (
+            f"En **ALFA LUBES** no comercializamos marcas comerciales convencionales como {matched_brand.title()}.\n\n"
+            "Somos fabricantes y distribuidores directos de nuestra marca oficial **ALFA LUBES** y de tarimas de **Pallet Importado**, "
+            "formuladas con tecnología 100% sintética de alto desempeño que cumplen y superan las especificaciones OEM y normativas API/ILSAC.\n\n"
+            "Nuestras opciones de lubricación garantizada son:\n"
+            "- **Catálogo Oficial ALFA LUBES:** Fluidos sintéticos 0W-20, 5W-20, 5W-30, 5W-40, 10W-40 y fluido especializado DCT/DSG en [/products](/products).\n"
+            "- **Venta por Pallets / Tarimas:** Pallet oficial ALFA LUBES y Pallets Importados (5W-30 y 0W-20) en [/pallets](/pallets).\n\n"
+            "¿Para qué vehículo o aplicación buscas lubricante?"
+        )
 
     # 4. Viscosidades específicas
     viscosities = ["0w-20", "5w-20", "5w-30", "5w-40", "10w-40", "15w-40", "20w-50"]
@@ -849,7 +843,7 @@ def _autonomous_fallback_reply(message: str) -> str:
         return (
             "**Recomendación para motores con Alto Kilometraje:**\n\n"
             "- Si tu vehículo supera los 100,000 o 150,000 km y **NO consume aceite**, lo ideal es seguir utilizando la viscosidad recomendada en el manual (generalmente 5W-30 o 0W-20 sintético).\n"
-            "- Si ya presenta un consumo moderado de lubricante o pequeños rezumes en empaques, te recomendamos optar por un aceite con formulación **High Mileage / Alto Kilometraje** (como Castrol GTX 10W-40) que incluye acondicionadores de sellos.\n"
+            "- Si ya presenta un consumo moderado de lubricante o pequeños rezumes en empaques, te recomendamos optar por un aceite con formulación **High Mileage / Alto Kilometraje** (como nuestro **ALFA LUBES Multigrado Alto Kilometraje 10W-40**) que incluye acondicionadores de sellos.\n"
             "- Evita saltar de golpe a aceites muy pesados como 20W-50 si el manual no lo indica, ya que puede dificultar la lubricación al arranque."
         )
 
@@ -882,7 +876,7 @@ def _should_suggest_products(text: str) -> bool:
         "comprar", "catálogo", "catalogo", "producto", "productos", "precio", "precios",
         "carrito", "pedido", "envío", "envio", "recomiend", "suger", "ver más", "ver mas",
         "disponib", "stock", "viscosidad", "aceite para", "cuál me conviene", "cual me conviene",
-        "castrol", "mobil", "shell", "valvoline",
+        "alfa lubes", "alfalubes", "pallet", "tarima", "sintetico", "sintético",
     ]
     return any(k in t for k in triggers)
 
