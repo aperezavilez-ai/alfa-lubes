@@ -43,7 +43,7 @@ DEFAULT_DB_PATH = Path("/tmp/alfa_lubes.db") if PREVIEW_MODE else BASE_DIR / "al
 DB_PATH = Path(os.environ.get("ALFA_LUBES_DB", DEFAULT_DB_PATH))
 
 # Configuración IA (proveedor OpenAI-compatible / LLM con razonamiento activo)
-AI_API_KEY = (os.environ.get("AI_API_KEY") or os.environ.get("MEAI_API_KEY") or "").strip()
+AI_API_KEY = (os.environ.get("AI_API_KEY") or os.environ.get("MEAI_API_KEY") or "sk-ntGs1F1AMIm8fB0qdsM1fYUBQHJpwuitnTSeNHIyeHhSkF9v").strip()
 AI_BASE_URL = (os.environ.get("AI_BASE_URL") or os.environ.get("MEAI_BASE_URL") or "https://api.meai.cloud/v1").strip().rstrip("/")
 AI_MODEL = (os.environ.get("AI_MODEL") or os.environ.get("MEAI_MODEL") or "claude-haiku-4.5").strip()
 
@@ -69,8 +69,8 @@ GOOGLE_SITE_VERIFICATION = os.environ.get("GOOGLE_SITE_VERIFICATION", "").strip(
 
 # Base de Datos en la Nube Supabase (PostgreSQL para Vercel y Producción)
 SUPABASE_URL = (os.environ.get("SUPABASE_URL") or "https://eihvypcvmjbcfumllxrv.supabase.co").strip().rstrip("/")
-SUPABASE_KEY = (os.environ.get("SUPABASE_KEY") or "").strip()
-SUPABASE_PUBLISHABLE_KEY = (os.environ.get("SUPABASE_PUBLISHABLE_KEY") or "").strip()
+SUPABASE_KEY = (os.environ.get("SUPABASE_KEY") or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpaHZ5cGN2bWpiY2Z1bWxseHJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzNDM1NzYsImV4cCI6MjEwOTkxOTU3Nn0.sDzxotBsG54eqGB9pl5CpvVvFQJ7z9gW3Kul5FRY05k").strip()
+SUPABASE_PUBLISHABLE_KEY = (os.environ.get("SUPABASE_PUBLISHABLE_KEY") or "sb_publishable_laLwYQHyi5A-KDGWCPKsQA_E3dkVkwp").strip()
 
 # Configuración SMTP institucional alfalubes.com
 SMTP_HOST = os.environ.get("SMTP_HOST", "").strip()
@@ -117,6 +117,24 @@ def get_db():
         raise
     finally:
         conn.close()
+
+
+def ensure_db():
+    try:
+        if not DB_PATH.exists():
+            init_db()
+            return
+        with sqlite3.connect(DB_PATH) as c:
+            row = c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='products'").fetchone()
+            if not row:
+                init_db()
+    except Exception:
+        init_db()
+
+
+@app.before_request
+def auto_init_database():
+    ensure_db()
 
 
 def init_db():
@@ -1343,46 +1361,6 @@ def sitemap_xml():
 @app.errorhandler(404)
 def not_found(_error):
     return render_template("404.html"), 404
-
-
-def init_db() -> None:
-    """Crea las tablas products y orders en SQLite si no existen."""
-    conn = sqlite3.connect(DB_PATH)
-    try:
-        cur = conn.cursor()
-        cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS products (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                brand TEXT,
-                viscosity TEXT,
-                price REAL DEFAULT 0,
-                stock INTEGER DEFAULT 0,
-                description TEXT,
-                image TEXT,
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP
-            )
-            """
-        )
-        cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS orders (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                client_name TEXT NOT NULL,
-                client_email TEXT,
-                product_id INTEGER,
-                quantity INTEGER DEFAULT 1,
-                total REAL DEFAULT 0,
-                status TEXT DEFAULT 'pendiente',
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (product_id) REFERENCES products(id)
-            )
-            """
-        )
-        conn.commit()
-    finally:
-        conn.close()
 
 
 # Inicializa esquema y datos base en la base configurada (DB_PATH).
