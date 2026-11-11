@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+{% block title %}Gestión de Usuarios y Roles | ALFA LUBES{% endblock %}
+{% block content %}
+<section class="py-8 sm:py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
+    <!-- Header de Navegación del Panel -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-5">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <a href="{{ url_for('admin_panel') }}" class="text-xs text-slate-400 hover:text-amber-400 transition flex items-center gap-1">
+            <i class="fa-solid fa-arrow-left"></i> Panel Principal
+          </a>
+          <span class="text-slate-600">/</span>
+          <span class="text-xs text-amber-400 font-bold uppercase tracking-wider">Gestión de Acceso</span>
+        </div>
+        <h1 class="text-3xl font-extrabold text-white flex items-center gap-3">
+          <i class="fa-solid fa-users-gear text-amber-400"></i> Usuarios y Roles Administrativos
+        </h1>
+        <p class="text-sm text-slate-400">Administra las cuentas autorizadas, asigna roles y gestiona contraseñas corporativas.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button onclick="openNewUserModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 shadow-lg">
+          <i class="fa-solid fa-user-plus"></i> Dar de Alta Nuevo Usuario
+        </button>
+        <a href="{{ url_for('admin_reports') }}" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2.5 rounded-xl font-semibold text-xs transition flex items-center gap-2">
+          <i class="fa-solid fa-boxes-stacked text-amber-400"></i> Reportes Pallets
+        </a>
+      </div>
+    </div>
+
+    <!-- Tarjetas de Resumen -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Usuarios Totales</p>
+          <p class="text-2xl font-black text-white mt-1">{{ users|length }}</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-users"></i>
+        </div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Super Administradores</p>
+          <p class="text-2xl font-black text-amber-400 mt-1">
+            {{ users|selectattr('role', 'equalto', 'super')|list|length }}
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Sesión Actual</p>
+          <p class="text-sm font-bold text-white mt-1 truncate max-w-[200px]">{{ session.get('admin_name', 'Administrador') }}</p>
+          <p class="text-[11px] text-emerald-400">{{ session.get('admin_email', '') }} ({{ session.get('admin_role', '')|upper }})</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Usuarios y Roles -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div>
+          <h2 class="font-bold text-base text-white">Directorio de Administradores Registrados</h2>
+          <p class="text-xs text-slate-400">Control de credenciales, roles asignados y operaciones de seguridad.</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-950/60 text-slate-400 uppercase font-bold tracking-wider border-b border-slate-800">
+            <tr>
+              <th class="p-4">Usuario</th>
+              <th class="p-4">Correo Institucional</th>
+              <th class="p-4">Rol Asignado</th>
+              <th class="p-4">Estado</th>
+              <th class="p-4">Fecha Alta</th>
+              <th class="p-4 text-right">Acciones de Seguridad</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 text-slate-300">
+            {% for u in users %}
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="p-4 font-semibold text-white flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-amber-400 font-bold shrink-0">
+                  {{ u.name[:2]|upper }}
+                </div>
+                <span>{{ u.name }}</span>
+              </td>
+              <td class="p-4 font-mono text-sky-400">{{ u.email }}</td>
+              <td class="p-4">
+                {% if u.role == 'super' %}
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                  <i class="fa-solid fa-crown text-[10px]"></i> Super Admin
+                </span>
+                {% elif u.role == 'admin' %}
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                  <i class="fa-solid fa-user-gear text-[10px]"></i> Administrador
+                </span>
+                {% else %}
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  <i class="fa-solid fa-tag text-[10px]"></i> Ventas / Comercial
+                </span>
+                {% endif %}
+              </td>
+              <td class="p-4">
+                {% if u.active %}
+                <span class="text-emerald-400 flex items-center gap-1 font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Activo
+                </span>
+                {% else %}
+                <span class="text-rose-400 flex items-center gap-1 font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Inactivo
+                </span>
+                {% endif %}
+              </td>
+              <td class="p-4 text-slate-400">{{ u.created_at[:10] if u.created_at else 'Permanente' }}</td>
+              <td class="p-4 text-right space-x-2">
+                <!-- Cambiar Contraseña -->
+                <button type="button" onclick="openPasswordModal('{{ u.id }}', '{{ u.name }}', '{{ u.email }}')" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-semibold transition" title="Cambiar Contraseña">
+                  <i class="fa-solid fa-key"></i> Cambiar Clave
+                </button>
+
+                <!-- Eliminar Usuario (protección para admin total) -->
+                {% if u.email.lower() in ['alfonsoavilery@icloud.com', 'alfonsoavilezy@icloud.com'] %}
+                <span class="text-slate-500 text-[11px] italic px-2 py-1 bg-slate-950/60 rounded-lg border border-slate-800">
+                  <i class="fa-solid fa-lock text-[10px]"></i> Principal
+                </span>
+                {% elif session.get('admin_email','').lower() == u.email.lower() %}
+                <span class="text-slate-500 text-[11px] italic px-2 py-1 bg-slate-950/60 rounded-lg border border-slate-800">
+                  Tu sesión
+                </span>
+                {% else %}
+                <form action="{{ url_for('admin_delete_user', user_id=u.id) }}" method="post" class="inline" onsubmit="return confirm('¿Estás seguro de eliminar al usuario {{ u.name }} ({{ u.email }})?');">
+                  <button type="submit" class="bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 px-3 py-1.5 rounded-lg font-semibold transition" title="Eliminar usuario">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sección para Cambiar Mi Propia Contraseña -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-xl">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-base text-white">Cambiar mi Contraseña de Acceso</h3>
+          <p class="text-xs text-slate-400">Actualiza la contraseña de tu cuenta activa ({{ session.get('admin_email', '') }}).</p>
+        </div>
+      </div>
+
+      <form action="{{ url_for('admin_change_own_password') }}" method="post" class="space-y-3.5 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Nueva Contraseña *</label>
+            <input name="new_password" type="password" required minlength="4" placeholder="Mínimo 4 caracteres" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Confirmar Contraseña *</label>
+            <input name="confirm_password" type="password" required minlength="4" placeholder="Repite la contraseña" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
+          </div>
+        </div>
+        <button type="submit" class="bg-sky-700 hover:bg-sky-600 text-white font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow">
+          <i class="fa-solid fa-check"></i> Actualizar Mi Contraseña
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Modal: Dar de Alta Nuevo Usuario -->
+<div id="new-user-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
+    <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-amber-500/10 via-slate-900 to-slate-900">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-base text-white">Dar de Alta Usuario</h3>
+          <p class="text-xs text-amber-300/80">Nuevo acceso administrativo ALFA LUBES</p>
+        </div>
+      </div>
+      <button onclick="closeNewUserModal()" class="text-slate-400 hover:text-white p-2">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <form method="post" action="{{ url_for('admin_users') }}" class="p-5 space-y-4 text-xs">
+      <div>
+        <label class="block font-semibold text-slate-300 mb-1">Nombre Completo *</label>
+        <input name="name" type="text" required placeholder="Ej. Roberto Ruelas" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-400">
+      </div>
+
+      <div>
+        <label class="block font-semibold text-slate-300 mb-1">Correo Institucional *</label>
+        <input name="email" type="email" required placeholder="usuario@alfalubes.com" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-400">
+      </div>
+
+      <div>
+        <label class="block font-semibold text-slate-300 mb-1">Contraseña Inicial *</label>
+        <input name="password" type="password" required minlength="4" placeholder="Contraseña segura" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-400">
+      </div>
+
+      <div>
+        <label class="block font-semibold text-slate-300 mb-1">Rol Asignado *</label>
+        <select name="role" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-400">
+          <option value="admin" selected>Administrador (Acceso Completo)</option>
+          <option value="super">Super Admin (Control Total)</option>
+          <option value="ventas">Ventas / Comercial (Atención a Clientes)</option>
+        </select>
+      </div>
+
+      <div class="pt-3 border-t border-slate-800 flex justify-end gap-2">
+        <button type="button" onclick="closeNewUserModal()" class="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 font-semibold transition">Cancelar</button>
+        <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-user-check"></i> Guardar Usuario
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Cambiar Contraseña de Usuario -->
+<div id="password-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
+    <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-base text-white">Cambiar Contraseña</h3>
+          <p id="pwd-user-desc" class="text-xs text-slate-400">Usuario seleccionado</p>
+        </div>
+      </div>
+      <button onclick="closePasswordModal()" class="text-slate-400 hover:text-white p-2">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <form id="pwd-form" method="post" action="" class="p-5 space-y-4 text-xs">
+      <div>
+        <label class="block font-semibold text-slate-300 mb-1">Nueva Contraseña *</label>
+        <input name="new_password" type="password" required minlength="4" placeholder="Ingresa la nueva contraseña" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-400">
+      </div>
+
+      <div class="pt-3 border-t border-slate-800 flex justify-end gap-2">
+        <button type="button" onclick="closePasswordModal()" class="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 font-semibold transition">Cancelar</button>
+        <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-save"></i> Guardar Nueva Clave
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openNewUserModal() {
+  const m = document.getElementById('new-user-modal');
+  m.classList.remove('hidden');
+  m.classList.add('flex');
+}
+
+function closeNewUserModal() {
+  const m = document.getElementById('new-user-modal');
+  m.classList.add('hidden');
+  m.classList.remove('flex');
+}
+
+function openPasswordModal(userId, userName, userEmail) {
+  const m = document.getElementById('password-modal');
+  document.getElementById('pwd-user-desc').textContent = `${userName} (${userEmail})`;
+  document.getElementById('pwd-form').action = `/admin/users/${userId}/password`;
+  m.classList.remove('hidden');
+  m.classList.add('flex');
+}
+
+function closePasswordModal() {
+  const m = document.getElementById('password-modal');
+  m.classList.add('hidden');
+  m.classList.remove('flex');
+}
+</script>
+{% endblock %}

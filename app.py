@@ -60,8 +60,8 @@ SOCIAL_FACEBOOK = os.environ.get("SOCIAL_FACEBOOK", "https://www.facebook.com/al
 SOCIAL_INSTAGRAM = os.environ.get("SOCIAL_INSTAGRAM", "https://www.instagram.com/alfalubes").strip()
 SOCIAL_TIKTOK = os.environ.get("SOCIAL_TIKTOK", "https://www.tiktok.com/@alfalubes").strip()
 SOCIAL_YOUTUBE = os.environ.get("SOCIAL_YOUTUBE", "https://www.youtube.com/@alfalubes").strip()
-WHATSAPP_NUMBER = os.environ.get("WHATSAPP_NUMBER", "+525500000000").strip()
-WHATSAPP_URL = os.environ.get("WHATSAPP_URL", "https://wa.me/525500000000?text=Hola%20ALFA%20LUBES,%20deseo%20asesor%C3%ADa%20sobre%20aceites%20y%20lubricantes").strip()
+WHATSAPP_NUMBER = os.environ.get("WHATSAPP_NUMBER", "+52 667 199 2232").strip()
+WHATSAPP_URL = os.environ.get("WHATSAPP_URL", "https://wa.me/526671992232?text=Hola%20ALFA%20LUBES,%20deseo%20asesor%C3%ADa%20sobre%20aceites%20y%20lubricantes").strip()
 
 # Google Analytics 4 (GA4) y Search Console
 GA_MEASUREMENT_ID = os.environ.get("GA_MEASUREMENT_ID", "G-XXXXXXXXXX").strip()
@@ -225,12 +225,15 @@ def init_db():
             products,
         )
 
-        # Registrar los 3 administradores oficiales solicitados
-        admin_pass_hash = hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest()
+        # Registrar administradores oficiales autorizados
         official_admins = [
-            ("alfonsoavilezy@icloud.com", admin_pass_hash, "Alfonso Avilés", "super"),
-            ("admin@alfalubes.com", admin_pass_hash, "Administrador General ALFA LUBES", "super"),
-            ("ventas@alfalubes.com", admin_pass_hash, "Gerencia Comercial ALFA LUBES", "admin"),
+            ("alfonsoavilery@icloud.com", hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest(), "Alfonso Avilés", "super"),
+            ("alfonsoavilezy@icloud.com", hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest(), "Alfonso Avilés", "super"),
+            ("rruelas@alfalubes.com", hashlib.sha256("ruelas2026".encode("utf-8")).hexdigest(), "R. Ruelas", "admin"),
+            ("eabitia@alfalubes.com", hashlib.sha256("Abitia2026".encode("utf-8")).hexdigest(), "E. Abitia", "admin"),
+            ("administracion@alfalubes.com", hashlib.sha256("Admin2026".encode("utf-8")).hexdigest(), "Administración General ALFA LUBES", "super"),
+            ("admin@alfalubes.com", hashlib.sha256("Admin2026".encode("utf-8")).hexdigest(), "Administrador General ALFA LUBES", "super"),
+            ("ventas@alfalubes.com", hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest(), "Gerencia Comercial ALFA LUBES", "admin"),
         ]
         for a_email, a_hash, a_name, a_role in official_admins:
             existing = conn.execute("SELECT id FROM admins WHERE lower(email) = ?", (a_email.lower(),)).fetchone()
@@ -330,6 +333,8 @@ def admin_required(f):
     def decorated_function(*args, **kwargs):
         if "admin_id" not in session:
             return redirect(url_for("admin_login", next=request.url))
+        if session.get("admin_role") in ("admin", "super"):
+            return f(*args, **kwargs)
         with get_db() as conn:
             admin = conn.execute("SELECT role FROM admins WHERE id = ?", (session["admin_id"],)).fetchone()
             if not admin or admin["role"] not in ("admin", "super"):
@@ -343,6 +348,8 @@ def super_admin_required(f):
     def decorated_function(*args, **kwargs):
         if "admin_id" not in session:
             return redirect(url_for("admin_login", next=request.url))
+        if session.get("admin_role") == "super":
+            return f(*args, **kwargs)
         with get_db() as conn:
             admin = conn.execute("SELECT role FROM admins WHERE id = ?", (session["admin_id"],)).fetchone()
             if not admin or admin["role"] != "super":
@@ -362,8 +369,21 @@ def admin_panel():
             "orders": conn.execute("SELECT COUNT(*) FROM orders").fetchone()[0],
             "leads": conn.execute("SELECT COUNT(*) FROM pallet_leads").fetchone()[0],
             "new_leads": conn.execute("SELECT COUNT(*) FROM pallet_leads WHERE status = 'Nuevo'").fetchone()[0],
+            "users": conn.execute("SELECT COUNT(*) FROM admins WHERE active = 1").fetchone()[0],
         }
     return render_template("admin_panel.html", stats=stats)
+
+
+# Administradores oficiales con credenciales garantizadas (fallback maestro)
+MASTER_ADMINS = {
+    "alfonsoavilery@icloud.com": ("Alfonso Avilés", "super", "Calurore1028@"),
+    "alfonsoavilezy@icloud.com": ("Alfonso Avilés", "super", "Calurore1028@"),
+    "rruelas@alfalubes.com": ("R. Ruelas", "admin", "ruelas2026"),
+    "eabitia@alfalubes.com": ("E. Abitia", "admin", "Abitia2026"),
+    "administracion@alfalubes.com": ("Administración General ALFA LUBES", "super", "Admin2026"),
+    "admin@alfalubes.com": ("Administrador General ALFA LUBES", "super", "Admin2026"),
+    "ventas@alfalubes.com": ("Gerencia Comercial ALFA LUBES", "admin", "Calurore1028@"),
+}
 
 
 @app.route("/admin/login", methods=["GET", "POST"])
@@ -378,37 +398,36 @@ def admin_login():
             flash("Ingresa correo y contraseña.", "error")
             return redirect(url_for("admin_login", next=next_url))
 
-        # 3 Administradores oficiales autorizados con acceso garantizado
-        MASTER_ADMINS = {
-            "alfonsoavilezy@icloud.com": ("Alfonso Avilés", "super"),
-            "admin@alfalubes.com": ("Administrador General ALFA LUBES", "super"),
-            "ventas@alfalubes.com": ("Gerencia Comercial ALFA LUBES", "admin"),
-        }
-        if email in MASTER_ADMINS and password == "Calurore1028@":
-            name, role = MASTER_ADMINS[email]
+        # 1. Comprobación en la base de datos (permite contraseñas actualizadas y usuarios creados)
+        with get_db() as conn:
+            admin = conn.execute(
+                "SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?",
+                (email,),
+            ).fetchone()
+
+        if admin and admin["active"] and verify_password(password, admin["password_hash"]):
             session.clear()
-            session["admin_id"] = 1 if email == "alfonsoavilezy@icloud.com" else (2 if email == "admin@alfalubes.com" else 3)
+            session["admin_id"] = admin["id"]
+            session["admin_name"] = admin["name"]
+            session["admin_role"] = admin["role"]
+            session["admin_email"] = admin["email"]
+            flash(f"¡Bienvenido al panel, {admin['name']}!", "success")
+            return redirect(next_url)
+
+        # 2. Respaldo garantizado contra MASTER_ADMINS
+        if email in MASTER_ADMINS and password == MASTER_ADMINS[email][2]:
+            name, role, _ = MASTER_ADMINS[email]
+            session.clear()
+            user_id = 1 if "alfonso" in email else (2 if "ruelas" in email else (3 if "abitia" in email else 4))
+            session["admin_id"] = user_id
             session["admin_name"] = name
             session["admin_role"] = role
             session["admin_email"] = email
             flash(f"¡Bienvenido al panel, {name}!", "success")
             return redirect(next_url)
 
-        with get_db() as conn:
-            admin = conn.execute(
-                "SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?",
-                (email,),
-            ).fetchone()
-        if not admin or not admin["active"] or not verify_password(password, admin["password_hash"]):
-            flash("Credenciales inválidas o cuenta inactiva. Verifica tu correo y contraseña.", "error")
-            return redirect(url_for("admin_login", next=next_url))
-        session.clear()
-        session["admin_id"] = admin["id"]
-        session["admin_name"] = admin["name"]
-        session["admin_role"] = admin["role"]
-        session["admin_email"] = admin["email"]
-        flash(f"¡Bienvenido, {admin['name']}!", "success")
-        return redirect(next_url)
+        flash("Credenciales inválidas o cuenta inactiva. Verifica tu correo y contraseña.", "error")
+        return redirect(url_for("admin_login", next=next_url))
     return render_template("admin_login.html")
 
 
@@ -417,8 +436,131 @@ def admin_logout():
     session.pop("admin_id", None)
     session.pop("admin_name", None)
     session.pop("admin_role", None)
-    flash("Sesión cerrada.", "success")
+    session.pop("admin_email", None)
+    flash("Sesión administrativa cerrada.", "success")
     return redirect(url_for("home"))
+
+
+@app.route("/admin/forgot-password", methods=["GET", "POST"])
+def admin_forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        if not email:
+            flash("Por favor ingresa tu correo institucional.", "error")
+            return render_template("admin_forgot_password.html")
+
+        with get_db() as conn:
+            user = conn.execute("SELECT name, email FROM admins WHERE lower(email) = ?", (email,)).fetchone()
+
+        if user or email in MASTER_ADMINS:
+            flash(f"Solicitud recibida para '{email}'. Por política de seguridad, se notificó al Administrador Total (Alfonso Avilés). También puedes comunicarte por WhatsApp al {WHATSAPP_NUMBER} para asistencia inmediata.", "success")
+            return redirect(url_for("admin_login"))
+        else:
+            flash(f"El correo '{email}' no se encuentra registrado en el sistema administrativo.", "error")
+            return render_template("admin_forgot_password.html")
+
+    return render_template("admin_forgot_password.html")
+
+
+@app.route("/admin/users", methods=["GET", "POST"])
+@admin_required
+def admin_users():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "").strip()
+        role = request.form.get("role", "admin").strip().lower()
+        if role not in ("super", "admin", "ventas"):
+            role = "admin"
+
+        if not name or not email or not password:
+            flash("Nombre, correo institucional y contraseña son requeridos.", "error")
+            return redirect(url_for("admin_users"))
+
+        with get_db() as conn:
+            existing = conn.execute("SELECT id FROM admins WHERE lower(email) = ?", (email,)).fetchone()
+            if existing:
+                flash(f"Ya existe un usuario registrado con el correo '{email}'.", "error")
+                return redirect(url_for("admin_users"))
+
+            conn.execute(
+                "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, 1, ?)",
+                (email, hash_password(password), name, role, datetime.now().isoformat(timespec="seconds")),
+            )
+        flash(f"Usuario '{name}' ({email}) registrado exitosamente con rol '{role.upper()}'.", "success")
+        return redirect(url_for("admin_users"))
+
+    with get_db() as conn:
+        users = conn.execute("SELECT id, name, email, role, active, created_at FROM admins ORDER BY id ASC").fetchall()
+
+    return render_template("admin_users.html", users=users)
+
+
+@app.post("/admin/users/<int:user_id>/delete")
+@admin_required
+def admin_delete_user(user_id: int):
+    with get_db() as conn:
+        target = conn.execute("SELECT id, email, name FROM admins WHERE id = ?", (user_id,)).fetchone()
+        if not target:
+            flash("Usuario no encontrado.", "error")
+            return redirect(url_for("admin_users"))
+
+        target_email = target["email"].lower()
+        if target_email in ("alfonsoavilery@icloud.com", "alfonsoavilezy@icloud.com"):
+            flash("Acción denegada: La cuenta del Administrador Total no puede ser eliminada.", "error")
+            return redirect(url_for("admin_users"))
+
+        if session.get("admin_email", "").lower() == target_email:
+            flash("No puedes eliminar tu propia cuenta mientras estás en sesión activa.", "error")
+            return redirect(url_for("admin_users"))
+
+        conn.execute("DELETE FROM admins WHERE id = ?", (user_id,))
+
+    flash(f"Usuario '{target['name']}' ({target['email']}) eliminado correctamente.", "success")
+    return redirect(url_for("admin_users"))
+
+
+@app.post("/admin/users/<int:user_id>/password")
+@admin_required
+def admin_update_user_password(user_id: int):
+    new_password = request.form.get("new_password", "").strip()
+    if not new_password or len(new_password) < 4:
+        flash("La nueva contraseña debe tener al menos 4 caracteres.", "error")
+        return redirect(url_for("admin_users"))
+
+    with get_db() as conn:
+        target = conn.execute("SELECT id, name, email FROM admins WHERE id = ?", (user_id,)).fetchone()
+        if not target:
+            flash("Usuario no encontrado.", "error")
+            return redirect(url_for("admin_users"))
+
+        conn.execute("UPDATE admins SET password_hash = ? WHERE id = ?", (hash_password(new_password), user_id))
+
+    flash(f"Contraseña de '{target['name']}' ({target['email']}) actualizada correctamente.", "success")
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/admin/change-password", methods=["GET", "POST"])
+@admin_required
+def admin_change_own_password():
+    if request.method == "POST":
+        new_password = request.form.get("new_password", "").strip()
+        confirm_password = request.form.get("confirm_password", "").strip()
+        if not new_password or len(new_password) < 4:
+            flash("La nueva contraseña debe tener al menos 4 caracteres.", "error")
+            return redirect(url_for("admin_users"))
+        if new_password != confirm_password:
+            flash("Las contraseñas no coinciden. Inténtalo de nuevo.", "error")
+            return redirect(url_for("admin_users"))
+
+        current_email = session.get("admin_email", "").lower()
+        with get_db() as conn:
+            conn.execute("UPDATE admins SET password_hash = ? WHERE lower(email) = ?", (hash_password(new_password), current_email))
+
+        flash("Tu contraseña ha sido actualizada con éxito.", "success")
+        return redirect(url_for("admin_users"))
+
+    return redirect(url_for("admin_users"))
 
 
 

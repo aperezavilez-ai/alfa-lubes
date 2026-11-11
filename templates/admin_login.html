@@ -24,34 +24,10 @@
         <button class="w-full bg-sky-800 hover:bg-sky-700 rounded-lg py-3 font-semibold text-white transition shadow-lg">Entrar a Administración</button>
       </form>
 
-      <!-- Cuentas Oficiales Autorizadas -->
-      <div class="mt-6 pt-5 border-t border-slate-800 text-xs space-y-2.5">
-        <p class="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-user-shield text-amber-400"></i> 3 Administradores Autorizados:
-        </p>
-        <div class="space-y-1.5">
-          <button type="button" onclick="document.querySelector('input[name=email]').value='alfonsoavilezy@icloud.com';document.getElementById('admin-password').value='Calurore1028@';" class="w-full text-left p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-amber-400/50 transition group flex justify-between items-center">
-            <div>
-              <span class="font-bold text-sky-400 group-hover:text-amber-300">alfonsoavilezy@icloud.com</span>
-              <span class="text-[10px] text-slate-400 block">Alfonso Avilés (Super Administrador)</span>
-            </div>
-            <span class="text-[10px] text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded">Usar cuenta</span>
-          </button>
-          <button type="button" onclick="document.querySelector('input[name=email]').value='admin@alfalubes.com';document.getElementById('admin-password').value='Calurore1028@';" class="w-full text-left p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-sky-400/50 transition group flex justify-between items-center">
-            <div>
-              <span class="font-bold text-sky-400 group-hover:text-amber-300">admin@alfalubes.com</span>
-              <span class="text-[10px] text-slate-400 block">Administrador General ALFA LUBES (Super)</span>
-            </div>
-            <span class="text-[10px] text-sky-400 font-bold bg-sky-400/10 px-2 py-0.5 rounded">Usar cuenta</span>
-          </button>
-          <button type="button" onclick="document.querySelector('input[name=email]').value='ventas@alfalubes.com';document.getElementById('admin-password').value='Calurore1028@';" class="w-full text-left p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-emerald-400/50 transition group flex justify-between items-center">
-            <div>
-              <span class="font-bold text-sky-400 group-hover:text-amber-300">ventas@alfalubes.com</span>
-              <span class="text-[10px] text-slate-400 block">Gerencia Comercial ALFA LUBES (Admin)</span>
-            </div>
-            <span class="text-[10px] text-emerald-400 font-bold bg-emerald-400/10 px-2 py-0.5 rounded">Usar cuenta</span>
-          </button>
-        </div>
+      <div class="mt-6 pt-4 border-t border-slate-800 text-center">
+        <a href="{{ url_for('admin_forgot_password') }}" class="text-xs text-amber-400 hover:text-amber-300 font-semibold transition inline-flex items-center gap-1.5">
+          <i class="fa-solid fa-key text-[11px]"></i> ¿Olvidaste tu contraseña? Recuperar acceso aquí
+        </a>
       </div>
     </div>
   </div>
