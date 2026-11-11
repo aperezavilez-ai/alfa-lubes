@@ -43,7 +43,7 @@ DEFAULT_DB_PATH = Path("/tmp/alfa_lubes.db") if PREVIEW_MODE else BASE_DIR / "al
 DB_PATH = Path(os.environ.get("ALFA_LUBES_DB", DEFAULT_DB_PATH))
 
 # Configuración IA (proveedor OpenAI-compatible / LLM con razonamiento activo)
-AI_API_KEY = (os.environ.get("AI_API_KEY") or os.environ.get("MEAI_API_KEY") or "sk-ntGs1F1AMIm8fB0qdsM1fYUBQHJpwuitnTSeNHIyeHhSkF9v").strip()
+AI_API_KEY = (os.environ.get("AI_API_KEY") or os.environ.get("MEAI_API_KEY") or "").strip()
 AI_BASE_URL = (os.environ.get("AI_BASE_URL") or os.environ.get("MEAI_BASE_URL") or "https://api.meai.cloud/v1").strip().rstrip("/")
 AI_MODEL = (os.environ.get("AI_MODEL") or os.environ.get("MEAI_MODEL") or "claude-haiku-4.5").strip()
 
@@ -1345,45 +1345,47 @@ def not_found(_error):
     return render_template("404.html"), 404
 
 
-def init_db():
-    """Inicializa la base de datos local SQLite si no existe."""
-    import sqlite3
-    import os
-    db_path = os.environ.get("ALFA_LUBES_DB", "alfa_lubes.db")
-    if os.path.exists(db_path):
-        return
+def init_db() -> None:
+    """Crea las tablas products y orders en SQLite si no existen."""
+    conn = sqlite3.connect(DB_PATH)
     try:
-        conn = sqlite3.connect(db_path)
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS products (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
+                title TEXT NOT NULL,
                 brand TEXT,
                 viscosity TEXT,
-                price REAL,
+                price REAL DEFAULT 0,
                 stock INTEGER DEFAULT 0,
-                image TEXT,
                 description TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                image TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
-        """)
-        cur.execute("""
+            """
+        )
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS orders (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                customer_name TEXT,
-                customer_email TEXT,
-                total REAL,
+                client_name TEXT NOT NULL,
+                client_email TEXT,
+                product_id INTEGER,
+                quantity INTEGER DEFAULT 1,
+                total REAL DEFAULT 0,
                 status TEXT DEFAULT 'pendiente',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (product_id) REFERENCES products(id)
             )
-        """)
+            """
+        )
         conn.commit()
+    finally:
         conn.close()
-    except Exception:
-        pass
 
 
+# Inicializa esquema y datos base en la base configurada (DB_PATH).
 init_db()
 
 

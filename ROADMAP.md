@@ -6,13 +6,13 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 
 ## Proceso
 - Fase: implementacion
-- Estado: Patch OK: app.py (2026-11-11 01:55)
-- Actualizado: 2026-11-11 01:55
+- Estado: Patch OK: .env.example (2026-11-11 02:13)
+- Actualizado: 2026-11-11 02:13
 - Preview: desconocido — usa el preview del IDE, no inventes puertos
 
 ## Mapa
-- app.py
 - .env.example
+- app.py
 - templates/ai_agent.html
 - .env
 - .gitignore
@@ -31,13 +31,14 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 - supabase_schema.sql
 - templates/index.html
 - templates/pallets.html
+- src/
 
 ## Archivos clave (no reexplorar)
-- app.py
 - .env.example
-- .gitignore
-- requirements.txt
+- app.py
 - supabase_schema.sql
+- requirements.txt
+- .gitignore
 - templates/index.html
 - templates/pallets.html
 - .env
@@ -45,7 +46,7 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 - templates/base.html
 
 ## Tarea activa
-- AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del analisis previo quedan ANULADAS para esta corrida.
+- haz lo que debes hacer corrije todo
 
 ## Bloqueos / bugs conocidos
 - Ninguno registrado
@@ -55,13 +56,17 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 - Se implementó fallback transparente: lee de Supabase si está disponible; si aún no se ejecutan las migraciones en Supabase, lee de SQLite local para no interrumpir el sitio.
 
 ## Cambios recientes
+- .env.example — archivo escrito (kernel) (2026-11-11 02:13)
+- app.py — parche aplicado (kernel) (2026-11-11 02:13)
+- app.py
+- supabase_schema.sql
+- app.py — parche aplicado (kernel) (2026-11-11 02:06)
+- .env.example
+- requirements.txt
+- .gitignore
 - app.py — parche aplicado (kernel) (2026-11-11 01:55)
 - app.py — parche aplicado (kernel) (2026-11-11 01:54)
 - .env.example — archivo escrito (kernel) (2026-11-11 01:52)
-- app.py
-- .gitignore
-- requirements.txt
-- supabase_schema.sql
 - templates/index.html
 - templates/pallets.html
 - .env
@@ -69,9 +74,6 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 - app.py (integración Supabase, tabla pallets, ruta /pallets, prompt y fallback de IA con pallets)
 - .env (SUPABASE_URL, SUPABASE_KEY, SUPABASE_PUBLISHABLE_KEY)
 - templates/pallets.html (página dedicada de tarimas y aceites importados con fotos y botones de cotización)
-- templates/index.html (sección llamativa "LOS MEJORES ACEITES IMPORTADOS" con fotos de pallets)
-- templates/base.html (enlace en navbar a Pallets & Mayoreo)
-- templates/ai_agent.html (preguntas sugeridas de pallets importados)
 
 ## Verificado
 - Endpoints probados exitosamente: /, /products, /ai-agent, /robots.txt, /sitemap.xml, /api/ai-chat.
