@@ -150,35 +150,6 @@
         </table>
       </div>
     </div>
-
-    <!-- Sección para Cambiar Mi Propia Contraseña -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-xl">
-      <div class="flex items-center gap-3 mb-3">
-        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg">
-          <i class="fa-solid fa-lock"></i>
-        </div>
-        <div>
-          <h3 class="font-bold text-base text-white">Cambiar mi Contraseña de Acceso</h3>
-          <p class="text-xs text-slate-400">Actualiza la contraseña de tu cuenta activa ({{ session.get('admin_email', '') }}).</p>
-        </div>
-      </div>
-
-      <form action="{{ url_for('admin_change_own_password') }}" method="post" class="space-y-3.5 text-xs">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-300 mb-1">Nueva Contraseña *</label>
-            <input name="new_password" type="password" required minlength="4" placeholder="Mínimo 4 caracteres" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-300 mb-1">Confirmar Contraseña *</label>
-            <input name="confirm_password" type="password" required minlength="4" placeholder="Repite la contraseña" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-400">
-          </div>
-        </div>
-        <button type="submit" class="bg-sky-700 hover:bg-sky-600 text-white font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow">
-          <i class="fa-solid fa-check"></i> Actualizar Mi Contraseña
-        </button>
-      </form>
-    </div>
   </div>
 </section>
 
