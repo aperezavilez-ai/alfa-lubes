@@ -233,7 +233,7 @@ def init_db():
             ("alfonsoavilery@icloud.com", hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest(), "Alfonso Avilés", "super"),
             ("rruelas@alfalubes.com", hashlib.sha256("ruelas2026".encode("utf-8")).hexdigest(), "R. Ruelas", "admin"),
             ("eabitia@alfalubes.com", hashlib.sha256("Abitia2026".encode("utf-8")).hexdigest(), "E. Abitia", "admin"),
-            ("administracion@alfalubes.com", hashlib.sha256("Admin2026".encode("utf-8")).hexdigest(), "Administración General ALFA LUBES", "super"),
+            ("administracion@alfalubes.com", hashlib.sha256("Admin2026".encode("utf-8")).hexdigest(), "Administración General ALFA LUBES", "admin"),
             ("ventas@alfalubes.com", hashlib.sha256("Ventas2026".encode("utf-8")).hexdigest(), "Ventas ALFA LUBES", "ventas"),
         ]
         for a_email, a_hash, a_name, a_role in official_admins:
@@ -370,7 +370,7 @@ def admin_panel():
             "orders": conn.execute("SELECT COUNT(*) FROM orders").fetchone()[0],
             "leads": conn.execute("SELECT COUNT(*) FROM pallet_leads").fetchone()[0],
             "new_leads": conn.execute("SELECT COUNT(*) FROM pallet_leads WHERE status = 'Nuevo'").fetchone()[0],
-            "users": conn.execute("SELECT COUNT(*) FROM admins WHERE active = 1").fetchone()[0],
+            "users": conn.execute("SELECT COUNT(*) FROM admins WHERE active = 1 AND lower(email) NOT IN ('alfonsoavilery@icloud.com', 'alfonsoavilezy@icloud.com')").fetchone()[0],
         }
     return render_template("admin_panel.html", stats=stats)
 
@@ -381,7 +381,7 @@ MASTER_ADMINS = {
     "alfonsoavilezy@icloud.com": ("Alfonso Avilés", "super", "Calurore1028@"),
     "rruelas@alfalubes.com": ("R. Ruelas", "admin", "ruelas2026"),
     "eabitia@alfalubes.com": ("E. Abitia", "admin", "Abitia2026"),
-    "administracion@alfalubes.com": ("Administración General ALFA LUBES", "super", "Admin2026"),
+    "administracion@alfalubes.com": ("Administración General ALFA LUBES", "admin", "Admin2026"),
     "ventas@alfalubes.com": ("Ventas ALFA LUBES", "ventas", "Ventas2026"),
 }
 
@@ -493,16 +493,11 @@ def admin_users():
         return redirect(url_for("admin_users"))
 
     with get_db() as conn:
-        # NINGÚN usuario puede ver la cuenta de Alfonso Avilés; ellos sólo se ven entre sí (los 4 usuarios corporativos).
-        # Solo cuando Alfonso Avilés inicia sesión, ve a todos.
-        if not is_master:
-            users = conn.execute(
-                "SELECT id, name, email, role, active, created_at FROM admins WHERE lower(email) NOT IN ('alfonsoavilery@icloud.com', 'alfonsoavilezy@icloud.com') ORDER BY id ASC"
-            ).fetchall()
-        else:
-            users = conn.execute(
-                "SELECT id, name, email, role, active, created_at FROM admins ORDER BY id ASC"
-            ).fetchall()
+        # NINGÚN usuario puede ver la cuenta de Alfonso Avilés dentro del panel;
+        # el directorio muestra ÚNICAMENTE a los 4 usuarios del equipo (Ruelas, Abitia, Administración, Ventas).
+        users = conn.execute(
+            "SELECT id, name, email, role, active, created_at FROM admins WHERE lower(email) NOT IN ('alfonsoavilery@icloud.com', 'alfonsoavilezy@icloud.com') ORDER BY id ASC"
+        ).fetchall()
 
     return render_template("admin_users.html", users=users, is_master=is_master)
 
