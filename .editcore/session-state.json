@@ -1,33 +1,96 @@
 {
   "version": 1,
   "workspaceRoot": "D:\\PROGRAMAS IA\\ALFA LUBES",
-  "updatedAt": "2026-11-08T22:52:54.060Z",
+  "updatedAt": "2026-11-11T01:55:28.730Z",
   "fileTree": [
     {
-      "path": "templates/ai_agent.html",
+      "path": ".env.example",
+      "kind": "file"
+    },
+    {
+      "path": ".env",
+      "kind": "file"
+    },
+    {
+      "path": ".gitignore",
+      "kind": "file"
+    },
+    {
+      "path": "200",
+      "kind": "file"
+    },
+    {
+      "path": "alfa_lubes.db",
       "kind": "file"
     },
     {
       "path": "app.py",
       "kind": "file"
+    },
+    {
+      "path": "flask.log",
+      "kind": "file"
+    },
+    {
+      "path": "FOTOS/",
+      "kind": "directory"
+    },
+    {
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "path": "requirements.txt",
+      "kind": "file"
+    },
+    {
+      "path": "ROADMAP.md",
+      "kind": "file"
+    },
+    {
+      "path": "server.log",
+      "kind": "file"
+    },
+    {
+      "path": "static/",
+      "kind": "directory"
+    },
+    {
+      "path": "supabase_schema.sql",
+      "kind": "file"
+    },
+    {
+      "path": "templates/",
+      "kind": "directory"
+    },
+    {
+      "path": "__pycache__/",
+      "kind": "directory"
     }
   ],
-  "fileTreeAt": "2026-11-08T22:52:34.512Z",
+  "fileTreeAt": "2026-11-11T01:43:00.773Z",
   "recentMods": [
+    {
+      "path": "app.py",
+      "action": "replace_in_file",
+      "summary": "parche aplicado (kernel)",
+      "at": "2026-11-11T01:55:28.730Z"
+    },
+    {
+      "path": ".env.example",
+      "action": "write_file",
+      "summary": "archivo escrito (kernel)",
+      "at": "2026-11-11T01:52:04.636Z"
+    },
     {
       "path": "templates/ai_agent.html",
       "action": "replace_in_file",
       "summary": "parche aplicado (kernel)",
       "at": "2026-11-08T22:52:54.059Z"
-    },
-    {
-      "path": "app.py",
-      "action": "replace_in_file",
-      "summary": "parche aplicado (kernel)",
-      "at": "2026-11-08T22:52:34.512Z"
     }
   ],
   "recentReads": [],
   "task": "",
-  "nextAction": ""
+  "nextAction": "",
+  "fileTreeHash": "748529575e0b"
 }

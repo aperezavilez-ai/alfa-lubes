@@ -1,9 +1,15 @@
 {
   "version": 3,
-  "builtAt": "2026-11-08T22:09:02.368Z",
-  "fileCount": 15,
+  "builtAt": "2026-11-11T01:42:42.308Z",
+  "fileCount": 21,
   "symbolCount": 0,
-  "schemaCount": 0,
+  "schemaCount": 1,
   "symbols": [],
-  "schemas": []
+  "schemas": [
+    {
+      "path": "supabase_schema.sql",
+      "bytes": 6090,
+      "mtimeMs": 1794347958708.2527
+    }
+  ]
 }

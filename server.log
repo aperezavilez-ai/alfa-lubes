@@ -114,3 +114,15 @@ Traceback (most recent call last):
     raise BuildError(endpoint, values, method, self)
 werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'ai_chat'. Did you mean 'ai_agent' instead?
 127.0.0.1 - - [05/Nov/2026 19:48:44] "GET /ai-agent HTTP/1.1" 500 -
+127.0.0.1 - - [09/Nov/2026 08:34:31] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 08:34:31] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 08:34:31] "GET /static/images/banner.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 08:34:31] "GET /static/images/alfa-lubes-logo.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 08:36:48] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 08:36:49] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 08:36:50] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 08:36:51] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 09:09:38] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 09:09:38] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 09:09:40] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2026 09:09:40] "GET / HTTP/1.1" 200 -

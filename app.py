@@ -69,8 +69,8 @@ GOOGLE_SITE_VERIFICATION = os.environ.get("GOOGLE_SITE_VERIFICATION", "").strip(
 
 # Base de Datos en la Nube Supabase (PostgreSQL para Vercel y Producción)
 SUPABASE_URL = (os.environ.get("SUPABASE_URL") or "https://eihvypcvmjbcfumllxrv.supabase.co").strip().rstrip("/")
-SUPABASE_KEY = (os.environ.get("SUPABASE_KEY") or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpaHZ5cGN2bWpiY2Z1bWxseHJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzNDM1NzYsImV4cCI6MjEwOTkxOTU3Nn0.sDzxotBsG54eqGB9pl5CpvVvFQJ7z9gW3Kul5FRY05k").strip()
-SUPABASE_PUBLISHABLE_KEY = (os.environ.get("SUPABASE_PUBLISHABLE_KEY") or "sb_publishable_laLwYQHyi5A-KDGWCPKsQA_E3dkVkwp").strip()
+SUPABASE_KEY = (os.environ.get("SUPABASE_KEY") or "").strip()
+SUPABASE_PUBLISHABLE_KEY = (os.environ.get("SUPABASE_PUBLISHABLE_KEY") or "").strip()
 
 # Configuración SMTP institucional alfalubes.com
 SMTP_HOST = os.environ.get("SMTP_HOST", "").strip()
@@ -1343,6 +1343,45 @@ def sitemap_xml():
 @app.errorhandler(404)
 def not_found(_error):
     return render_template("404.html"), 404
+
+
+def init_db():
+    """Inicializa la base de datos local SQLite si no existe."""
+    import sqlite3
+    import os
+    db_path = os.environ.get("ALFA_LUBES_DB", "alfa_lubes.db")
+    if os.path.exists(db_path):
+        return
+    try:
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS products (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                brand TEXT,
+                viscosity TEXT,
+                price REAL,
+                stock INTEGER DEFAULT 0,
+                image TEXT,
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS orders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_name TEXT,
+                customer_email TEXT,
+                total REAL,
+                status TEXT DEFAULT 'pendiente',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
 
 init_db()

@@ -6,13 +6,14 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 
 ## Proceso
 - Fase: implementacion
-- Estado: Ciclo finalizado.
-- Actualizado: 2026-11-08 22:54
+- Estado: Patch OK: app.py (2026-11-11 01:55)
+- Actualizado: 2026-11-11 01:55
 - Preview: desconocido — usa el preview del IDE, no inventes puertos
 
 ## Mapa
-- templates/ai_agent.html
 - app.py
+- .env.example
+- templates/ai_agent.html
 - .env
 - .gitignore
 - 200
@@ -26,34 +27,44 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 - templates/
 - __pycache__/
 - templates/base.html
+- (raiz)/
+- supabase_schema.sql
+- templates/index.html
+- templates/pallets.html
 
 ## Archivos clave (no reexplorar)
 - app.py
-- templates/ai_agent.html
+- .env.example
+- .gitignore
 - requirements.txt
+- supabase_schema.sql
+- templates/index.html
+- templates/pallets.html
 - .env
+- templates/ai_agent.html
 - templates/base.html
 
 ## Tarea activa
-- SOLICITUD:
-1. Agregar leyenda llamativa "LOS MEJORES ACEITES IMPORTADOS" y apartado con fotos para venta por pallets de aceites importados.
-2. Integrar Supabase con URL y credenciales (https://eihvypcvmjbcfumllxrv.supabase.co).
-
-PLAN COMPLETADO:
-1. Leyenda llamativa y sección premium de "LOS MEJORES ACEITES IMPORTADOS — Venta por Pallets y Tarimas" agregada en index.html y página dedicada /pallets.
-2. Generación e integración de fotos de almacén de pallets y tarimas completas selladas de aceite importado.
-3. Configuración de credenciales de Supabase en .env y creación del helper supabase_get() con fallback local en app.py.
-4. Creación del script SQL completo supabase_schema.sql listo para ejecutar en Supabase (tablas pallets, products, orders, clients con RLS).
-5. Entrenamiento del Asesor IA para responder autónomamente sobre venta de aceites importados por pallets y cotizaciones mayoristas.
+- AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del analisis previo quedan ANULADAS para esta corrida.
 
 ## Bloqueos / bugs conocidos
-- Ninguno. Verificado con test_client y Python 3.12.
+- Ninguno registrado
 
 ## Decisiones
 - Se creó la ruta dedicada /pallets y se enlazó en la barra de navegación principal de base.html.
 - Se implementó fallback transparente: lee de Supabase si está disponible; si aún no se ejecutan las migraciones en Supabase, lee de SQLite local para no interrumpir el sitio.
 
 ## Cambios recientes
+- app.py — parche aplicado (kernel) (2026-11-11 01:55)
+- app.py — parche aplicado (kernel) (2026-11-11 01:54)
+- .env.example — archivo escrito (kernel) (2026-11-11 01:52)
+- app.py
+- .gitignore
+- requirements.txt
+- supabase_schema.sql
+- templates/index.html
+- templates/pallets.html
+- .env
 - supabase_schema.sql (esquema SQL completo para Supabase)
 - app.py (integración Supabase, tabla pallets, ruta /pallets, prompt y fallback de IA con pallets)
 - .env (SUPABASE_URL, SUPABASE_KEY, SUPABASE_PUBLISHABLE_KEY)
@@ -66,7 +77,7 @@ PLAN COMPLETADO:
 - Endpoints probados exitosamente: /, /products, /ai-agent, /robots.txt, /sitemap.xml, /api/ai-chat.
 
 ## Siguiente
-- Conectar ID definitivo de Google Analytics y credenciales SMTP reales si se desea envío activo por correo.
+- Proponer optimización o nueva funcionalidad.
 
 ## Regla anti-reexploracion
 - Si el pedido del usuario apunta a un archivo ya listado arriba: ve DIRECTO a read_file/replace_in_file de ese path.
