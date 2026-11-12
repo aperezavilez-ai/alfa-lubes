@@ -1,28 +1,64 @@
 {% extends "base.html" %}
 {% block title %}ALFA LUBES | Aceites y lubricantes para tu vehículo{% endblock %}
 {% block content %}
-<section class="relative min-h-[570px] lg:min-h-[680px] flex items-center overflow-hidden">
-    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Selección de aceites para motor ALFA LUBES" class="absolute inset-0 w-full h-full object-cover">
-    <div class="hero-overlay absolute inset-0"></div>
-    <div class="relative z-10 max-w-7xl mx-auto w-full px-6 py-20">
-        <div class="max-w-2xl">
-            <p class="gold tracking-[.22em] text-xs sm:text-sm font-bold mb-5 flex items-center gap-2">
-                <i class="fa-solid fa-shield-halved"></i> PROTECCIÓN PARA CADA CAMINO
+<section class="relative min-h-[580px] lg:min-h-[660px] flex items-center overflow-hidden border-b border-amber-500/30">
+    <img src="{{ url_for('static', filename='images/pallet-almacen.jpg') }}" alt="Los Mejores Aceites Importados - Venta por Pallets ALFA LUBES" class="absolute inset-0 w-full h-full object-cover object-center lg:object-right" fetchpriority="high" loading="eager">
+    <!-- Overlay degradado nítido: protege la legibilidad del texto sin oscurecer ni desenfocar la foto del almacén -->
+    <div class="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/25"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-16 sm:py-20 w-full">
+        <div class="max-w-3xl">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/20 border border-amber-400 text-amber-300 text-xs font-extrabold uppercase tracking-widest mb-4 shadow-lg">
+                <i class="fa-solid fa-plane-arrival"></i> IMPORTACIÓN DIRECTA DE ALTA GAMA
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-black text-white leading-tight mb-4 tracking-tight">
+                LOS MEJORES ACEITES <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">IMPORTADOS</span>
+            </h1>
+            <p class="text-xl sm:text-2xl font-bold text-amber-400 mb-4">Venta por Pallets y Mayoreo para Talleres, Refaccionarias y Flotillas</p>
+            <p class="text-slate-200 text-base sm:text-lg leading-relaxed mb-8 max-w-2xl">
+                Accede a precios de importador directo sin intermediarios. Tarimas completas selladas de fábrica con cajas de fluidos de transmisión <strong>DCT/DSG</strong>, aceites sintéticos premium <strong>0W-20, 5W-30</strong> y tambores industriales con flete seguro a todo México.
             </p>
-            <h1 class="text-5xl md:text-7xl font-extrabold leading-[1.03] mb-6">El cuidado de tu motor empieza <span class="text-sky-400">aquí.</span></h1>
-            <p class="text-lg sm:text-xl text-slate-200 max-w-xl mb-8">Encuentra aceites y lubricantes originales de marcas líderes. Consulta a nuestro <strong>Asesor IA autónomo</strong> o comunícate vía WhatsApp para elegir la viscosidad aprobada por tu fabricante.</p>
             <div class="flex flex-wrap gap-4 items-center">
-                <a href="{{ url_for('products') }}" class="bg-gold text-slate-950 px-7 py-4 rounded-xl font-bold hover:brightness-110 shadow-lg transition">Ver catálogo</a>
-                <a href="{{ url_for('ai_agent') }}" class="border border-amber-400/80 bg-slate-900/60 px-7 py-4 rounded-xl font-bold hover:bg-amber-400/10 text-white flex items-center gap-2 transition">
-                    <i class="fa-solid fa-robot text-gold"></i> Asesor IA de lubricantes
+                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-xl flex items-center gap-2 transition transform hover:scale-105">
+                    <i class="fa-brands fa-whatsapp text-xl"></i> Cotizar Pallet por WhatsApp
                 </a>
-                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-4 rounded-xl font-bold flex items-center gap-2 shadow-lg transition">
-                    <i class="fa-brands fa-whatsapp text-xl"></i> WhatsApp
+                <a href="mailto:{{ sales_email }}?subject=Solicitud%20de%20Lista%20de%20Precios%20Pallets" class="bg-gold text-slate-950 px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base hover:brightness-110 shadow-xl transition flex items-center gap-2">
+                    <i class="fa-solid fa-envelope mr-1"></i> Solicitar Lista de Precios
+                </a>
+                <a href="{{ url_for('pallets') }}" class="border border-amber-400/70 bg-slate-900/80 hover:bg-amber-400/10 text-amber-300 px-6 py-3.5 rounded-xl font-bold text-sm sm:text-base flex items-center gap-2 transition">
+                    <i class="fa-solid fa-boxes-stacked"></i> Ver Tarimas
+                </a>
+                <a href="{{ url_for('ai_agent') }}" class="border border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-white px-5 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 transition">
+                    <i class="fa-solid fa-robot text-gold"></i> Asesor IA
                 </a>
             </div>
-            <p class="mt-7 text-sm text-slate-300 flex items-center gap-2">
-                <i class="fa-solid fa-truck-fast text-sky-300"></i> Envíos a todo México para clientes particulares, talleres y flotillas.
-            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Barra de Ventajas Mayoristas (idéntica a la del banner) -->
+<section class="py-10 bg-slate-900/90 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 text-center">
+            <div class="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/90 card-hover">
+                <i class="fa-solid fa-boxes-packing text-amber-400 text-2xl mb-2"></i>
+                <h4 class="font-bold text-white text-sm">Tarimas Selladas</h4>
+                <p class="text-xs text-slate-400 mt-1">Embalaje con film plástico de alta resistencia y tarimas tratadas.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/90 card-hover">
+                <i class="fa-solid fa-certificate text-sky-400 text-2xl mb-2"></i>
+                <h4 class="font-bold text-white text-sm">100% Originales</h4>
+                <p class="text-xs text-slate-400 mt-1">Pedimentos de importación y trazabilidad directa de fabricante.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/90 card-hover">
+                <i class="fa-solid fa-percent text-emerald-400 text-2xl mb-2"></i>
+                <h4 class="font-bold text-white text-sm">Margen Superior</h4>
+                <p class="text-xs text-slate-400 mt-1">Hasta 40% de ahorro por volumen frente a compras por menudeo.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/90 card-hover">
+                <i class="fa-solid fa-truck-fast text-yellow-400 text-2xl mb-2"></i>
+                <h4 class="font-bold text-white text-sm">Envíos a Todo México</h4>
+                <p class="text-xs text-slate-400 mt-1">Alianzas con paqueterías de carga pesada y entrega garantizada.</p>
+            </div>
         </div>
     </div>
 </section>
@@ -90,24 +126,24 @@
     </div>
 </section>
 
-<!-- SECCIÓN DESTACADA: LOS MEJORES ACEITES IMPORTADOS (VENTA POR PALLETS) -->
+<!-- SECCIÓN INFERIOR DE PALLETS: TEXTOS DIFERENTES Y COMPLEMENTARIOS AL HERO -->
 <section class="py-16 sm:py-24 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-amber-500/20 relative overflow-hidden">
     <!-- Luz de fondo decorativa -->
     <div class="absolute -top-40 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-40 left-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="max-w-7xl mx-auto px-6 relative z-10">
-        <!-- Encabezado Llamativo -->
+        <!-- Encabezado Diferenciado (No repetitivo con el Hero) -->
         <div class="text-center max-w-3xl mx-auto mb-14">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-300 text-xs font-black uppercase tracking-widest mb-4 shadow-lg">
-                <i class="fa-solid fa-plane-arrival"></i> IMPORTACIÓN DIRECTA DE ALTA GAMA
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-400/15 border border-sky-400/40 text-sky-300 text-xs font-black uppercase tracking-widest mb-4 shadow-lg">
+                <i class="fa-solid fa-boxes-stacked"></i> INVENTARIO Y LOTES EN BODEGA
             </div>
-            <h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight mb-4 tracking-tight">
-                LOS MEJORES ACEITES <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">IMPORTADOS</span>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-4 tracking-tight">
+                TARIMAS DISPONIBLES <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-sky-300 to-amber-400">PARA ENTREGA INMEDIATA</span>
             </h2>
-            <p class="text-lg sm:text-xl font-bold text-amber-400 mb-3">Venta Directa por Pallets y Tarimas para Talleres y Mayoristas</p>
-            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                Adquiere cajas cerradas y tarimas completas selladas de fábrica. Fluidos sintéticos para transmisiones DCT/DSG, aceites de motor premium de grado internacional y tambores con precios preferenciales de importador directo.
+            <p class="text-base sm:text-lg font-bold text-slate-200 mb-3">Configuraciones de alta rotación listas para embarque a cualquier estado</p>
+            <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+                Selecciona la tarima o tambor ideal para las exigencias de tu negocio. Precios por volumen con pedimento de importación, trazabilidad total y facturación fiscal garantizada.
             </p>
         </div>
 
