@@ -17,17 +17,17 @@
             <p class="text-slate-200 text-base sm:text-lg leading-relaxed mb-8 max-w-2xl">
                 Accede a precios de importador directo sin intermediarios. Tarimas completas selladas de fábrica con cajas de fluidos de transmisión <strong>DCT/DSG</strong>, aceites sintéticos premium <strong>0W-20, 5W-30</strong> y tambores industriales con flete seguro a todo México.
             </p>
-            <div class="flex flex-wrap gap-4 items-center">
-                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-xl flex items-center gap-2 transition transform hover:scale-105">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 items-stretch sm:items-center">
+                <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto text-center bg-emerald-600 hover:bg-emerald-500 text-white px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-xl flex items-center justify-center gap-2 transition transform hover:scale-105">
                     <i class="fa-brands fa-whatsapp text-xl"></i> Cotizar Pallet por WhatsApp
                 </a>
-                <a href="mailto:{{ sales_email }}?subject=Solicitud%20de%20Lista%20de%20Precios%20Pallets" class="bg-gold text-slate-950 px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base hover:brightness-110 shadow-xl transition flex items-center gap-2">
+                <a href="mailto:{{ sales_email }}?subject=Solicitud%20de%20Lista%20de%20Precios%20Pallets" class="w-full sm:w-auto text-center bg-gold text-slate-950 px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base hover:brightness-110 shadow-xl transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-envelope mr-1"></i> Solicitar Lista de Precios
                 </a>
-                <a href="{{ url_for('pallets') }}" class="border border-amber-400/70 bg-slate-900/80 hover:bg-amber-400/10 text-amber-300 px-6 py-3.5 rounded-xl font-bold text-sm sm:text-base flex items-center gap-2 transition">
+                <a href="{{ url_for('pallets') }}" class="w-full sm:w-auto text-center border border-amber-400/70 bg-slate-900/80 hover:bg-amber-400/10 text-amber-300 px-6 py-3.5 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition">
                     <i class="fa-solid fa-boxes-stacked"></i> Ver Tarimas
                 </a>
-                <a href="{{ url_for('ai_agent') }}" class="border border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-white px-5 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 transition">
+                <a href="{{ url_for('ai_agent') }}" class="w-full sm:w-auto text-center border border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-white px-5 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition">
                     <i class="fa-solid fa-robot text-gold"></i> Asesor IA
                 </a>
             </div>
@@ -37,8 +37,8 @@
 
 <!-- Barra de Ventajas Mayoristas (idéntica a la del banner) -->
 <section class="py-10 bg-slate-900/90 border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 text-center">
             <div class="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/90 card-hover">
                 <i class="fa-solid fa-boxes-packing text-amber-400 text-2xl mb-2"></i>
                 <h4 class="font-bold text-white text-sm">Tarimas Selladas</h4>
@@ -65,12 +65,12 @@
 
 <!-- Beneficios ALFA LUBES -->
 <section class="py-16 sm:py-20">
-    <div class="max-w-7xl mx-auto px-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
         <div class="max-w-2xl mb-10">
             <p class="gold text-sm font-bold tracking-widest mb-2">COMPRA CON CONFIANZA</p>
             <h2 class="text-3xl sm:text-4xl font-bold">Todo para mantener tu motor protegido</h2>
         </div>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {% for icon, title, text in [
                 ('fa-oil-can','Calidad certificada','Línea oficial ALFA LUBES y aceites importados con estándares OEM y certificaciones API e ILSAC.'),
                 ('fa-robot','Asesor IA autónomo','Resuelve al instante qué viscosidad y especificación requiere tu vehículo 24/7.'),
@@ -83,6 +83,103 @@
                 <p class="text-slate-400 text-sm leading-relaxed">{{ text }}</p>
             </article>
             {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- SECCIÓN CINEMATOGRÁFICA OFICIAL: VIDEO AUTOPLAY PROFESIONAL ALFA LUBES -->
+<section class="py-16 sm:py-24 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-y border-amber-500/20 relative overflow-hidden">
+    <!-- Luces ambientales decorativas -->
+    <div class="absolute -top-32 right-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 left-10 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <!-- Encabezado de la experiencia en video -->
+        <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-300 text-xs font-black uppercase tracking-widest mb-4 shadow-lg">
+                <i class="fa-solid fa-play text-[10px]"></i> INGENIERÍA Y DESEMPEÑO AUTOMOTRIZ
+            </div>
+            <h2 class="text-3xl sm:text-5xl font-black text-white leading-tight mb-4 tracking-tight">
+                PUREZA SINTÉTICA <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">EN CADA GOTA</span>
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                Nuestras formulaciones sintéticas de grado internacional y fluidos avanzados DCT/DSG garantizan una película lubricante ultra resistente ante la máxima exigencia térmica y mecánica.
+            </p>
+        </div>
+
+        <!-- Tarjeta de Video Cinematográfica con Integración de Marca -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-slate-900/90 border border-amber-500/30 rounded-3xl p-5 sm:p-8 lg:p-10 shadow-[0_0_60px_rgba(228,170,36,0.12)] backdrop-blur">
+            <!-- Reproductor de Video Profesional Autónomo -->
+            <div class="lg:col-span-7 relative rounded-2xl overflow-hidden shadow-2xl bg-black border border-slate-800 flex items-center justify-center">
+                <video id="alfaVideoPlayer" class="w-full h-auto max-h-[580px] object-cover rounded-2xl" autoplay muted loop playsinline preload="auto">
+                    <source src="{{ url_for('static', filename='videos/alfa-lubes-showcase.mp4') }}" type="video/mp4">
+                    Tu navegador no soporta reproducción de video HTML5.
+                </video>
+                <!-- Insignia Oficial Flotante -->
+                <div class="absolute top-4 left-4 flex items-center gap-2 bg-slate-950/85 backdrop-blur border border-amber-400/50 px-3.5 py-1.5 rounded-full text-xs font-bold text-amber-300 shadow-xl">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>ALFA LUBES® Oficial</span>
+                </div>
+                <!-- Control de Sonido Discreto -->
+                <button type="button" id="alfaVideoSoundBtn" aria-label="Activar o silenciar audio" class="absolute bottom-4 right-4 bg-slate-950/85 hover:bg-slate-900 text-white border border-slate-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 backdrop-blur transition shadow-xl">
+                    <i id="alfaSoundIcon" class="fa-solid fa-volume-xmark text-amber-400"></i>
+                    <span id="alfaSoundLabel">Activar audio</span>
+                </button>
+            </div>
+
+            <!-- Fichas de Propuesta de Valor y Desempeño -->
+            <div class="lg:col-span-5 space-y-4">
+                <div class="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 card-hover">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center shrink-0 text-lg">
+                            <i class="fa-solid fa-gears"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-base mb-1">Fluidos DCT / DSG Especializados</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Formulación sintética de fricción controlada para cajas de doble embrague húmedo. Máxima protección para mecatrónica, engranes y discos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 card-hover">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-sky-400/20 text-sky-400 flex items-center justify-center shrink-0 text-lg">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-base mb-1">Tecnología Anti-Desgaste API SP</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Escudo molecular que previene el desgaste en frío y combate el fenómeno LSPI (preignición a baja velocidad) en motores turbo GDI.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 card-hover">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-400/20 text-emerald-400 flex items-center justify-center shrink-0 text-lg">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-base mb-1">Tarimas y Menudeo Disponible</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Adquiere por botella individual o por tarimas cerradas de fábrica con hasta 40% de ahorro para talleres y flotillas.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex flex-col sm:flex-row gap-3">
+                    <a href="{{ url_for('products') }}" class="flex-1 text-center bg-gold text-slate-950 py-3.5 px-5 rounded-xl font-bold text-xs sm:text-sm hover:brightness-110 shadow-lg transition">
+                        Explorar Catálogo
+                    </a>
+                    <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="flex-1 text-center bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 px-5 rounded-xl font-bold text-xs sm:text-sm shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> Asesoría WhatsApp
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -287,4 +384,34 @@
         </div>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const video = document.getElementById('alfaVideoPlayer');
+    const soundBtn = document.getElementById('alfaVideoSoundBtn');
+    const soundIcon = document.getElementById('alfaSoundIcon');
+    const soundLabel = document.getElementById('alfaSoundLabel');
+
+    if (video && soundBtn) {
+        // Garantizar reproducción automática en bucle conforme a estándares móviles y web
+        video.muted = true;
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {});
+        }
+
+        soundBtn.addEventListener('click', () => {
+            if (video.muted) {
+                video.muted = false;
+                if (soundIcon) soundIcon.className = 'fa-solid fa-volume-high text-amber-400';
+                if (soundLabel) soundLabel.textContent = 'Silenciar audio';
+            } else {
+                video.muted = true;
+                if (soundIcon) soundIcon.className = 'fa-solid fa-volume-xmark text-amber-400';
+                if (soundLabel) soundLabel.textContent = 'Activar audio';
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -6,8 +6,8 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 
 ## Proceso
 - Fase: implementacion
-- Estado: Patch OK: .env.example (2026-11-11 02:13)
-- Actualizado: 2026-11-11 02:13
+- Estado: Ciclo finalizado.
+- Actualizado: 2026-11-11 02:15
 - Preview: desconocido — usa el preview del IDE, no inventes puertos
 
 ## Mapa
@@ -32,10 +32,11 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 - templates/index.html
 - templates/pallets.html
 - src/
+- static/images/
 
 ## Archivos clave (no reexplorar)
-- .env.example
 - app.py
+- .env.example
 - supabase_schema.sql
 - requirements.txt
 - .gitignore
@@ -46,7 +47,16 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 - templates/base.html
 
 ## Tarea activa
-- haz lo que debes hacer corrije todo
+- SOLICITUD ORIGINAL:
+si lo tengo
+
+PLAN AUTORIZADO:
+## 🧪 Chequeos reales ejecutados
+
+| Chequeo | Resultado | Detalle |
+|---|---|---|
+| Sintaxis JS/JSON | ✅ pasa | 0 archivos compilados |
+| Imports / require | ✅ pasa | 0 a
 
 ## Bloqueos / bugs conocidos
 - Ninguno registrado
@@ -56,12 +66,12 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 - Se implementó fallback transparente: lee de Supabase si está disponible; si aún no se ejecutan las migraciones en Supabase, lee de SQLite local para no interrumpir el sitio.
 
 ## Cambios recientes
+- app.py
+- .env.example
 - .env.example — archivo escrito (kernel) (2026-11-11 02:13)
 - app.py — parche aplicado (kernel) (2026-11-11 02:13)
-- app.py
 - supabase_schema.sql
 - app.py — parche aplicado (kernel) (2026-11-11 02:06)
-- .env.example
 - requirements.txt
 - .gitignore
 - app.py — parche aplicado (kernel) (2026-11-11 01:55)
