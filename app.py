@@ -47,12 +47,12 @@ AI_API_KEY = (os.environ.get("AI_API_KEY") or os.environ.get("MEAI_API_KEY") or 
 AI_BASE_URL = (os.environ.get("AI_BASE_URL") or os.environ.get("MEAI_BASE_URL") or "https://api.meai.cloud/v1").strip().rstrip("/")
 AI_MODEL = (os.environ.get("AI_MODEL") or os.environ.get("MEAI_MODEL") or "claude-haiku-4.5").strip()
 
-# Identidad de Marca y Correos Propios alfalubes.com
+# Identidad de Marca y Correos Propios y Reales alfalubes.com
 BRAND_NAME = os.environ.get("BRAND_NAME", "ALFA LUBES")
-CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "contacto@alfalubes.com").strip()
-SALES_EMAIL = os.environ.get("SALES_EMAIL", "ventas@alfalubes.com").strip()
-SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", "soporte@alfalubes.com").strip()
-ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@alfalubes.com").strip()
+CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "ventas.alfalubes@gmail.com").strip()
+SALES_EMAIL = os.environ.get("SALES_EMAIL", "ventas.alfalubes@gmail.com").strip()
+SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", "ventas.alfalubes@gmail.com").strip()
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "alfalubesx@gmail.com").strip()
 SITE_URL = os.environ.get("SITE_URL", "https://alfalubes.com").strip().rstrip("/")
 
 # Redes Sociales Oficiales ALFA LUBES y Canales
@@ -243,16 +243,16 @@ def init_db():
             products,
         )
 
-        # Limpiar cuentas duplicadas y obsoletas para tener exactamente los 4 usuarios corporativos + Alfonso Avilés
-        conn.execute("DELETE FROM admins WHERE lower(email) NOT IN ('alfonsoavilery@icloud.com', 'rruelas@alfalubes.com', 'eabitia@alfalubes.com', 'administracion@alfalubes.com', 'ventas@alfalubes.com')")
+        # Limpiar cuentas obsoletas para tener exactamente los 4 colaboradores en Gmail + Alfonso Avilés
+        conn.execute("DELETE FROM admins WHERE lower(email) NOT IN ('alfonsoavilery@icloud.com', 'alfonsoavilezy@icloud.com', 'alfalubesx@gmail.com', 'ventas.alfalubes@gmail.com', 'rruelas.alfalubes@gmail.com', 'eabitia.alfalubes@gmail.com')")
 
-        # Cuentas oficiales exactas: Alfonso Avilés (Admin Total) + 4 usuarios corporativos
+        # Cuentas oficiales activas: Alfonso Avilés (Super Admin) + 4 cuentas reales de Gmail
         official_admins = [
             ("alfonsoavilery@icloud.com", hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest(), "Alfonso Avilés", "super"),
-            ("rruelas@alfalubes.com", hashlib.sha256("ruelas2026".encode("utf-8")).hexdigest(), "R. Ruelas", "admin"),
-            ("eabitia@alfalubes.com", hashlib.sha256("Abitia2026".encode("utf-8")).hexdigest(), "E. Abitia", "admin"),
-            ("administracion@alfalubes.com", hashlib.sha256("Admin2026".encode("utf-8")).hexdigest(), "Administración General ALFA LUBES", "admin"),
-            ("ventas@alfalubes.com", hashlib.sha256("Ventas2026".encode("utf-8")).hexdigest(), "Ventas ALFA LUBES", "ventas"),
+            ("alfalubesx@gmail.com", hashlib.sha256("@lfa1ub3s".encode("utf-8")).hexdigest(), "Administración General ALFA LUBES", "admin"),
+            ("ventas.alfalubes@gmail.com", hashlib.sha256("@lfalub3s".encode("utf-8")).hexdigest(), "Ventas y Contacto ALFA LUBES", "ventas"),
+            ("rruelas.alfalubes@gmail.com", hashlib.sha256("@lfalub3s".encode("utf-8")).hexdigest(), "R. Ruelas", "admin"),
+            ("eabitia.alfalubes@gmail.com", hashlib.sha256("@lfalub3s".encode("utf-8")).hexdigest(), "E. Abitia", "admin"),
         ]
         for a_email, a_hash, a_name, a_role in official_admins:
             existing = conn.execute("SELECT id FROM admins WHERE lower(email) = ?", (a_email.lower(),)).fetchone()
@@ -395,12 +395,21 @@ def admin_panel():
 
 # Administradores oficiales con credenciales garantizadas (fallback maestro)
 MASTER_ADMINS = {
+    # Administrador Total
     "alfonsoavilery@icloud.com": ("Alfonso Avilés", "super", "Calurore1028@"),
     "alfonsoavilezy@icloud.com": ("Alfonso Avilés", "super", "Calurore1028@"),
-    "rruelas@alfalubes.com": ("R. Ruelas", "admin", "ruelas2026"),
-    "eabitia@alfalubes.com": ("E. Abitia", "admin", "Abitia2026"),
-    "administracion@alfalubes.com": ("Administración General ALFA LUBES", "admin", "Admin2026"),
-    "ventas@alfalubes.com": ("Ventas ALFA LUBES", "ventas", "Ventas2026"),
+    # Cuentas Reales Gmail
+    "alfalubesx@gmail.com": ("Administración General ALFA LUBES", "admin", "@lfa1ub3s"),
+    "ventas.alfalubes@gmail.com": ("Ventas y Contacto ALFA LUBES", "ventas", "@lfalub3s"),
+    "rruelas.alfalubes@gmail.com": ("R. Ruelas", "admin", "@lfalub3s"),
+    "eabitia.alfalubes@gmail.com": ("E. Abitia", "admin", "@lfalub3s"),
+    # Aliases alfalubes.com compatibles
+    "administracion@alfalubes.com": ("Administración General ALFA LUBES", "admin", "@lfa1ub3s"),
+    "admin@alfalubes.com": ("Administración General ALFA LUBES", "admin", "@lfa1ub3s"),
+    "ventas@alfalubes.com": ("Ventas y Contacto ALFA LUBES", "ventas", "@lfalub3s"),
+    "contacto@alfalubes.com": ("Ventas y Contacto ALFA LUBES", "ventas", "@lfalub3s"),
+    "rruelas@alfalubes.com": ("R. Ruelas", "admin", "@lfalub3s"),
+    "eabitia@alfalubes.com": ("E. Abitia", "admin", "@lfalub3s"),
 }
 
 
@@ -436,7 +445,22 @@ def admin_login():
         if email in MASTER_ADMINS and password == MASTER_ADMINS[email][2]:
             name, role, _ = MASTER_ADMINS[email]
             session.clear()
-            user_id = 1 if "alfonso" in email else (2 if "ruelas" in email else (3 if "abitia" in email else 4))
+            user_id = 1
+            with get_db() as conn:
+                db_user = conn.execute("SELECT id FROM admins WHERE lower(email)=?", (email,)).fetchone()
+                if db_user:
+                    user_id = db_user["id"]
+                else:
+                    target_email = "ventas.alfalubes@gmail.com" if ("ventas" in email or "contacto" in email) else (
+                        "alfalubesx@gmail.com" if "admin" in email else (
+                            "rruelas.alfalubes@gmail.com" if "ruelas" in email else (
+                                "eabitia.alfalubes@gmail.com" if "abitia" in email else "alfonsoavilery@icloud.com"
+                            )
+                        )
+                    )
+                    db_user = conn.execute("SELECT id FROM admins WHERE lower(email)=?", (target_email,)).fetchone()
+                    if db_user:
+                        user_id = db_user["id"]
             session["admin_id"] = user_id
             session["admin_name"] = name
             session["admin_role"] = role
