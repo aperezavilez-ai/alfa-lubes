@@ -72,13 +72,14 @@ SUPABASE_URL = (os.environ.get("SUPABASE_URL") or "https://eihvypcvmjbcfumllxrv.
 SUPABASE_KEY = (os.environ.get("SUPABASE_KEY") or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpaHZ5cGN2bWpiY2Z1bWxseHJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzNDM1NzYsImV4cCI6MjEwOTkxOTU3Nn0.sDzxotBsG54eqGB9pl5CpvVvFQJ7z9gW3Kul5FRY05k").strip()
 SUPABASE_PUBLISHABLE_KEY = (os.environ.get("SUPABASE_PUBLISHABLE_KEY") or "sb_publishable_laLwYQHyi5A-KDGWCPKsQA_E3dkVkwp").strip()
 
-# Configuración SMTP institucional alfalubes.com
-SMTP_HOST = os.environ.get("SMTP_HOST", "").strip()
+# Configuración SMTP institucional alfalubes.com (Resend Relay)
+SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.resend.com").strip()
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
-SMTP_USER = os.environ.get("SMTP_USER", "").strip()
-SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "").strip()
-SMTP_FROM = os.environ.get("SMTP_FROM", SALES_EMAIL).strip()
+SMTP_USER = os.environ.get("SMTP_USER", "resend").strip()
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "re_kQi6V5Px_PoqYuq23SzfhsdNp6xtDdEtT").strip()
+SMTP_FROM = os.environ.get("SMTP_FROM", "ventas@alfalubes.com").strip()
 SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "1").strip() in ("1", "true", "True")
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "re_kQi6V5Px_PoqYuq23SzfhsdNp6xtDdEtT").strip()
 
 
 def supabase_get(endpoint: str) -> list | dict | None:
