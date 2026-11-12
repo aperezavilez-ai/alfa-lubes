@@ -991,54 +991,53 @@ def ai_agent():
 
 
 def _alfa_system_prompt() -> str:
-    """Construye el prompt de sistema con contexto exhaustivo de catálogo y marca ALFA LUBES."""
-    try:
-        with get_db() as conn:
-            rows = conn.execute(
-                "SELECT name, brand, viscosity, price, stock, description FROM products WHERE stock > 0 ORDER BY brand, name LIMIT 60"
-            ).fetchall()
-    except Exception:
-        rows = []
-    catalog = "\n".join(
-        f"- {r['brand']} {r['name']} ({r['viscosity']}) · ${r['price']:.2f} MXN · Stock: {r['stock']} · {r['description']}"
-        for r in rows
-    ) or "(Catálogo no disponible en este momento)"
+    """Construye el prompt de sistema para un Asesor Técnico Humano y Experto en ALFA LUBES."""
     return (
-        f"Eres el ASESOR TÉCNICO Y COMERCIAL DE INTELIGENCIA ARTIFICIAL DE {BRAND_NAME} ({SITE_URL}). "
-        "Eres un especialista automotriz experto en aceites de motor, lubricantes, viscosidades SAE, normativas API/ILSAC/ACEA y mantenimiento vehicular. "
-        "Atiendes a clientes particulares, talleres mecánicos y flotillas de manera autónoma, profesional, cálida y orientada a cerrar ventas de forma honesta.\n\n"
-        "IDENTIDAD INSTITUCIONAL Y CANALES OFICIALES:\n"
-        f"- Sitio Web: {SITE_URL}\n"
-        f"- Correo de Atención: {CONTACT_EMAIL}\n"
-        f"- Correo de Ventas y Pedidos: {SALES_EMAIL}\n"
-        f"- Correo de Soporte: {SUPPORT_EMAIL}\n"
-        f"- WhatsApp Oficial: {WHATSAPP_URL} (Atención directa y pedidos al {WHATSAPP_NUMBER})\n"
-        f"- Redes Sociales Oficiales: Facebook ({SOCIAL_FACEBOOK}), Instagram ({SOCIAL_INSTAGRAM}), TikTok ({SOCIAL_TIKTOK}) y YouTube ({SOCIAL_YOUTUBE}). En TikTok e Instagram compartimos tips rápidos y fichas técnicas; en YouTube tutoriales de cambio de aceite y análisis de lubricación.\n\n"
-        "CONOCIMIENTO TÉCNICO FUNDAMENTAL:\n"
-        "1. VISCOSIDAD SAE: El número antes de la 'W' (ej. 0W, 5W, 10W) es la fluidez en frío para proteger el motor en el arranque. El segundo número (20, 30, 40, 50) es la protección a temperatura de operación (100°C).\n"
-        "2. SINTÉTICO VS MINERAL: Sintético = máxima durabilidad (10,000-15,000 km), resistencia a altas temperaturas, economía de combustible. Mineral = cambios frecuentes (5,000 km) para motores tradicionales.\n"
-        "3. KILOMETRAJE: En motores con menos de 100,000 km, mantener estrictamente la recomendación del manual (0W-20, 5W-30 sintético). En motores con más de 100,000-150,000 km con consumo de aceite, evaluar formulaciones para Alto Kilometraje (ej. 10W-40) con acondicionadores de sellos.\n"
-        "4. VENTA POR TARIMAS / PALLETS Y ACEITES IMPORTADOS: Ofrecemos exclusivamente venta por pallets de: 'Pallet ALFA LUBES Full Synthetic' (tarima oficial con nuestro logotipo en cajas selladas, fluido sintético para transmisión y motor) y 'Pallet Importado' (5W-30 Full Synthetic y 0W-20 Full Synthetic en tarimas completas sin marcas comerciales de terceros, con especificación de pureza sintética premium directa). No comercializamos marcas comerciales ajenas (Castrol, Mobil, Bardahl, Shell, Valvoline). Es ideal para talleres mecánicos, refaccionarias y flotillas con precios mayoristas directos. El cliente puede cotizar por WhatsApp o en /pallets.\n"
-        "5. CAPTACIÓN DE CLIENTES PARA VENTA POR PALLETS / MAYOREO A ADMINISTRACIÓN:\n"
-        "   - Cuando un cliente pregunte por pallets, mayoreo, flotillas o precios de tarima, explícale las 3 opciones de pallets y canaliza activamente la venta hacia la Dirección de Administración y Ventas para preparar su cotización oficial y flete.\n"
-        "   - Solicítale amablemente sus datos de contacto para registrar su reporte de captación:\n"
-        "     1) Nombre de contacto\n"
-        "     2) Teléfono o WhatsApp\n"
-        "     3) Empresa, taller o refaccionaria\n"
-        "     4) Ciudad y Estado de entrega\n"
-        "     5) Tarima de interés y número de tarimas estimadas\n"
-        "   - Infórmale que sus datos serán transferidos de inmediato al panel de administración en la sesión de reportes para que un ejecutivo le asigne precio de distribuidor directo.\n"
-        "6. RAZONAMIENTO Y ASESORÍA TÉCNICA DINÁMICA:\n"
-        "   - Responde con autonomía total, profundidad técnica y calidez a cualquier duda sobre motores, viscosidades (0W-20, 5W-20, 5W-30, 5W-40, 10W-40, DCT/DSG), turbocompresores, inyección directa, sistemas Start-Stop o intervalos de cambio.\n"
-        "   - Si preguntan '¿qué aceites vendes?', desglosa con orgullo todo nuestro catálogo ALFA LUBES y las opciones de tarimas mayoristas.\n"
-        "   - REGLA ABSOLUTA DE MARCA: Cero menciones de marcas de la competencia (Castrol, Mobil, Shell, Valvoline, Bardahl). Nuestra única marca oficial es ALFA LUBES y la línea de Pallets Importados.\n"
-        "7. DATOS NECESARIOS: Si el cliente pregunta qué aceite usar, pregúntale: Marca, Modelo, Año, Kilometraje y si presenta consumo de aceite.\n"
-        "8. COMPRA Y ENVÍOS: Los pedidos de menudeo se realizan directamente agregando productos al carrito en /products y registrando sus datos en /checkout. Se ofrecen envíos rápidos a todo México.\n\n"
-        "CATÁLOGO DE PRODUCTOS EN STOCK:\n"
-        f"{catalog}\n\n"
-        "PAUTAS DE RESPUESTA:\n"
-        "- Responde siempre en español, con excelente formato (tablas, viñetas, negritas) y redacción técnica accesible.\n"
-        "- Sé claro, directo y no inventes compatibilidades OEM sin recordar al usuario verificar el manual de su vehículo."
+        f"Eres el ASESOR TÉCNICO Y COMERCIAL DE {BRAND_NAME} ({SITE_URL}). "
+        "Eres un profesional automotriz experto en lubricación, aceites de motor, viscosidades SAE, normativas internacionales (API, ILSAC, ACEA), "
+        "transmisiones y mantenimiento vehicular. Atiendes a conductores particulares, talleres mecánicos, refaccionarias y flotillas.\n\n"
+        "TONO Y PERSONALIDAD (AGENTE HUMANO REAL):\n"
+        "- Hablas de forma totalmente natural, cercana, cálida y profesional, como un asesor técnico experimentado que te atiende en el mostrador o por WhatsApp.\n"
+        "- CERO TEXTOS PREESTABLECIDOS NI ACARTONADOS: Prohibido soltar discursos de bienvenida largos, menús rígidos o tablas gigantescas de precios si el cliente no las ha pedido.\n"
+        "- Si el cliente solo saluda (ej. 'hola', 'buenas tardes'), saluda de vuelta con calidez humana en 1 o 2 renglones breves: '¡Hola! Bienvenido a Alfa Lubes. Te atiendo con gusto, ¿para qué vehículo buscas aceite hoy o qué duda tienes sobre lubricación?'.\n"
+        "- LONGITUD Y AGILIDAD: Responde de forma ágil y concisa en 2 a 3 párrafos conversacionales directos. Ve al grano con empatía y sin rodeos innecesarios.\n"
+        "- Responde DIRECTO a lo que el usuario pregunta, con explicaciones claras, fluidas y concisas. Usa negritas con naturalidad para resaltar datos clave.\n\n"
+        "CONOCIMIENTO TÉCNICO MAESTRO DEL RUBRO AUTOMOTRIZ:\n"
+        "1. VISCOSIDADES SAE (0W-20, 5W-20, 5W-30, 5W-40, 10W-40, 15W-40, 20W-50):\n"
+        "   - El número con 'W' (Winter) indica la fluidez en frío para proteger el motor durante el arranque, donde ocurre hasta el 70% del desgaste.\n"
+        "   - El segundo número (20, 30, 40) es la película protectora a temperatura de operación (100°C).\n"
+        "   - Los motores modernos tienen conductos de lubricación milimétricos (sistemas VVT, VTEC, EcoBoost, Skyactiv, híbridos). Un aceite muy grueso tarda en subir y genera fricción.\n"
+        "2. DESMITIFICANDO EL KILOMETRAJE:\n"
+        "   - Si un vehículo tiene 80,000 km, 120,000 km o más y NO consume aceite, se debe MANTENER la viscosidad recomendada por el fabricante (0W-20 o 5W-30 Full Synthetic). Subir a 20W-50 solo por kilometraje es un grave error que desgasta el motor y daña la bomba.\n"
+        "   - Si el motor ya presenta consumo de aceite (más de medio litro entre servicios) o rezumes leves en juntas, la opción correcta es nuestro ALFA LUBES Multigrado Alto Kilometraje 10W-40, formulado con acondicionadores especiales de sellos.\n"
+        "3. TRANSMISIONES ESPECIALIZADAS (DCT/DSG vs CVT vs ATF):\n"
+        "   - Las cajas de doble embrague (DSG de Volkswagen/Audi/SEAT, DCT de Hyundai/Kia, PowerShift) requieren fluido 100% sintético específico de fricción controlada como nuestro ALFA LUBES DCT/DSG Full Synthetic ($380 MXN). Usar ATF común arruina los embragues húmedos y la mecatrónica.\n"
+        "4. NORMAS API SP E ILSAC GF-6:\n"
+        "   - Esenciales para motores turbo e inyección directa (TGDI) para prevenir la preignición a baja velocidad (LSPI) y el estiramiento de la cadena de distribución. Toda nuestra línea sintética cumple con estos estándares.\n\n"
+        "CATÁLOGO OFICIAL Y PRECIOS DE ALFA LUBES:\n"
+        "- ALFA LUBES Full Synthetic 0W-20 ($349.00 MXN): Para autos modernos, híbridos y máxima economía de combustible.\n"
+        "- ALFA LUBES Full Synthetic 5W-20 ($289.00 MXN): Para vehículos que exigen viscosidad 5W-20.\n"
+        "- ALFA LUBES Full Synthetic 5W-30 ($299.00 MXN): La viscosidad más versátil y demandada del mercado mexicano.\n"
+        "- ALFA LUBES Synthetic Protection 5W-40 ($329.00 MXN): Para motores turbo, europeos o alta exigencia térmica en carretera.\n"
+        "- ALFA LUBES Multigrado Alto Kilometraje 10W-40 ($199.00 MXN): Con acondicionadores de sellos para motores con +100,000 km.\n"
+        "- ALFA LUBES DCT/DSG Full Synthetic ($380.00 MXN): Fluido para transmisiones de doble embrague.\n\n"
+        "VENTA MAYORISTA POR TARIMAS (PALLETS) PARA TALLERES Y REFACCIONARIAS:\n"
+        "- Pallet ALFA LUBES Full Synthetic ($78,500.00 MXN · 48 cajas selladas con logotipo oficial).\n"
+        "- Pallet Importado 5W-30 Full Synthetic ($72,000.00 MXN · 48 cajas selladas de importación directa).\n"
+        "- Pallet Importado 0W-20 Full Synthetic ($74,800.00 MXN · 48 cajas selladas de importación directa).\n"
+        "- Todas las tarimas vienen selladas de fábrica con pedimento de importación, factura fiscal y flete seguro a todo México con hasta 40% de ahorro frente a menudeo.\n\n"
+        "CAPTACIÓN DE CLIENTES DE PALLETS / MAYOREO (CIERRE COMERCIAL NATURAL):\n"
+        "- Cuando alguien pregunte por tarimas, mayoreo o precios para su taller o refaccionaria, dale la información con entusiasmo y pide amablemente sus datos:\n"
+        "  'Para que el área de Administración y Ventas te envíe la cotización formal con el mejor descuento por volumen y el flete exacto a tu ciudad, ¿me apoyas con tu nombre, WhatsApp, negocio o taller, y a qué ciudad sería el envío?'.\n"
+        "- Infórmale que su requerimiento se turna directamente a Administración para que un ejecutivo lo contacte a la brevedad.\n\n"
+        "REGLA ESTRICTA DE MARCA:\n"
+        "- NUNCA vendas, recomiendes ni menciones marcas comerciales de la competencia (Castrol, Mobil, Bardahl, Shell, Valvoline).\n"
+        "- Si el cliente pregunta por ellas, acláralo con cortesía: 'En Alfa Lubes no manejamos marcas ajenas; somos fabricantes y distribuidores directos de nuestra línea oficial ALFA LUBES y de tarimas de Pallet Importado 100% sintéticas con especificación API SP / ILSAC GF-6 que igualan y superan los requerimientos de agencia a un precio mucho más accesible'.\n\n"
+        "CANALES OFICIALES:\n"
+        f"- WhatsApp Oficial: {WHATSAPP_NUMBER} ({WHATSAPP_URL})\n"
+        f"- Correo de Ventas: {SALES_EMAIL}\n"
+        f"- Correo de Contacto: {CONTACT_EMAIL}\n"
+        f"- Web: {SITE_URL}"
     )
 
 
@@ -1050,8 +1049,9 @@ def _call_ai_service(history: list[dict]) -> str | None:
     payload = json.dumps({
         "model": AI_MODEL,
         "messages": [{"role": "system", "content": _alfa_system_prompt()}] + history,
-        "temperature": 0.3,
-        "max_tokens": 2200,
+        "reasoning_effort": "low",
+        "temperature": 0.5,
+        "max_tokens": 900,
     }).encode("utf-8")
     headers = {
         "Content-Type": "application/json",
@@ -1059,7 +1059,7 @@ def _call_ai_service(history: list[dict]) -> str | None:
     }
     req = urlrequest.Request(url, data=payload, headers=headers, method="POST")
     try:
-        with urlrequest.urlopen(req, timeout=40) as resp:
+        with urlrequest.urlopen(req, timeout=35) as resp:
             body = json.loads(resp.read().decode("utf-8"))
         choices = body.get("choices") or []
         if choices:
@@ -1067,13 +1067,12 @@ def _call_ai_service(history: list[dict]) -> str | None:
             content = msg.get("content")
             if isinstance(content, str) and content.strip():
                 return content.strip()
-            # Si el modelo concentró su respuesta en el bloque de razonamiento
             reasoning = msg.get("reasoning")
-            if isinstance(reasoning, str) and len(reasoning.strip()) > 40:
+            if isinstance(reasoning, str) and len(reasoning.strip()) > 20:
                 return reasoning.strip()
-        if isinstance(body.get("response"), str):
+        if isinstance(body.get("response"), str) and body["response"].strip():
             return body["response"].strip()
-        if isinstance(body.get("content"), str):
+        if isinstance(body.get("content"), str) and body["content"].strip():
             return body["content"].strip()
     except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, KeyError, ValueError, OSError):
         return None
@@ -1081,156 +1080,66 @@ def _call_ai_service(history: list[dict]) -> str | None:
 
 
 def _autonomous_fallback_reply(message: str) -> str:
-    """Motor de respuesta autónomo de respaldo para ALFA LUBES."""
+    """Respaldo conversacional natural de ALFA LUBES en caso de intermitencia temporal."""
     low = (message or "").lower().strip()
 
-    # Catálogo directo y qué aceites venden
-    if any(k in low for k in ["que aceites", "qué aceites", "que vendes", "qué vendes", "productos", "catalogo", "catálogo", "lista de aceites", "que tienes", "qué tienes"]):
+    # Saludo simple
+    if any(k in low for k in ["hola", "buenas", "buen dia", "buenos dias", "buenas tardes", "buenas noches", "hey"]):
         return (
-            "En **ALFA LUBES** contamos con formulaciones sintéticas de alta tecnología para venta individual y por tarimas completas (pallets):\n\n"
-            "🛢️ **Línea Oficial ALFA LUBES (Menudeo y Taller):**\n"
-            "- **ALFA LUBES Full Synthetic 0W-20** ($349.00 MXN) — Máxima economía de combustible y arranque en frío.\n"
-            "- **ALFA LUBES Full Synthetic 5W-20** ($289.00 MXN) — Protección eficiente para motores ligeros.\n"
-            "- **ALFA LUBES Full Synthetic 5W-30** ($299.00 MXN) — Protección integral contra el desgaste en motores modernos.\n"
-            "- **ALFA LUBES Synthetic Protection 5W-40** ($329.00 MXN) — Para alta exigencia térmica y carretera.\n"
-            "- **ALFA LUBES Multigrado Alto Kilometraje 10W-40** ($199.00 MXN) — Con acondicionadores de sellos para +100,000 km.\n"
-            "- **ALFA LUBES DCT/DSG Full Synthetic** ($380.00 MXN) — Fluido especializado para transmisiones DSG, S-Tronic y DCT.\n\n"
-            "📦 **Venta por Tarimas / Pallets (Mayoristas y Flotillas):**\n"
-            "- **Pallet ALFA LUBES Full Synthetic** (Tarima oficial con nuestro logotipo en cajas selladas).\n"
-            "- **Pallet Importado 5W-30 Full Synthetic** (Tarima mayorista de importación directa).\n"
-            "- **Pallet Importado 0W-20 Full Synthetic** (Tarima mayorista para autos modernos e híbridos).\n\n"
-            "👉 Puedes explorar el catálogo en [/products](/products) o ver fotos de las tarimas en [/pallets](/pallets). ¿Para qué vehículo buscas lubricante?"
+            "¡Hola! Bienvenido a **ALFA LUBES**. Te atiendo con mucho gusto, ¿para qué vehículo buscas aceite hoy o qué duda tienes sobre lubricación?"
         )
 
-    # 1. WhatsApp y atención directa
-    if any(k in low for k in ["whatsapp", "whats", "wathsapp", "watsapp", "celular", "mensaje directo"]):
+    # Catálogo o qué aceites tienen
+    if any(k in low for k in ["que aceites", "qué aceites", "que vendes", "qué vendes", "productos", "catalogo", "catálogo", "lista", "que tienes", "qué tienes"]):
         return (
-            f"📱 Puedes comunicarte directamente con nuestro equipo por **WhatsApp**:\n\n"
-            f"👉 [Iniciar chat en WhatsApp]({WHATSAPP_URL}) (Número: **{WHATSAPP_NUMBER}**)\n\n"
-            "Con gusto te asesoramos de inmediato con recomendaciones de aceites, cotizaciones para talleres o estado de tu pedido."
+            "En **ALFA LUBES** contamos con formulaciones 100% sintéticas de alta tecnología:\n\n"
+            "• **0W-20 Full Synthetic** ($349 MXN) — Para autos modernos e híbridos.\n"
+            "• **5W-20 Full Synthetic** ($289 MXN) — Protección avanzada de baja viscosidad.\n"
+            "• **5W-30 Full Synthetic** ($299 MXN) — La viscosidad más versátil y vendida.\n"
+            "• **5W-40 Synthetic Protection** ($329 MXN) — Para motores turbo y alta exigencia en carretera.\n"
+            "• **10W-40 Alto Kilometraje** ($199 MXN) — Con acondicionadores de sellos para motores con +100,000 km.\n"
+            "• **DCT/DSG Full Synthetic** ($380 MXN) — Especial para transmisiones de doble embrague.\n\n"
+            "También manejamos tarimas cerradas en venta por pallets para talleres y refaccionarias. ¿Para qué vehículo o aplicación lo necesitas?"
         )
 
-    # 2. Venta por Pallets y Aceites Importados
-    if any(k in low for k in ["pallet", "pallets", "tarima", "tarimas", "importado", "importados", "mayoreo", "flotilla", "cajas", "tambor", "tambores"]):
-        pallets_data = get_all_pallets()
-        p_lines = [f"- **{p.get('title')}** ({p.get('viscosity')} · {p.get('units_per_pallet')} unidades): **${float(p.get('pallet_price', 0)):,.2f} MXN**" for p in pallets_data]
+    # Pallets y mayoreo
+    if any(k in low for k in ["pallet", "pallets", "tarima", "tarimas", "mayoreo", "flotilla", "cajas", "tambor", "tambores"]):
         return (
-            f"🏆 **¡LOS MEJORES ACEITES IMPORTADOS EN VENTA POR PALLETS!**\n\n"
-            "En **ALFA LUBES** somos importadores directos y distribuimos tarimas completas con precios mayoristas para talleres mecánicos, refaccionarias y flotillas:\n\n"
-            + "\n".join(p_lines) + "\n\n"
-            f"📦 Todas las tarimas vienen selladas con film de alta resistencia y documentación de importación.\n\n"
-            f"👉 Puedes consultar fotos y detalles en [/pallets](/pallets) o solicitar una cotización personalizada por [WhatsApp aquí]({WHATSAPP_URL}) o al correo **{SALES_EMAIL}**."
+            "¡Excelente! En **ALFA LUBES** somos distribuidores directos de tarimas completas (48 cajas por pallet selladas de fábrica), ideales para talleres y refaccionarias con hasta 40% de ahorro:\n\n"
+            "• **Pallet ALFA LUBES Full Synthetic:** $78,500 MXN\n"
+            "• **Pallet Importado 5W-30 Full Synthetic:** $72,000 MXN\n"
+            "• **Pallet Importado 0W-20 Full Synthetic:** $74,800 MXN\n\n"
+            "Todas las tarimas cuentan con pedimento de importación y factura fiscal. Para que el área de Administración y Ventas te arme la cotización formal con el flete exacto a tu ciudad, ¿me apoyas con tu nombre, WhatsApp, negocio o taller, y a qué ciudad sería el envío?"
         )
 
-    # 2. Redes sociales
-    if any(k in low for k in ["redes", "red social", "facebook", "instagram", "tiktok", "youtube", "social", "seguirlos", "videos"]):
+    # WhatsApp directo
+    if any(k in low for k in ["whatsapp", "whats", "celular", "telefono", "teléfono"]):
         return (
-            f"¡En **{BRAND_NAME}** nos encanta estar cerca de ti! Puedes seguirnos y ver tips de lubricación en nuestras redes oficiales:\n\n"
-            f"- 📱 **WhatsApp**: [{WHATSAPP_NUMBER}]({WHATSAPP_URL}) — Asesoría rápida y pedidos.\n"
-            f"- 📘 **Facebook**: [{SOCIAL_FACEBOOK}]({SOCIAL_FACEBOOK}) — Novedades, promociones y comunidad.\n"
-            f"- 📸 **Instagram**: [@alfalubes]({SOCIAL_INSTAGRAM}) — Fichas técnicas, especificaciones y fotos de producto.\n"
-            f"- 🎵 **TikTok**: [@alfalubes]({SOCIAL_TIKTOK}) — Consejos rápidos de lubricación y mitos del motor.\n"
-            f"- ▶️ **YouTube**: [@alfalubes]({SOCIAL_YOUTUBE}) — Guías técnicas y comparativas de aceites.\n\n"
-            "¿Deseas conocer más sobre algún producto o viscosidad en específico?"
+            f"Con gusto puedes escribirnos a nuestro **WhatsApp oficial**: [{WHATSAPP_NUMBER}]({WHATSAPP_URL}). "
+            "Ahí un asesor de nuestro equipo te apoya al instante con cotizaciones, pedidos o dudas técnicas."
         )
 
-    # 3. Correos y contacto institucional
-    if any(k in low for k in ["correo", "email", "contacto", "telefono", "teléfono", "escribir", "soporte", "atencion", "atención"]):
+    # Consulta sobre marcas de la competencia
+    if any(b in low for k in ["castrol", "mobil", "movil", "shell", "valvoline", "bardahl", "bardal"] for b in [k]):
         return (
-            f"Nuestros canales de contacto oficiales para **{BRAND_NAME}** son:\n\n"
-            f"- 📱 **WhatsApp Oficial:** [{WHATSAPP_NUMBER}]({WHATSAPP_URL})\n"
-            f"- ✉️ **Atención general:** [{CONTACT_EMAIL}](mailto:{CONTACT_EMAIL})\n"
-            f"- 💼 **Ventas y cotizaciones:** [{SALES_EMAIL}](mailto:{SALES_EMAIL})\n"
-            f"- 🛠️ **Soporte y garantías:** [{SUPPORT_EMAIL}](mailto:{SUPPORT_EMAIL})\n\n"
-            "Todos nuestros correos utilizan el dominio propio institucional **alfalubes.com**. También puedes explorar el catálogo y levantar tu pedido en [/products](/products)."
+            "En **ALFA LUBES** no manejamos marcas ajenas; somos distribuidores directos de nuestra línea oficial **ALFA LUBES** y de tarimas de **Pallet Importado**. "
+            "Nuestras formulaciones son 100% sintéticas con especificación API SP / ILSAC GF-6, igualando y superando los requerimientos de fabricante a un precio mucho más conveniente. "
+            "¿Para qué vehículo buscas aceite? Con gusto te asesoro con la opción exacta."
         )
 
-    # 3. Consulta sobre marcas ajenas (Castrol, Mobil, Bardahl, etc.)
-    matched_brand = None
-    for b in ["castrol", "mobil", "movil", "shell", "valvoline", "bardahl", "bardal"]:
-        if b in low:
-            matched_brand = b
-            break
-    if matched_brand:
+    # Viscosidades específicas
+    if any(v in low for v in ["0w-20", "5w-20", "5w-30", "5w-40", "10w-40", "15w-40", "20w-50"]):
         return (
-            f"En **ALFA LUBES** no comercializamos marcas comerciales convencionales como {matched_brand.title()}.\n\n"
-            "Somos fabricantes y distribuidores directos de nuestra marca oficial **ALFA LUBES** y de tarimas de **Pallet Importado**, "
-            "formuladas con tecnología 100% sintética de alto desempeño que cumplen y superan las especificaciones OEM y normativas API/ILSAC.\n\n"
-            "Nuestras opciones de lubricación garantizada son:\n"
-            "- **Catálogo Oficial ALFA LUBES:** Fluidos sintéticos 0W-20, 5W-20, 5W-30, 5W-40, 10W-40 y fluido especializado DCT/DSG en [/products](/products).\n"
-            "- **Venta por Pallets / Tarimas:** Pallet oficial ALFA LUBES y Pallets Importados (5W-30 y 0W-20) en [/pallets](/pallets).\n\n"
-            "¿Para qué vehículo o aplicación buscas lubricante?"
+            "La viscosidad correcta depende de las tolerancias con las que fue diseñado tu motor. "
+            "En motores modernos con distribución variable recomendamos respetar la especificación de manual (como 0W-20 o 5W-30 Full Synthetic). "
+            "Si el auto ya supera los 100,000 km y presenta consumo leve, nuestro 10W-40 Alto Kilometraje es la mejor alternativa. "
+            "¿Cuál es el modelo, año y kilometraje de tu vehículo?"
         )
 
-    # 4. Viscosidades específicas
-    viscosities = ["0w-20", "5w-20", "5w-30", "5w-40", "10w-40", "15w-40", "20w-50"]
-    found_visc = None
-    for v in viscosities:
-        if v in low:
-            found_visc = v
-            break
-    if found_visc:
-        try:
-            with get_db() as conn:
-                prods = conn.execute(
-                    "SELECT name, brand, viscosity, price, stock FROM products WHERE lower(viscosity) = ? AND stock > 0",
-                    (found_visc,),
-                ).fetchall()
-            if prods:
-                plist = ", ".join([f"**{p['name']}** (${p['price']:,.2f} MXN)" for p in prods])
-                return (
-                    f"El grado **{found_visc.upper()}** es excelente para una lubricación precisa según el fabricante.\n\n"
-                    f"En nuestro inventario disponible tenemos: {plist}.\n\n"
-                    "Recuerda siempre confirmar en el manual de propietario de tu auto que coincida la viscosidad y norma API. ¿Cuál es el año y modelo de tu vehículo?"
-                )
-        except Exception:
-            pass
-
-    # 5. Sintético vs Mineral
-    if any(k in low for k in ["sintetico vs mineral", "sintético vs mineral", "diferencia", "mineral o sintetico", "mineral o sintético"]):
-        return (
-            "**Diferencias clave entre Aceite Sintético y Mineral:**\n\n"
-            "1. **100% Sintético**:\n"
-            "   - Máxima pureza molecular y resistencia a temperaturas extremas.\n"
-            "   - Fluye al instante en arranques en frío (reduciendo hasta un 70% el desgaste inicial).\n"
-            "   - Durabilidad: 10,000 a 15,000 km.\n"
-            "   - Recomendado para motores modernos, con inyección directa o turbo.\n\n"
-            "2. **Mineral**:\n"
-            "   - Refinado de petróleo tradicional.\n"
-            "   - Durabilidad: 5,000 km.\n"
-            "   - Recomendado para motores antiguos o con tolerancias holgadas.\n\n"
-            "En **ALFA LUBES** recomendamos usar la viscosidad sintética recomendada por tu fabricante para alargar la vida útil de tu motor."
-        )
-
-    # 6. Alto kilometraje
-    if any(k in low for k in ["kilometraje", "alto kilometraje", "100000", "100,000", "150000", "gasta aceite", "humo"]):
-        return (
-            "**Recomendación para motores con Alto Kilometraje:**\n\n"
-            "- Si tu vehículo supera los 100,000 o 150,000 km y **NO consume aceite**, lo ideal es seguir utilizando la viscosidad recomendada en el manual (generalmente 5W-30 o 0W-20 sintético).\n"
-            "- Si ya presenta un consumo moderado de lubricante o pequeños rezumes en empaques, te recomendamos optar por un aceite con formulación **High Mileage / Alto Kilometraje** (como nuestro **ALFA LUBES Multigrado Alto Kilometraje 10W-40**) que incluye acondicionadores de sellos.\n"
-            "- Evita saltar de golpe a aceites muy pesados como 20W-50 si el manual no lo indica, ya que puede dificultar la lubricación al arranque."
-        )
-
-    # 7. Compra y envíos
-    if any(k in low for k in ["comprar", "pedido", "catalogo", "catálogo", "envio", "envío", "pago", "precio", "costo"]):
-        return (
-            f"Comprar en **{BRAND_NAME}** es muy fácil:\n\n"
-            "1. Explora los productos disponibles en [/products](/products).\n"
-            "2. Selecciona la cantidad y haz clic en **Agregar al carrito**.\n"
-            "3. En el carrito, haz clic en **Confirmar compra** y completa tus datos de contacto.\n"
-            f"4. Nuestro equipo de ventas te contactará desde **{SALES_EMAIL}** para acordar la entrega y el medio de pago.\n\n"
-            "¿Tienes dudas sobre qué aceite requiere tu motor? Dime marca, modelo y año para orientarte."
-        )
-
-    # Saludo o respuesta general
+    # Respuesta conversacional general
     return (
-        f"¡Hola! Soy tu **Asesor de Lubricación {BRAND_NAME}**.\n\n"
-        "Estoy listo para responder de manera autónoma todas tus dudas sobre aceites automotrices, viscosidades y productos de nuestro catálogo.\n\n"
-        "Para darte la mejor recomendación, por favor compárteme:\n"
-        "- **Marca y Modelo** de tu vehículo\n"
-        "- **Año y Tipo de Motor**\n"
-        "- **Kilometraje actual** y si tiene consumo de aceite\n\n"
-        f"También puedes escribirnos a [{CONTACT_EMAIL}](mailto:{CONTACT_EMAIL}) o ver nuestro catálogo en [/products](/products)."
+        "Con gusto te asesoro. En **ALFA LUBES** contamos con aceites 100% sintéticos y fluidos para transmisión de alto desempeño. "
+        "Compárteme qué auto tienes (marca, modelo, año y kilometraje) o qué duda tienes sobre lubricación para darte la recomendación exacta."
     )
 
 

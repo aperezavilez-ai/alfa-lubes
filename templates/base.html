@@ -384,13 +384,23 @@
             closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
         }
 
+        function formatWidgetMarkdown(text) {
+            if (!text) return '';
+            let escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            escaped = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-amber-400 font-semibold underline hover:text-amber-300">$1</a>');
+            escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            escaped = escaped.replace(/^\s*[-•]\s+(.+)$/gm, '• $1');
+            return escaped;
+        }
+
         function appendWidgetMsg(text, isUser) {
             const wrap = document.createElement('div');
             wrap.className = 'flex gap-2' + (isUser ? ' justify-end' : '');
             const avatar = isUser
                 ? '<div class="w-6 h-6 rounded-full bg-sky-500/20 flex items-center justify-center text-sky-400 text-[10px] shrink-0 mt-0.5 order-2"><i class="fa-solid fa-user"></i></div>'
                 : '<div class="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center text-gold text-[10px] shrink-0 mt-0.5"><i class="fa-solid fa-robot"></i></div>';
-            const bubble = `<div class="${isUser ? 'bg-sky-600 text-white rounded-2xl rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-2xl rounded-tl-none'} p-3 max-w-[85%] whitespace-pre-line leading-relaxed">${text}</div>`;
+            const formatted = isUser ? text : formatWidgetMarkdown(text);
+            const bubble = `<div class="${isUser ? 'bg-sky-600 text-white rounded-2xl rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-2xl rounded-tl-none'} p-3 max-w-[85%] whitespace-pre-line leading-relaxed">${formatted}</div>`;
             wrap.innerHTML = avatar + bubble;
             messagesBox.appendChild(wrap);
             messagesBox.scrollTop = messagesBox.scrollHeight;
