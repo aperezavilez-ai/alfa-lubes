@@ -15,7 +15,7 @@ from email.mime.text import MIMEText
 from urllib import request as urlrequest
 from urllib.error import HTTPError, URLError
 
-from flask import Flask, Response, abort, flash, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, Response, abort, flash, jsonify, redirect, render_template, request, send_from_directory, session, url_for
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -1223,6 +1223,15 @@ def ai_recommend():
         reason=reason,
         confidence="Orientativa",
         additional="Este asesor aplica reglas generales y no consulta catálogos OEM ni sustituye el manual del vehículo. Si compartes marca, modelo, año y motor, el equipo puede ayudarte a validar compatibilidad.",
+    )
+
+
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, "static", "images"),
+        "favicon.ico",
+        mimetype="image/vnd.microsoft.icon",
     )
 
 
