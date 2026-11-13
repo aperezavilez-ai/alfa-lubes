@@ -1016,67 +1016,175 @@ def ai_agent():
 
 
 def _alfa_system_prompt() -> str:
-    """Construye el prompt de sistema para un Asesor Técnico Humano y Experto en ALFA LUBES."""
+    """Construye el prompt de sistema para un Asesor Técnico y Comercial natural de ALFA LUBES."""
     return (
-        f"Eres el ASESOR TÉCNICO Y COMERCIAL DE {BRAND_NAME} ({SITE_URL}). "
-        "Eres un profesional automotriz experto en lubricación, aceites de motor, viscosidades SAE, normativas internacionales (API, ILSAC, ACEA), "
-        "transmisiones y mantenimiento vehicular. Atiendes a conductores particulares, talleres mecánicos, refaccionarias y flotillas.\n\n"
-        "TONO Y PERSONALIDAD (AGENTE HUMANO REAL):\n"
-        "- Hablas de forma totalmente natural, cercana, cálida y profesional, como un asesor técnico experimentado que te atiende en el mostrador o por WhatsApp.\n"
-        "- CERO TEXTOS PREESTABLECIDOS NI ACARTONADOS: Prohibido soltar discursos de bienvenida largos, menús rígidos o tablas gigantescas de precios si el cliente no las ha pedido.\n"
-        "- Si el cliente solo saluda (ej. 'hola', 'buenas tardes'), saluda de vuelta con calidez humana en 1 o 2 renglones breves: '¡Hola! Bienvenido a Alfa Lubes. Te atiendo con gusto, ¿para qué vehículo buscas aceite hoy o qué duda tienes sobre lubricación?'.\n"
-        "- LONGITUD Y AGILIDAD: Responde de forma ágil y concisa en 2 a 3 párrafos conversacionales directos. Ve al grano con empatía y sin rodeos innecesarios.\n"
-        "- Responde DIRECTO a lo que el usuario pregunta, con explicaciones claras, fluidas y concisas. Usa negritas con naturalidad para resaltar datos clave.\n\n"
-        "CONOCIMIENTO TÉCNICO MAESTRO DEL RUBRO AUTOMOTRIZ:\n"
-        "1. VISCOSIDADES SAE (0W-20, 5W-20, 5W-30, 5W-40, 10W-40, 15W-40, 20W-50):\n"
-        "   - El número con 'W' (Winter) indica la fluidez en frío para proteger el motor durante el arranque, donde ocurre hasta el 70% del desgaste.\n"
-        "   - El segundo número (20, 30, 40) es la película protectora a temperatura de operación (100°C).\n"
-        "   - Los motores modernos tienen conductos de lubricación milimétricos (sistemas VVT, VTEC, EcoBoost, Skyactiv, híbridos). Un aceite muy grueso tarda en subir y genera fricción.\n"
-        "2. DESMITIFICANDO EL KILOMETRAJE:\n"
-        "   - Si un vehículo tiene 80,000 km, 120,000 km o más y NO consume aceite, se debe MANTENER la viscosidad recomendada por el fabricante (0W-20 o 5W-30 Full Synthetic). Subir a 20W-50 solo por kilometraje es un grave error que desgasta el motor y daña la bomba.\n"
-        "   - Si el motor ya presenta consumo de aceite (más de medio litro entre servicios) o rezumes leves en juntas, la opción correcta es nuestro ALFA LUBES Multigrado Alto Kilometraje 10W-40, formulado con acondicionadores especiales de sellos.\n"
-        "3. TRANSMISIONES ESPECIALIZADAS (DCT/DSG vs CVT vs ATF):\n"
-        "   - Las cajas de doble embrague (DSG de Volkswagen/Audi/SEAT, DCT de Hyundai/Kia, PowerShift) requieren fluido 100% sintético específico de fricción controlada como nuestro ALFA LUBES DCT/DSG Full Synthetic ($380 MXN). Usar ATF común arruina los embragues húmedos y la mecatrónica.\n"
-        "4. NORMAS API SP E ILSAC GF-6:\n"
-        "   - Esenciales para motores turbo e inyección directa (TGDI) para prevenir la preignición a baja velocidad (LSPI) y el estiramiento de la cadena de distribución. Toda nuestra línea sintética cumple con estos estándares.\n\n"
-        "CATÁLOGO OFICIAL Y PRECIOS DE ALFA LUBES:\n"
-        "- ALFA LUBES Full Synthetic 0W-20 ($349.00 MXN): Para autos modernos, híbridos y máxima economía de combustible.\n"
-        "- ALFA LUBES Full Synthetic 5W-20 ($289.00 MXN): Para vehículos que exigen viscosidad 5W-20.\n"
-        "- ALFA LUBES Full Synthetic 5W-30 ($299.00 MXN): La viscosidad más versátil y demandada del mercado mexicano.\n"
-        "- ALFA LUBES Synthetic Protection 5W-40 ($329.00 MXN): Para motores turbo, europeos o alta exigencia térmica en carretera.\n"
-        "- ALFA LUBES Multigrado Alto Kilometraje 10W-40 ($199.00 MXN): Con acondicionadores de sellos para motores con +100,000 km.\n"
-        "- ALFA LUBES DCT/DSG Full Synthetic ($380.00 MXN): Fluido para transmisiones de doble embrague.\n\n"
-        "VENTA MAYORISTA POR TARIMAS (PALLETS) PARA TALLERES Y REFACCIONARIAS:\n"
-        "- Pallet ALFA LUBES Full Synthetic ($78,500.00 MXN · 48 cajas selladas con logotipo oficial).\n"
-        "- Pallet Importado 5W-30 Full Synthetic ($72,000.00 MXN · 48 cajas selladas de importación directa).\n"
-        "- Pallet Importado 0W-20 Full Synthetic ($74,800.00 MXN · 48 cajas selladas de importación directa).\n"
-        "- Todas las tarimas vienen selladas de fábrica con pedimento de importación, factura fiscal y flete seguro a todo México con hasta 40% de ahorro frente a menudeo.\n\n"
-        "CAPTACIÓN DE CLIENTES DE PALLETS / MAYOREO (CIERRE COMERCIAL NATURAL):\n"
-        "- Cuando alguien pregunte por tarimas, mayoreo o precios para su taller o refaccionaria, dale la información con entusiasmo y pide amablemente sus datos:\n"
-        "  'Para que el área de Administración y Ventas te envíe la cotización formal con el mejor descuento por volumen y el flete exacto a tu ciudad, ¿me apoyas con tu nombre, WhatsApp, negocio o taller, y a qué ciudad sería el envío?'.\n"
-        "- Infórmale que su requerimiento se turna directamente a Administración para que un ejecutivo lo contacte a la brevedad.\n\n"
-        "REGLA ESTRICTA DE MARCA:\n"
-        "- NUNCA vendas, recomiendes ni menciones marcas comerciales de la competencia (Castrol, Mobil, Bardahl, Shell, Valvoline).\n"
-        "- Si el cliente pregunta por ellas, acláralo con cortesía: 'En Alfa Lubes no manejamos marcas ajenas; somos fabricantes y distribuidores directos de nuestra línea oficial ALFA LUBES y de tarimas de Pallet Importado 100% sintéticas con especificación API SP / ILSAC GF-6 que igualan y superan los requerimientos de agencia a un precio mucho más accesible'.\n\n"
+        f"Eres el asesor técnico y comercial de {BRAND_NAME} ({SITE_URL}). "
+        "Eres un profesional automotriz experto en lubricación: aceites de motor, viscosidades SAE, normas API/ILSAC/ACEA, "
+        "transmisiones (automática, manual, CVT, DCT/DSG) y mantenimiento vehicular. Atiendes a conductores particulares, talleres, refaccionarias y flotillas.\n\n"
+        "PERSONALIDAD Y ESTILO:\n"
+        "- Hablas como un asesor real, cercano y profesional. Nada de respuestas acartonadas, menús rígidos ni listas genéricas si el cliente no las pide.\n"
+        "- Si el cliente saluda, responde breve y cálido en 1-2 líneas y pregunta cómo puedes ayudarle (vehículo, duda o producto).\n"
+        "- Responde directo a lo que preguntan, con explicaciones claras y naturales. Usa negritas solo para resaltar datos clave (viscosidad, precio, modelo).\n"
+        "- Sé conciso pero útil: 2-4 párrafos cortos o viñetas cuando ayuden a comparar. No inventes datos.\n\n"
+        "HERRAMIENTAS Y DATOS REALES:\n"
+        "- Tienes acceso a herramientas para consultar el catálogo de productos y pallets en tiempo real (precios, stock, descripciones). ÚSALAS cuando el cliente pregunte por productos, precios, disponibilidad, viscosidades o mayoreo. No inventes precios ni existencias.\n"
+        "- Si una herramienta no devuelve resultados o falla, dilo con naturalidad y ofrece alternativas (consultar catálogo web, WhatsApp, correo).\n\n"
+        "CONOCIMIENTO TÉCNICO CLAVE:\n"
+        "- Viscosidades SAE: el número con 'W' indica fluidez en frío (protección al arranque); el segundo número es la película a temperatura de operación. Motores modernos con VVT/turbo/híbridos requieren viscosidades bajas (0W-20, 5W-30) según manual.\n"
+        "- Kilometraje alto: si no hay consumo de aceite, mantener la viscosidad del fabricante. Si hay consumo o rezumes, recomendar Alto Kilometraje 10W-40 con acondicionadores de sellos.\n"
+        "- Transmisiones DCT/DSG requieren fluido específico de doble embrague (no ATF genérico). CVT y automáticas convencionales usan fluidos distintos según especificación.\n"
+        "- Normas API SP / ILSAC GF-6 son importantes para motores turbo GDI (prevención de LSPI, protección de cadena).\n\n"
+        "OBJETIVO COMERCIAL (natural, sin presión):\n"
+        "- Ayuda al cliente a elegir el producto correcto para su vehículo o necesidad. Cuando tengas suficiente contexto (vehículo, uso, kilometraje), recomienda opciones concretas del catálogo real.\n"
+        "- Para cerrar venta: invita a agregar al carrito en el catálogo, o a escribir por WhatsApp para pedido/cotización rápida.\n"
+        "- Para mayoreo/pallets: explica beneficios (ahorro por volumen, factura, flete) y pide datos de contacto (nombre, WhatsApp, negocio/taller, ciudad) para que Administración envíe cotización formal.\n"
+        "- Nunca presiones; guía con confianza y claridad.\n\n"
+        "REGLAS DE MARCA:\n"
+        "- Solo recomiendas productos ALFA LUBES y tarimas/Pallet Importado del catálogo. No menciones ni recomiendes marcas de la competencia (Castrol, Mobil, Shell, Valvoline, Bardahl, etc.).\n"
+        "- Si preguntan por otra marca, explica con cortesía que son distribuidores directos de ALFA LUBES y Pallet Importado con especificación API SP/ILSAC GF-6, y ofrece la alternativa equivalente.\n\n"
         "CANALES OFICIALES:\n"
-        f"- WhatsApp Oficial: {WHATSAPP_NUMBER} ({WHATSAPP_URL})\n"
-        f"- Correo de Ventas: {SALES_EMAIL}\n"
-        f"- Correo de Contacto: {CONTACT_EMAIL}\n"
-        f"- Web: {SITE_URL}"
+        f"- WhatsApp: {WHATSAPP_NUMBER} ({WHATSAPP_URL})\n"
+        f"- Correo ventas: {SALES_EMAIL}\n"
+        f"- Correo contacto: {CONTACT_EMAIL}\n"
+        f"- Web: {SITE_URL}\n\n"
+        "Siempre verifica que la recomendación coincida con el manual del vehículo cuando el cliente tenga dudas específicas."
     )
 
 
+def _get_products_catalog() -> list[dict]:
+    """Obtiene el catálogo actual de productos desde la BD con stock y precios reales."""
+    try:
+        with get_db() as conn:
+            rows = conn.execute(
+                "SELECT id, name, brand, viscosity, price, stock, image, description "
+                "FROM products WHERE stock > 0 ORDER BY brand, viscosity"
+            ).fetchall()
+            return [dict(row) for row in rows]
+    except Exception:
+        return []
+
+
+def _get_pallets_catalog() -> list[dict]:
+    """Obtiene los pallets/tarimas disponibles desde la BD."""
+    try:
+        with get_db() as conn:
+            rows = conn.execute(
+                "SELECT id, title, brand, oil_type, viscosity, units_per_pallet, "
+                "pallet_price, unit_price_approx, image, description, origin "
+                "FROM pallets WHERE active = 1 ORDER BY brand, title"
+            ).fetchall()
+            return [dict(row) for row in rows]
+    except Exception:
+        return []
+
+
+def _get_product_by_viscosity(viscosity: str) -> list[dict]:
+    """Busca productos por viscosidad específica."""
+    try:
+        with get_db() as conn:
+            rows = conn.execute(
+                "SELECT id, name, brand, viscosity, price, stock, image, description "
+                "FROM products WHERE viscosity LIKE ? AND stock > 0 ORDER BY price",
+                (f"%{viscosity}%",)
+            ).fetchall()
+            return [dict(row) for row in rows]
+    except Exception:
+        return []
+
+
+def _search_products(query: str) -> list[dict]:
+    """Busca productos por nombre, marca o descripción."""
+    try:
+        with get_db() as conn:
+            rows = conn.execute(
+                "SELECT id, name, brand, viscosity, price, stock, image, description "
+                "FROM products WHERE (name LIKE ? OR brand LIKE ? OR description LIKE ?) AND stock > 0 "
+                "ORDER BY brand, viscosity",
+                (f"%{query}%", f"%{query}%", f"%{query}%")
+            ).fetchall()
+            return [dict(row) for row in rows]
+    except Exception:
+        return []
+
+
+# Definición de herramientas (function calling) para la IA
+AI_TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_products_catalog",
+            "description": "Obtiene el catálogo completo de productos ALFA LUBES disponibles con precios y stock actualizado en tiempo real.",
+            "parameters": {"type": "object", "properties": {}, "required": []}
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_pallets_catalog",
+            "description": "Obtiene las tarimas/pallets de mayoreo disponibles para talleres y refaccionarias con precios por volumen.",
+            "parameters": {"type": "object", "properties": {}, "required": []}
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_product_by_viscosity",
+            "description": "Busca productos por viscosidad SAE específica (ej: 5W-30, 0W-20, 10W-40).",
+            "parameters": {
+                "type": "object",
+                "properties": {"viscosity": {"type": "string", "description": "Viscosidad SAE a buscar (ej: 5W-30)"}},
+                "required": ["viscosity"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "search_products",
+            "description": "Busca productos por nombre, marca o palabra clave en la descripción.",
+            "parameters": {
+                "type": "object",
+                "properties": {"query": {"type": "string", "description": "Término de búsqueda (ej: sintético, transmisión, alto kilometraje)"}},
+                "required": ["query"]
+            }
+        }
+    }
+]
+
+
+def _execute_tool_call(name: str, arguments: dict) -> str:
+    """Ejecuta una llamada a herramienta y devuelve el resultado como JSON string."""
+    try:
+        if name == "get_products_catalog":
+            result = _get_products_catalog()
+        elif name == "get_pallets_catalog":
+            result = _get_pallets_catalog()
+        elif name == "get_product_by_viscosity":
+            result = _get_product_by_viscosity(arguments.get("viscosity", ""))
+        elif name == "search_products":
+            result = _search_products(arguments.get("query", ""))
+        else:
+            result = {"error": f"Herramienta desconocida: {name}"}
+        return json.dumps(result, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({"error": str(e)}, ensure_ascii=False)
+
+
 def _call_ai_service(history: list[dict]) -> str | None:
-    """Llama a la API de IA (formato OpenAI-compatible) con razonamiento activo."""
+    """Llama a la API de IA con function calling para consultar catálogo real en tiempo real."""
     if not AI_API_KEY:
         return None
     url = f"{AI_BASE_URL}/chat/completions"
+    
+    # Primera llamada: el modelo decide si usar herramientas
     payload = json.dumps({
         "model": AI_MODEL,
         "messages": [{"role": "system", "content": _alfa_system_prompt()}] + history,
+        "tools": AI_TOOLS,
+        "tool_choice": "auto",
         "reasoning_effort": "low",
-        "temperature": 0.5,
-        "max_tokens": 900,
+        "temperature": 0.4,
+        "max_tokens": 1200,
     }).encode("utf-8")
     headers = {
         "Content-Type": "application/json",
@@ -1084,17 +1192,54 @@ def _call_ai_service(history: list[dict]) -> str | None:
     }
     req = urlrequest.Request(url, data=payload, headers=headers, method="POST")
     try:
-        with urlrequest.urlopen(req, timeout=35) as resp:
+        with urlrequest.urlopen(req, timeout=45) as resp:
             body = json.loads(resp.read().decode("utf-8"))
         choices = body.get("choices") or []
-        if choices:
-            msg = choices[0].get("message") or {}
-            content = msg.get("content")
-            if isinstance(content, str) and content.strip():
-                return content.strip()
-            reasoning = msg.get("reasoning")
-            if isinstance(reasoning, str) and len(reasoning.strip()) > 20:
-                return reasoning.strip()
+        if not choices:
+            return None
+        msg = choices[0].get("message") or {}
+        
+        # Si el modelo quiere usar herramientas, ejecutarlas y hacer segunda llamada
+        tool_calls = msg.get("tool_calls")
+        if tool_calls:
+            # Ejecutar cada herramienta
+            tool_messages = []
+            for tc in tool_calls:
+                fn_name = tc.get("function", {}).get("name")
+                fn_args = json.loads(tc.get("function", {}).get("arguments", "{}"))
+                result = _execute_tool_call(fn_name, fn_args)
+                tool_messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc.get("id"),
+                    "name": fn_name,
+                    "content": result
+                })
+            
+            # Segunda llamada con resultados de herramientas
+            second_payload = json.dumps({
+                "model": AI_MODEL,
+                "messages": [{"role": "system", "content": _alfa_system_prompt()}] + history + [msg] + tool_messages,
+                "reasoning_effort": "low",
+                "temperature": 0.4,
+                "max_tokens": 1200,
+            }).encode("utf-8")
+            second_req = urlrequest.Request(url, data=second_payload, headers=headers, method="POST")
+            with urlrequest.urlopen(second_req, timeout=45) as resp2:
+                body2 = json.loads(resp2.read().decode("utf-8"))
+            choices2 = body2.get("choices") or []
+            if choices2:
+                msg2 = choices2[0].get("message") or {}
+                content2 = msg2.get("content")
+                if isinstance(content2, str) and content2.strip():
+                    return content2.strip()
+        
+        # Respuesta directa sin herramientas
+        content = msg.get("content")
+        if isinstance(content, str) and content.strip():
+            return content.strip()
+        reasoning = msg.get("reasoning")
+        if isinstance(reasoning, str) and len(reasoning.strip()) > 20:
+            return reasoning.strip()
         if isinstance(body.get("response"), str) and body["response"].strip():
             return body["response"].strip()
         if isinstance(body.get("content"), str) and body["content"].strip():
@@ -1153,15 +1298,22 @@ def _autonomous_fallback_reply(message: str) -> str:
         )
 
     # Viscosidades específicas
-    if any(v in low for v in ["0w-20", "5w-20", "5w-30", "5w-40", "10w-40", "15w-40", "20w-50"]):
-        return (
-            "La viscosidad correcta depende de las tolerancias con las que fue diseñado tu motor. "
-            "En motores modernos con distribución variable recomendamos respetar la especificación de manual (como 0W-20 o 5W-30 Full Synthetic). "
-            "Si el auto ya supera los 100,000 km y presenta consumo leve, nuestro 10W-40 Alto Kilometraje es la mejor alternativa. "
-            "¿Cuál es el modelo, año y kilometraje de tu vehículo?"
-        )
+    matches = _get_product_by_viscosity(message)
+    if matches:
+        lines = [f"Tenemos estos productos con viscosidad '{message.strip()}':"]
+        for m in matches:
+            lines.append(f"• **{m['name']}** — ${m['price']:.2f} MXN · Stock: {m['stock']}")
+        lines.append("\n¿Cuál es el modelo, año y kilometraje de tu vehículo para recomendarte la mejor opción?")
+        return "\n".join(lines)
 
     # Respuesta conversacional general
+    if products:
+        lines = ["Con gusto te asesoro. En **ALFA LUBES** contamos con aceites 100% sintéticos y fluidos para transmisión de alto desempeño:"]
+        for p in products[:4]:
+            lines.append(f"• **{p['name']}** — ${p['price']:.2f} MXN")
+        lines.append("\nCompárteme qué auto tienes (marca, modelo, año y kilometraje) o qué duda tienes sobre lubricación para darte la recomendación exacta.")
+        return "\n".join(lines)
+
     return (
         "Con gusto te asesoro. En **ALFA LUBES** contamos con aceites 100% sintéticos y fluidos para transmisión de alto desempeño. "
         "Compárteme qué auto tienes (marca, modelo, año y kilometraje) o qué duda tienes sobre lubricación para darte la recomendación exacta."

@@ -94,6 +94,7 @@
 </section>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
 const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
@@ -283,6 +284,7 @@ document.getElementById('lead-form').addEventListener('submit', async function(e
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar a Administración';
   }
+});
 });
 </script>
 
