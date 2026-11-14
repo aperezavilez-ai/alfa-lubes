@@ -43,7 +43,7 @@ DEFAULT_DB_PATH = Path("/tmp/alfa_lubes.db") if PREVIEW_MODE else BASE_DIR / "al
 DB_PATH = Path(os.environ.get("ALFA_LUBES_DB", DEFAULT_DB_PATH))
 
 # Configuración IA (proveedor OpenAI-compatible / LLM con razonamiento activo)
-AI_API_KEY = (os.environ.get("AI_API_KEY") or os.environ.get("MEAI_API_KEY") or "sk-ntGs1F1AMIm8fB0qdsM1fYUBQHJpwuitnTSeNHIyeHhSkF9v").strip()
+AI_API_KEY = (os.environ.get("AI_API_KEY") or os.environ.get("MEAI_API_KEY") or "").strip()
 AI_BASE_URL = (os.environ.get("AI_BASE_URL") or os.environ.get("MEAI_BASE_URL") or "https://api.meai.cloud/v1").strip().rstrip("/")
 AI_MODEL = (os.environ.get("AI_MODEL") or os.environ.get("MEAI_MODEL") or "claude-haiku-4.5").strip()
 
@@ -1023,6 +1023,7 @@ def _alfa_system_prompt() -> str:
         "transmisiones (automática, manual, CVT, DCT/DSG) y mantenimiento vehicular. Atiendes a conductores particulares, talleres, refaccionarias y flotillas.\n\n"
         "PERSONALIDAD Y ESTILO:\n"
         "- Hablas como un asesor real, cercano y profesional. Nada de respuestas acartonadas, menús rígidos ni listas genéricas si el cliente no las pide.\n"
+        "- No uses respuestas prestablecidas ni guiones escritos de antemano; adapta tu respuesta a lo que el cliente dice en cada momento, como si hablaran cara a cara.\n"
         "- Si el cliente saluda, responde breve y cálido en 1-2 líneas y pregunta cómo puedes ayudarle (vehículo, duda o producto).\n"
         "- Responde directo a lo que preguntan, con explicaciones claras y naturales. Usa negritas solo para resaltar datos clave (viscosidad, precio, modelo).\n"
         "- Sé conciso pero útil: 2-4 párrafos cortos o viñetas cuando ayuden a comparar. No inventes datos.\n\n"
@@ -1250,73 +1251,51 @@ def _call_ai_service(history: list[dict]) -> str | None:
 
 
 def _autonomous_fallback_reply(message: str) -> str:
-    """Respaldo conversacional natural de ALFA LUBES en caso de intermitencia temporal."""
-    low = (message or "").lower().strip()
+    """Respaldo natural basado en catálogo real cuando la IA configurada no responde."""
+    text = (message or "").strip()
+    lower = text.lower()
 
-    # Saludo simple
-    if any(k in low for k in ["hola", "buenas", "buen dia", "buenos dias", "buenas tardes", "buenas noches", "hey"]):
+    # Intentar orientar con datos reales del catálogo
+    suggestions = []
+    try:
+        if any(k in lower for k in ("pallet", "tarima", "mayoreo", "flotilla", "distribuidor")):
+            pallets = _get_pallets_catalog()
+            if pallets:
+                top = pallets[:2]
+                names = ", ".join(p.get("name", "tarima") for p in top)
+                suggestions.append(f"Para mayoreo puedo orientarte con opciones como {names}.")
+        # Búsqueda simple por términos del mensaje
+        terms = [t for t in lower.replace(",", " ").split() if len(t) >= 3][:4]
+        if terms:
+            products = _search_products(" ".join(terms))
+            if not products:
+                products = _get_products_catalog()
+            if products:
+                picks = products[:3]
+                parts = []
+                for p in picks:
+                    name = p.get("name", "producto")
+                    visc = p.get("viscosity")
+                    price = p.get("formatted_price") or (f"${p.get('price')}" if p.get("price") is not None else None)
+                    label = name + (f" ({visc})" if visc else "")
+                    if price:
+                        label += f", {price}"
+                    parts.append(label)
+                suggestions.append("Del catálogo actual te puedo recomendar: " + "; ".join(parts) + ".")
+    except Exception:
+        suggestions = []
+
+    if suggestions:
         return (
-            "¡Hola! Bienvenido a **ALFA LUBES**. Te atiendo con mucho gusto, ¿para qué vehículo buscas aceite hoy o qué duda tienes sobre lubricación?"
+            "Con gusto te ayudo. " + " ".join(suggestions) + " "
+            "Si me compartes tu vehículo, año y kilometraje te digo cuál es la opción más adecuada para cuidarlo. "
+            f"Para cerrar tu pedido o cotización rápida también puedes escribirme por WhatsApp: [{WHATSAPP_NUMBER}]({WHATSAPP_URL})."
         )
-
-    # Catálogo o qué aceites tienen
-    if any(k in low for k in ["que aceites", "qué aceites", "que vendes", "qué vendes", "productos", "catalogo", "catálogo", "lista", "que tienes", "qué tienes"]):
-        return (
-            "En **ALFA LUBES** contamos con formulaciones 100% sintéticas de alta tecnología:\n\n"
-            "• **0W-20 Full Synthetic** ($349 MXN) — Para autos modernos e híbridos.\n"
-            "• **5W-20 Full Synthetic** ($289 MXN) — Protección avanzada de baja viscosidad.\n"
-            "• **5W-30 Full Synthetic** ($299 MXN) — La viscosidad más versátil y vendida.\n"
-            "• **5W-40 Synthetic Protection** ($329 MXN) — Para motores turbo y alta exigencia en carretera.\n"
-            "• **10W-40 Alto Kilometraje** ($199 MXN) — Con acondicionadores de sellos para motores con +100,000 km.\n"
-            "• **DCT/DSG Full Synthetic** ($380 MXN) — Especial para transmisiones de doble embrague.\n\n"
-            "También manejamos tarimas cerradas en venta por pallets para talleres y refaccionarias. ¿Para qué vehículo o aplicación lo necesitas?"
-        )
-
-    # Pallets y mayoreo
-    if any(k in low for k in ["pallet", "pallets", "tarima", "tarimas", "mayoreo", "flotilla", "cajas", "tambor", "tambores"]):
-        return (
-            "¡Excelente! En **ALFA LUBES** somos distribuidores directos de tarimas completas (48 cajas por pallet selladas de fábrica), ideales para talleres y refaccionarias con hasta 40% de ahorro:\n\n"
-            "• **Pallet ALFA LUBES Full Synthetic:** $78,500 MXN\n"
-            "• **Pallet Importado 5W-30 Full Synthetic:** $72,000 MXN\n"
-            "• **Pallet Importado 0W-20 Full Synthetic:** $74,800 MXN\n\n"
-            "Todas las tarimas cuentan con pedimento de importación y factura fiscal. Para que el área de Administración y Ventas te arme la cotización formal con el flete exacto a tu ciudad, ¿me apoyas con tu nombre, WhatsApp, negocio o taller, y a qué ciudad sería el envío?"
-        )
-
-    # WhatsApp directo
-    if any(k in low for k in ["whatsapp", "whats", "celular", "telefono", "teléfono"]):
-        return (
-            f"Con gusto puedes escribirnos a nuestro **WhatsApp oficial**: [{WHATSAPP_NUMBER}]({WHATSAPP_URL}). "
-            "Ahí un asesor de nuestro equipo te apoya al instante con cotizaciones, pedidos o dudas técnicas."
-        )
-
-    # Consulta sobre marcas de la competencia
-    if any(b in low for k in ["castrol", "mobil", "movil", "shell", "valvoline", "bardahl", "bardal"] for b in [k]):
-        return (
-            "En **ALFA LUBES** no manejamos marcas ajenas; somos distribuidores directos de nuestra línea oficial **ALFA LUBES** y de tarimas de **Pallet Importado**. "
-            "Nuestras formulaciones son 100% sintéticas con especificación API SP / ILSAC GF-6, igualando y superando los requerimientos de fabricante a un precio mucho más conveniente. "
-            "¿Para qué vehículo buscas aceite? Con gusto te asesoro con la opción exacta."
-        )
-
-    # Viscosidades específicas
-    matches = _get_product_by_viscosity(message)
-    if matches:
-        lines = [f"Tenemos estos productos con viscosidad '{message.strip()}':"]
-        for m in matches:
-            lines.append(f"• **{m['name']}** — ${m['price']:.2f} MXN · Stock: {m['stock']}")
-        lines.append("\n¿Cuál es el modelo, año y kilometraje de tu vehículo para recomendarte la mejor opción?")
-        return "\n".join(lines)
-
-    # Respuesta conversacional general
-    if products:
-        lines = ["Con gusto te asesoro. En **ALFA LUBES** contamos con aceites 100% sintéticos y fluidos para transmisión de alto desempeño:"]
-        for p in products[:4]:
-            lines.append(f"• **{p['name']}** — ${p['price']:.2f} MXN")
-        lines.append("\nCompárteme qué auto tienes (marca, modelo, año y kilometraje) o qué duda tienes sobre lubricación para darte la recomendación exacta.")
-        return "\n".join(lines)
 
     return (
-        "Con gusto te asesoro. En **ALFA LUBES** contamos con aceites 100% sintéticos y fluidos para transmisión de alto desempeño. "
-        "Compárteme qué auto tienes (marca, modelo, año y kilometraje) o qué duda tienes sobre lubricación para darte la recomendación exacta."
+        "Con gusto te ayudo a elegir el aceite ideal. "
+        "Cuéntame qué vehículo tienes (marca, modelo, año y kilometraje) y con qué uso lo manejas, y te recomiendo la mejor opción del catálogo de Alfa Lubes. "
+        f"Si prefieres, también puedo atenderte por WhatsApp para cotizar y cerrar tu pedido: [{WHATSAPP_NUMBER}]({WHATSAPP_URL})."
     )
 
 
