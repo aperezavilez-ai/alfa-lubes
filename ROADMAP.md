@@ -7,7 +7,7 @@ EditCore actualiza este archivo tras cambios. No pedirlo al usuario. No pegar co
 ## Proceso
 - Fase: implementacion
 - Estado: Ciclo finalizado.
-- Actualizado: 2026-11-11 02:15
+- Actualizado: 2026-11-14 18:24
 - Preview: desconocido — usa el preview del IDE, no inventes puertos
 
 ## Mapa
@@ -66,6 +66,9 @@ PLAN AUTORIZADO:
 - Se implementó fallback transparente: lee de Supabase si está disponible; si aún no se ejecutan las migraciones en Supabase, lee de SQLite local para no interrumpir el sitio.
 
 ## Cambios recientes
+- [EditCore] app.py — parche aplicado (kernel) (2026-11-14 18:24)
+- [EditCore] _check_env.py — Conecta el Asesor IA de verdad: en app.py, el endpoint /api/ai-chat debe responder con la IA configu
+- [EditCore] templates/ai_agent.html — parche aplicado (kernel) (2026-11-13 03:32)
 - app.py
 - .env.example
 - .env.example — archivo escrito (kernel) (2026-11-11 02:13)

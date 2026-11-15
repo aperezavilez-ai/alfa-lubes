@@ -2,7 +2,7 @@
   "version": 2,
   "objective": "",
   "style": "",
-  "workingOn": "SOLICITUD ORIGINAL:\nsi lo tengo\n\nPLAN AUTORIZADO:\n## 🧪 Chequeos reales ejecutados\n\n| Chequeo | Resultado | Detalle |\n|---|---|---|\n| Sintaxis JS/JSON | ✅ pasa | 0 archivos compilados |\n| Imports / require | ✅ pasa | 0 archivos de código revisados |\n| Conflictos de merge | ✅ pasa | sin marcadores |\n| Variables de entorno | ⏭️ no aplica | no hay .env.example para comparar |\n| Referencias en documen",
+  "workingOn": "AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del analisis previo quedan ANULADAS para esta corrida.\n\nPuedes usar write_file y replace_in_file sobre codigo real del proyecto abierto.\n\nNo uses .claude/*.md ni ROADMAP.md ni TODOs documentales como objetivo de correccion.\n\nSOLICITUD ORIGINAL (sanitizada):\nel proyecto esta conectado a github versel y supabase,.,,,. porq",
   "decisions": [
     {
       "t": 1794175808598,
@@ -55,6 +55,82 @@
     {
       "t": 1794362888271,
       "text": "En `app.py` había **dos definiciones de `init_db()`**:"
+    },
+    {
+      "t": 1794594979265,
+      "text": "subagente analyst: **Raíz**: D:\\PROGRAMAS IA\\ALFA LUBES"
+    },
+    {
+      "t": 1794598998879,
+      "text": "subagente analyst · app.py · Analiza la implementación actual del endpoint /api/ai-chat y…: Memoria compartida (expediente + Cerebro + Mapa)"
+    },
+    {
+      "t": 1794598998903,
+      "text": "subagente analyst · templates/ai_agent.html · Revisa el frontend del chat (sendMessage, addMessage, format…: Memoria compartida (expediente + Cerebro + Mapa)"
+    },
+    {
+      "t": 1794598998929,
+      "text": "subagente explorer · vercel.json · ¿Existe vercel.json en la raíz? Si no existe, ¿es necesario …: Nota: la ruta solicitada `vercel.json` no existe; se usó el mapa cognitivo."
+    },
+    {
+      "t": 1794598998950,
+      "text": "subagente analyst · ROADMAP.md · Lee el ROADMAP.md actual. ¿Qué tareas quedan marcadas como p…: Memoria compartida (expediente + Cerebro + Mapa)"
+    },
+    {
+      "t": 1794600154444,
+      "text": "subagente analyst · supabase_schema.sql · Responde con datos concretos: qué productos existen realment…: Memoria compartida (expediente + Cerebro + Mapa)"
+    },
+    {
+      "t": 1794621519499,
+      "text": "subagente analyst · app.py (endpoint /api/ai-chat y funciones de IA) · Analiza la implementación actual del endpoint /api/ai-chat y…: Memoria compartida (expediente + Cerebro + Mapa)"
+    },
+    {
+      "t": 1794621519531,
+      "text": "subagente analyst · supabase_schema.sql + init_db() y consultas de catálogo en app.py · Con el esquema real de la base de datos del proyecto (supaba…: Memoria compartida (expediente + Cerebro + Mapa)"
+    },
+    {
+      "t": 1794679006629,
+      "text": "subagente explorer · .: Archivos: .env, .env.example, .gitignore, 200, alfa_lubes.db, app.py, favicon.ico, flask.log, README.md, requirements.txt, ROADMAP.md, server.log, supabase_schema.sql, VIDEO-2026-11-02-13-25-36.mp4"
+    },
+    {
+      "t": 1794694186291,
+      "text": "subagente explorer · supabase_schema.sql + consultas de catálogo en app.py · Mapea el esquema real de la base de datos de ALFA Lubes: sup…: Nota: la ruta solicitada `supabase_schema.sql + consultas de catálogo en app.py` no existe; se usó el mapa cognitivo."
+    },
+    {
+      "t": 1794694186374,
+      "text": "subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la implementación actual del endpoint /api/ai-chat e…: Memoria compartida (expediente + Cerebro + Mapa)"
+    },
+    {
+      "t": 1794768282025,
+      "text": "No existe ninguna regla de publicar releases los lunes; cualquier indicación previa en ese sentido queda sin efecto por no establecida."
+    },
+    {
+      "t": 1794768301888,
+      "text": "La publicación a producción se completó el 14 de noviembre de 2026: commit cc75c0a en main, alias https://www.alfalubes.com respondiendo HTTP 200. No hay despliegue pendiente."
+    },
+    {
+      "t": 1794768301914,
+      "text": "Las variables de entorno del proyecto están completas con prefijo MEAI_ (MEAI_API_KEY, MEAI_BASE_URL, MEAI_MODEL) y app.py las resuelve con respaldo en líneas 46-48. Las variables se cargaron en Vercel (entorno Production) y se redesplegó; Supabase cloud está poblada (3 configuraciones de tarimas, 6 productos, tablas de clientes, pedidos y prospectos). El Asesor respondió correctamente en el sitio"
+    },
+    {
+      "t": 1794769393234,
+      "text": "El archivo _check_env.py no existe en la raíz del proyecto ALFA LUBES (verificado con Test-Path y Get-ChildItem: NOT_FOUND). Fue un temporal de verificación que ya no está presente."
+    },
+    {
+      "t": 1794775707180,
+      "text": "No existe ninguna regla de publicar releases los lunes en ALFA LUBES; cualquier indicación previa en ese sentido queda sin efecto por no establecida."
+    },
+    {
+      "t": 1794775707238,
+      "text": "Publicación a producción de ALFA LUBES completada el 2026-11-14: commit cc75c0a en rama main, alias https://www.alfalubes.com respondiendo HTTP 200 en vivo. No hay despliegue pendiente."
+    },
+    {
+      "t": 1794775707301,
+      "text": "Variables de entorno en Vercel cargadas (entorno Production, las del .env local) y redespliegue probado en producción. No queda pendiente de configuración en Vercel."
+    },
+    {
+      "t": 1794775707365,
+      "text": "Variables del .env de ALFA LUBES completas con prefijo MEAI_ (MEAI_API_KEY, MEAI_BASE_URL, MEAI_MODEL); app.py las resuelve con respaldo en las líneas 46-48. No se exigen nombres AI_* literales."
     }
   ],
   "notes": [],
@@ -73,9 +149,672 @@
       "rel": ".env.example",
       "action": "modified",
       "at": 1794362200372
+    },
+    {
+      "rel": "_check_env.py",
+      "action": "modified",
+      "at": 1794621677780
     }
   ],
-  "verified": [],
+  "verified": [
+    {
+      "t": 1794598803226,
+      "text": "Verificado (captura del preview): OK — app.py, app.py"
+    },
+    {
+      "t": 1794621677697,
+      "text": "Verificado (captura del preview): OK — _check_env.py"
+    }
+  ],
   "discarded": [],
-  "updatedAt": "2026-11-11T02:12:34.353Z"
+  "facts": [
+    {
+      "kind": "asset",
+      "file": "app.py",
+      "t": 1794541237482,
+      "asset": "pallet-alfalubes.jpg"
+    },
+    {
+      "kind": "asset",
+      "file": "app.py",
+      "t": 1794541237482,
+      "asset": "pallet-importado-5w30.jpg"
+    },
+    {
+      "kind": "asset",
+      "file": "app.py",
+      "t": 1794541237482,
+      "asset": "pallet-importado-0w20.jpg"
+    },
+    {
+      "kind": "asset",
+      "file": "app.py",
+      "t": 1794541237482,
+      "asset": "alfa-dct-dsg.jpg"
+    },
+    {
+      "kind": "asset",
+      "file": "app.py",
+      "t": 1794541237482,
+      "asset": "aceite-1.jpg"
+    },
+    {
+      "kind": "asset",
+      "file": "app.py",
+      "t": 1794541237482,
+      "asset": "aceite-2.jpg"
+    },
+    {
+      "kind": "asset",
+      "file": "app.py",
+      "t": 1794541237482,
+      "asset": "aceite-3.jpg"
+    },
+    {
+      "kind": "asset",
+      "file": "app.py",
+      "t": 1794541237482,
+      "asset": "aceite-4.jpg"
+    },
+    {
+      "kind": "asset",
+      "file": "app.py",
+      "t": 1794541237482,
+      "asset": "aceite-5.jpg"
+    },
+    {
+      "kind": "section",
+      "file": "templates/ai_agent.html",
+      "t": 1794541237482,
+      "name": "openPalletModal",
+      "relation": "contiene"
+    },
+    {
+      "kind": "section",
+      "file": "templates/ai_agent.html",
+      "t": 1794541237482,
+      "name": "closePalletModal",
+      "relation": "contiene"
+    },
+    {
+      "kind": "section",
+      "file": "templates/base.html",
+      "t": 1794541237482,
+      "name": "gtag",
+      "relation": "contiene"
+    },
+    {
+      "kind": "section",
+      "file": "templates/base.html",
+      "t": 1794541237482,
+      "name": "formatWidgetMarkdown",
+      "relation": "contiene"
+    },
+    {
+      "kind": "subagent",
+      "file": "ROADMAP.md",
+      "t": 1794594979232,
+      "text": "subagente analyst: **Raíz**: D:\\PROGRAMAS IA\\ALFA LUBES"
+    },
+    {
+      "kind": "subagent",
+      "file": "vercel.json",
+      "t": 1794598998915,
+      "text": "subagente explorer · vercel.json · ¿Existe vercel.json en la raíz? Si no existe, ¿es necesario …: Nota: la ruta solicitada `vercel.json` no existe; se usó el mapa cognitivo."
+    },
+    {
+      "kind": "read",
+      "file": "templates/base.html",
+      "t": 1794598998939,
+      "why": "mapeado por subagente analyst · ROADMAP.md · Lee el ROADMAP.md actual. ¿Qué tareas quedan marcadas como p…"
+    },
+    {
+      "kind": "section",
+      "file": "templates/ai_agent.html",
+      "t": 1794599348982,
+      "name": "formatMarkdown",
+      "relation": "contiene"
+    },
+    {
+      "kind": "section",
+      "file": "templates/ai_agent.html",
+      "t": 1794599348982,
+      "name": "addMessage",
+      "relation": "contiene"
+    },
+    {
+      "kind": "section",
+      "file": "templates/ai_agent.html",
+      "t": 1794599348982,
+      "name": "showTyping",
+      "relation": "contiene"
+    },
+    {
+      "kind": "section",
+      "file": "templates/ai_agent.html",
+      "t": 1794599348982,
+      "name": "removeTyping",
+      "relation": "contiene"
+    },
+    {
+      "kind": "section",
+      "file": "templates/ai_agent.html",
+      "t": 1794599348982,
+      "name": "sendMessage",
+      "relation": "contiene"
+    },
+    {
+      "kind": "read",
+      "file": "asesor.py",
+      "t": 1794621519515,
+      "why": "mapeado por subagente analyst · supabase_schema.sql + init_db() y consultas de catálogo en app.py · Con el esquema real de la base de datos del proyecto (supaba"
+    },
+    {
+      "kind": "subagent",
+      "file": "asesor.py",
+      "t": 1794621519515,
+      "text": "subagente analyst · supabase_schema.sql + init_db() y consultas de catálogo en app.py · Con el esquema real de la base de datos del proyecto (supaba…: Memoria compartida (expediente + Cerebro + Mapa)"
+    },
+    {
+      "kind": "asset",
+      "file": "supabase_schema.sql",
+      "t": 1794621677887,
+      "asset": "pallet-alfalubes.jpg"
+    },
+    {
+      "kind": "read",
+      "file": ".env.example",
+      "t": 1794678275313
+    },
+    {
+      "kind": "section",
+      "file": "templates/ai_agent.html",
+      "t": 1794680856154,
+      "name": "py-6",
+      "relation": "contiene"
+    },
+    {
+      "kind": "subagent",
+      "file": "supabase_schema.sql",
+      "t": 1794694186272,
+      "text": "subagente explorer · supabase_schema.sql + consultas de catálogo en app.py · Mapea el esquema real de la base de datos de ALFA Lubes: sup…: Nota: la ruta solicitada `supabase_schema.sql + consultas de catálogo en app.py` no existe; se usó el mapa cognitivo."
+    },
+    {
+      "kind": "read",
+      "file": "vercel.json",
+      "t": 1794694186313,
+      "why": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la implementación actual del endpoint /api/ai-chat e…"
+    },
+    {
+      "kind": "read",
+      "file": "ROADMAP.md",
+      "t": 1794694186313,
+      "why": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la implementación actual del endpoint /api/ai-chat e…"
+    },
+    {
+      "kind": "read",
+      "file": "README.md",
+      "t": 1794694186314,
+      "why": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la implementación actual del endpoint /api/ai-chat e…"
+    },
+    {
+      "kind": "read",
+      "file": "templates/index.html",
+      "t": 1794694186314,
+      "why": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la implementación actual del endpoint /api/ai-chat e…"
+    },
+    {
+      "kind": "read",
+      "file": "templates/pallets.html",
+      "t": 1794694186314,
+      "why": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la implementación actual del endpoint /api/ai-chat e…"
+    },
+    {
+      "kind": "subagent",
+      "file": "app.py",
+      "t": 1794694186314,
+      "text": "subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la implementación actual del endpoint /api/ai-chat e…: Memoria compartida (expediente + Cerebro + Mapa)"
+    },
+    {
+      "kind": "read",
+      "file": "templates/ai_agent.html",
+      "t": 1794694211215,
+      "why": "pedido del turno: «Conecta el Asesor IA de verdad: en app.py, el endpoint /api/ai-chat debe responder con la IA configurada en el»"
+    },
+    {
+      "kind": "read",
+      "file": "supabase_schema.sql",
+      "t": 1794694211215
+    },
+    {
+      "kind": "read",
+      "file": ".env",
+      "t": 1794694629640,
+      "why": "pedido del turno: «Corrección de datos: las variables sí están en el .env, con prefijo MEAI_ (MEAI_API_KEY, MEAI_BASE_URL, MEAI_M»"
+    },
+    {
+      "kind": "section",
+      "file": "app.py",
+      "t": 1794694629640,
+      "name": "calling",
+      "relation": "contiene"
+    },
+    {
+      "kind": "read",
+      "file": "app.py",
+      "t": 1794694629640,
+      "why": "pedido del turno: «Corrección de datos: las variables sí están en el .env, con prefijo MEAI_ (MEAI_API_KEY, MEAI_BASE_URL, MEAI_M»"
+    }
+  ],
+  "fronts": [],
+  "readReceipts": [
+    {
+      "key": "templates/ai_agent.html#90-110",
+      "file": "templates/ai_agent.html",
+      "startLine": 90,
+      "endLine": 110,
+      "mtimeMs": 1794540764234.3945,
+      "size": 21840,
+      "totalLines": 369,
+      "at": 1794540958693
+    },
+    {
+      "key": "templates/base.html#375-400",
+      "file": "templates/base.html",
+      "startLine": 375,
+      "endLine": 400,
+      "mtimeMs": 1794512745028.759,
+      "size": 30617,
+      "totalLines": 463,
+      "at": 1794540971165
+    },
+    {
+      "key": "templates/base.html#60-90",
+      "file": "templates/base.html",
+      "startLine": 60,
+      "endLine": 90,
+      "mtimeMs": 1794512745028.759,
+      "size": 30617,
+      "totalLines": 463,
+      "at": 1794541023186
+    },
+    {
+      "key": "templates/base.html#360-395",
+      "file": "templates/base.html",
+      "startLine": 360,
+      "endLine": 395,
+      "mtimeMs": 1794512745028.759,
+      "size": 30617,
+      "totalLines": 463,
+      "at": 1794541028703
+    },
+    {
+      "key": "templates/ai_agent.html#42-0",
+      "file": "templates/ai_agent.html",
+      "startLine": 42,
+      "endLine": 0,
+      "mtimeMs": 1794540764234.3945,
+      "size": 21840,
+      "totalLines": 369,
+      "at": 1794598514108
+    },
+    {
+      "key": "templates/ai_agent.html#42-369",
+      "file": "templates/ai_agent.html",
+      "startLine": 42,
+      "endLine": 369,
+      "mtimeMs": 1794540764234.3945,
+      "size": 21840,
+      "totalLines": 369,
+      "at": 1794599074924
+    },
+    {
+      "key": "templates/ai_agent.html#113-369",
+      "file": "templates/ai_agent.html",
+      "startLine": 113,
+      "endLine": 369,
+      "mtimeMs": 1794540764234.3945,
+      "size": 21840,
+      "totalLines": 369,
+      "at": 1794599085422
+    },
+    {
+      "key": "supabase_schema.sql#1-0",
+      "file": "supabase_schema.sql",
+      "startLine": 1,
+      "endLine": 0,
+      "mtimeMs": 1794347958708.2527,
+      "size": 6090,
+      "totalLines": 139,
+      "at": 1794621528179
+    },
+    {
+      "key": ".env.example#1-0",
+      "file": ".env.example",
+      "startLine": 1,
+      "endLine": 0,
+      "mtimeMs": 1794363223520.6926,
+      "size": 463,
+      "totalLines": 27,
+      "at": 1794678128787
+    },
+    {
+      "key": ".env#1-0",
+      "file": ".env",
+      "startLine": 1,
+      "endLine": 0,
+      "mtimeMs": 1794525230523.2346,
+      "size": 1789,
+      "totalLines": 42,
+      "at": 1794678516399
+    },
+    {
+      "key": "templates/ai_agent.html#1-0",
+      "file": "templates/ai_agent.html",
+      "startLine": 1,
+      "endLine": 0,
+      "mtimeMs": 1794540764234.3945,
+      "size": 21840,
+      "totalLines": 369,
+      "at": 1794680390050
+    },
+    {
+      "key": "app.py#1-10",
+      "file": "app.py",
+      "startLine": 1,
+      "endLine": 10,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794680690835
+    },
+    {
+      "key": "app.py#1174-1253",
+      "file": "app.py",
+      "startLine": 1174,
+      "endLine": 1253,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794680694577
+    },
+    {
+      "key": "app.py#960-1017",
+      "file": "app.py",
+      "startLine": 960,
+      "endLine": 1017,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794680698179
+    },
+    {
+      "key": "app.py#1300-1450",
+      "file": "app.py",
+      "startLine": 1300,
+      "endLine": 1450,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794694191215
+    },
+    {
+      "key": "app.py#1250-1360",
+      "file": "app.py",
+      "startLine": 1250,
+      "endLine": 1360,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794694489387
+    },
+    {
+      "key": "app.py#1055-1175",
+      "file": "app.py",
+      "startLine": 1055,
+      "endLine": 1175,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794694496868
+    },
+    {
+      "key": "app.py#1174-1252",
+      "file": "app.py",
+      "startLine": 1174,
+      "endLine": 1252,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794694496882
+    },
+    {
+      "key": "app.py#1018-1115",
+      "file": "app.py",
+      "startLine": 1018,
+      "endLine": 1115,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794694504461
+    },
+    {
+      "key": "app.py#1112-1174",
+      "file": "app.py",
+      "startLine": 1112,
+      "endLine": 1174,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794694504475
+    },
+    {
+      "key": "app.py#1018-1055",
+      "file": "app.py",
+      "startLine": 1018,
+      "endLine": 1055,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794694508273
+    },
+    {
+      "key": "app.py#1055-1112",
+      "file": "app.py",
+      "startLine": 1055,
+      "endLine": 1112,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794694511041
+    },
+    {
+      "key": "app.py#1253-1315",
+      "file": "app.py",
+      "startLine": 1253,
+      "endLine": 1315,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794694523904
+    },
+    {
+      "key": "app.py#1313-1445",
+      "file": "app.py",
+      "startLine": 1313,
+      "endLine": 1445,
+      "mtimeMs": 1794680690615.0881,
+      "size": 68803,
+      "totalLines": 1445,
+      "at": 1794694523921
+    }
+  ],
+  "updatedAt": "2026-11-15T21:32:58.317Z",
+  "orientationMap": {
+    "version": 1,
+    "updatedAt": "2026-11-15T21:32:14.967Z",
+    "purpose": "",
+    "state": "[2026-11-15] Aplicado: nada (el kernel no registró escrituras en este turno).",
+    "decisions": [
+      {
+        "text": "subagente explorer · vercel.json · ¿Existe vercel.json en la raíz? Si no existe, ¿es necesario …: Nota: la ruta solicitada `vercel.json` no existe; se usó el mapa cognitivo.",
+        "at": "2026-11-13T19:43:18.929Z",
+        "source": "expediente del proyecto"
+      },
+      {
+        "text": "subagente analyst · ROADMAP.md · Lee el ROADMAP.md actual. ¿Qué tareas quedan marcadas como p…: Memoria compartida (expediente + Cerebro + Mapa)",
+        "at": "2026-11-13T19:43:18.950Z",
+        "source": "expediente del proyecto"
+      },
+      {
+        "text": "subagente analyst · supabase_schema.sql + init_db() y consultas de catálogo en app.py · Con el esquema real de la base de datos del proyecto (supaba…: Memoria compartida (expediente + Cerebro + Mapa)",
+        "at": "2026-11-14T01:58:39.531Z",
+        "source": "expediente del proyecto",
+        "supersedes": {
+          "text": "subagente analyst · supabase_schema.sql · Responde con datos concretos: qué productos existen realment…: Memoria compartida (expediente + Cerebro + Mapa)",
+          "at": "2026-11-13T20:02:34.444Z",
+          "source": "expediente del proyecto"
+        }
+      },
+      {
+        "text": "subagente explorer · .: Archivos: .env, .env.example, .gitignore, 200, alfa_lubes.db, app.py, favicon.ico, flask.log, README.md, requirements.txt, ROADMAP.md, server.log, supabase_schema.sql, VIDEO-2026-11-02-13-25-36.mp4",
+        "at": "2026-11-14T17:56:46.629Z",
+        "source": "expediente del proyecto"
+      },
+      {
+        "text": "subagente explorer · supabase_schema.sql + consultas de catálogo en app.py · Mapea el esquema real de la base de datos de ALFA Lubes: sup…: Nota: la ruta solicitada `supabase_schema.sql + consultas de catálogo en app.py` no existe; se usó el mapa cognitivo.",
+        "at": "2026-11-14T22:09:46.291Z",
+        "source": "expediente del proyecto"
+      },
+      {
+        "text": "No existe ninguna regla de publicar releases los lunes en ALFA LUBES; cualquier indicación previa en ese sentido queda sin efecto por no establecida.",
+        "at": "2026-11-15T20:48:27.180Z",
+        "source": "expediente del proyecto",
+        "supersedes": {
+          "text": "No existe ninguna regla de publicar releases los lunes; cualquier indicación previa en ese sentido queda sin efecto por no establecida.",
+          "at": "2026-11-15T18:44:42.025Z",
+          "source": "expediente del proyecto"
+        }
+      },
+      {
+        "text": "La publicación a producción se completó el 14 de noviembre de 2026: commit cc75c0a en main, alias https://www.alfalubes.com respondiendo HTTP 200. No hay despliegue pendiente.",
+        "at": "2026-11-15T18:45:01.888Z",
+        "source": "expediente del proyecto"
+      },
+      {
+        "text": "Las variables de entorno del proyecto están completas con prefijo MEAI_ (MEAI_API_KEY, MEAI_BASE_URL, MEAI_MODEL) y app.py las resuelve con respaldo en líneas 46-48. Las variables se cargaron en Vercel (entorno Production) y se redesplegó; Supabase cloud está poblada (3 configuraciones de tarimas, 6 productos, tablas de clientes, pedidos y prospectos). El Asesor respondió correctamente en el sitio",
+        "at": "2026-11-15T18:45:01.914Z",
+        "source": "expediente del proyecto"
+      },
+      {
+        "text": "El archivo _check_env.py no existe en la raíz del proyecto ALFA LUBES (verificado con Test-Path y Get-ChildItem: NOT_FOUND). Fue un temporal de verificación que ya no está presente.",
+        "at": "2026-11-15T19:03:13.234Z",
+        "source": "expediente del proyecto"
+      },
+      {
+        "text": "Publicación a producción de ALFA LUBES completada el 2026-11-14: commit cc75c0a en rama main, alias https://www.alfalubes.com respondiendo HTTP 200 en vivo. No hay despliegue pendiente.",
+        "at": "2026-11-15T20:48:27.238Z",
+        "source": "expediente del proyecto"
+      },
+      {
+        "text": "Variables de entorno en Vercel cargadas (entorno Production, las del .env local) y redespliegue probado en producción. No queda pendiente de configuración en Vercel.",
+        "at": "2026-11-15T20:48:27.301Z",
+        "source": "expediente del proyecto"
+      },
+      {
+        "text": "Variables del .env de ALFA LUBES completas con prefijo MEAI_ (MEAI_API_KEY, MEAI_BASE_URL, MEAI_MODEL); app.py las resuelve con respaldo en las líneas 46-48. No se exigen nombres AI_* literales.",
+        "at": "2026-11-15T20:48:27.365Z",
+        "source": "expediente del proyecto"
+      }
+    ],
+    "openFronts": [],
+    "closedFronts": [
+      {
+        "text": "¿qué queda pendiente?",
+        "at": "2026-11-13T17:33:30.446Z",
+        "source": "expediente",
+        "closedAt": "2026-11-13T17:33:30.446Z",
+        "closedBy": "rotación del frente en curso"
+      },
+      {
+        "text": "¿de esos pendientes, cuál es el más urgente?",
+        "at": "2026-11-13T17:32:52.863Z",
+        "source": "expediente",
+        "closedAt": "2026-11-13T17:32:52.863Z",
+        "closedBy": "rotación del frente en curso"
+      },
+      {
+        "text": "¿qué queda pendiente?",
+        "at": "2026-11-13T16:36:59.695Z",
+        "source": "expediente",
+        "closedAt": "2026-11-13T16:36:59.695Z",
+        "closedBy": "rotación del frente en curso"
+      },
+      {
+        "text": "de esos pendientes, cuál es el más urgente?",
+        "at": "2026-11-13T16:35:54.676Z",
+        "source": "expediente",
+        "closedAt": "2026-11-13T16:35:54.676Z",
+        "closedBy": "rotación del frente en curso"
+      },
+      {
+        "text": "que queda pendiente ?",
+        "at": "2026-11-13T15:07:13.353Z",
+        "source": "expediente",
+        "closedAt": "2026-11-13T15:07:13.353Z",
+        "closedBy": "rotación del frente en curso"
+      }
+    ],
+    "keyFiles": [
+      {
+        "file": ".env",
+        "role": "pedido del turno: «Corrección de datos: las variables sí están en el .env, con prefijo MEAI_ (MEAI_A…"
+      },
+      {
+        "file": "templates/pallets.html",
+        "role": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la …"
+      },
+      {
+        "file": "templates/index.html",
+        "role": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la …"
+      },
+      {
+        "file": "README.md",
+        "role": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la …"
+      },
+      {
+        "file": ".env.example",
+        "role": "leído"
+      },
+      {
+        "file": "supabase_schema.sql",
+        "role": "leído"
+      },
+      {
+        "file": "asesor.py",
+        "role": "mapeado por subagente"
+      },
+      {
+        "file": "vercel.json",
+        "role": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la …"
+      },
+      {
+        "file": "ROADMAP.md",
+        "role": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la …"
+      },
+      {
+        "file": "templates/base.html",
+        "role": "mapeado por subagente analyst · ROADMAP.md · Lee el ROADMAP.md actual. ¿Qué tareas quedan marcadas c…"
+      },
+      {
+        "file": "templates/ai_agent.html",
+        "role": "pedido del turno: «Conecta el Asesor IA de verdad: en app.py, el endpoint /api/ai-chat debe responde…"
+      },
+      {
+        "file": "app.py",
+        "role": "pedido del turno: «Corrección de datos: las variables sí están en el .env, con prefijo MEAI_ (MEAI_A…"
+      }
+    ],
+    "_lastWorkingOn": "el proyecto esta conectado a github versel y supabase,.,,,. porque no aplicas lo que te solicito"
+  }
 }
