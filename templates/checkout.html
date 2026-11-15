@@ -38,11 +38,16 @@
           <textarea id="address" name="address" autocomplete="street-address" required rows="3" maxlength="500" placeholder="Calle, número, colonia, código postal y ciudad para el envío" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-gold text-white text-sm"></textarea>
         </div>
 
-        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 text-xs text-slate-300 space-y-1.5">
-          <p class="font-semibold text-amber-400 flex items-center gap-1.5">
-            <i class="fa-solid fa-truck-ramp-box"></i> Proceso de entrega y pago transparente
+        <div class="p-4 rounded-xl bg-slate-950/70 border border-amber-500/30 text-xs text-slate-300 space-y-2">
+          <p class="font-semibold text-amber-400 flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-shield-halved text-emerald-400"></i> Pago 100% protegido con Mercado Pago
           </p>
-          <p>Al confirmar tu pedido, nuestro equipo de ventas se comunicará contigo desde <strong>{{ sales_email }}</strong> o vía WhatsApp para coordinar el método de pago preferido (transferencia o acordado) y preparar tu entrega.</p>
+          <p class="leading-relaxed">
+            Tu compra cuenta con respaldo total de <strong>Mercado Pago</strong>: acepta <strong>tarjetas de crédito y débito</strong> (Visa, Mastercard, AMEX), <strong>meses sin intereses</strong>, <strong>transferencia bancaria SPEI</strong> o <strong>efectivo en tiendas OXXO</strong>.
+          </p>
+          <p class="text-slate-400 text-[11px] flex items-center gap-1.5 pt-1 border-t border-slate-800">
+            <i class="fa-solid fa-truck-fast text-sky-400"></i> Al registrar tu pedido, nuestro equipo de ventas se comunicará desde <strong>{{ sales_email }}</strong> o vía WhatsApp para enviarte el enlace de pago seguro y coordinar tu flete inmediato.
+          </p>
         </div>
 
         <button type="submit" {% if preview_mode %}disabled{% endif %} class="w-full bg-gold text-slate-950 py-4 rounded-xl font-bold text-lg hover:brightness-110 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
