@@ -491,69 +491,6 @@
       "activeAgent": "supervisor",
       "activity": [
         {
-          "at": "2026-11-13T03:32:44.492Z",
-          "type": "lock_release",
-          "agent": "supervisor",
-          "path": "templates/ai_agent.html",
-          "op": null,
-          "note": "",
-          "prev": null
-        },
-        {
-          "at": "2026-11-13T03:34:06.124Z",
-          "type": "lock_acquire",
-          "agent": "chat-1794360842387-960ff37c25ad4",
-          "path": "app.py",
-          "op": "replace_in_file",
-          "note": "",
-          "prev": null
-        },
-        {
-          "at": "2026-11-13T03:34:06.343Z",
-          "type": "lock_release",
-          "agent": "supervisor",
-          "path": "app.py",
-          "op": null,
-          "note": "",
-          "prev": null
-        },
-        {
-          "at": "2026-11-13T15:02:01.930Z",
-          "type": "active_agent",
-          "agent": "supervisor",
-          "path": null,
-          "op": null,
-          "note": "",
-          "prev": "supervisor"
-        },
-        {
-          "at": "2026-11-13T15:06:45.931Z",
-          "type": "active_agent",
-          "agent": "supervisor",
-          "path": null,
-          "op": null,
-          "note": "",
-          "prev": "supervisor"
-        },
-        {
-          "at": "2026-11-13T16:35:25.416Z",
-          "type": "active_agent",
-          "agent": "supervisor",
-          "path": null,
-          "op": null,
-          "note": "",
-          "prev": "supervisor"
-        },
-        {
-          "at": "2026-11-13T16:36:49.973Z",
-          "type": "active_agent",
-          "agent": "supervisor",
-          "path": null,
-          "op": null,
-          "note": "",
-          "prev": "supervisor"
-        },
-        {
           "at": "2026-11-13T18:36:18.044Z",
           "type": "active_agent",
           "agent": "supervisor",
@@ -894,11 +831,38 @@
           "op": null,
           "note": "",
           "prev": "supervisor"
+        },
+        {
+          "at": "2026-11-15T21:38:39.161Z",
+          "type": "lock_acquire",
+          "agent": "chat-1794360842387-960ff37c25ad4",
+          "path": ".env.example",
+          "op": "replace_in_file",
+          "note": "",
+          "prev": null
+        },
+        {
+          "at": "2026-11-15T21:38:41.024Z",
+          "type": "lock_release",
+          "agent": "supervisor",
+          "path": ".env.example",
+          "op": null,
+          "note": "",
+          "prev": null
+        },
+        {
+          "at": "2026-11-16T19:46:27.169Z",
+          "type": "active_agent",
+          "agent": "supervisor",
+          "path": null,
+          "op": null,
+          "note": "",
+          "prev": "supervisor"
         }
       ],
-      "updatedAt": "2026-11-15T21:32:58.338Z",
+      "updatedAt": "2026-11-16T19:46:27.169Z",
       "lastMeta": {
-        "task": "AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del analisis previo quedan ANULADAS para esta corrida.\n\nPuedes usar write_file y replace_in_file sobre codigo real del proyecto abierto.\n\nNo uses .claude/*.md ni ROADMAP.md ni TODOs documentales como objetivo de correccion",
+        "task": "Publica este proyecto",
         "phase": null
       }
     },
@@ -970,5 +934,5 @@
     }
   },
   "locks": {},
-  "updatedAt": "2026-11-15T21:32:58.338Z"
+  "updatedAt": "2026-11-16T19:46:27.169Z"
 }

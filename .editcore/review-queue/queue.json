@@ -2,6 +2,19 @@
   "version": 1,
   "items": [
     {
+      "id": "chg_mwicws5u_841b",
+      "path": ".env.example",
+      "status": "accepted",
+      "source": "agent",
+      "at": "2026-11-15T21:38:40.915Z",
+      "backupPath": null,
+      "before": "# ALFA LUBES - Variables de entorno\n# Copia este archivo a .env y completa los valores antes de ejecutar en producción.\n\nALFA_LUBES_SECRET_KEY=\nALFA_LUBES_DB=\nSUPABASE_URL=\nSUPABASE_KEY=\nSUPABASE_PUBLISHABLE_KEY=\nAI_API_KEY=\nAI_BASE_URL=\nAI_MODEL=\nFLASK_DEBUG=\nPORT=\nBRAND_NAME=\nCONTACT_EMAIL=\nSALES_EMAIL=\nSUPPORT_EMAIL=\nADMIN_EMAIL=\nSITE_URL=\nSMTP_HOST=\nSMTP_PORT=\nSMTP_USER=\nSMTP_PASSWORD=\nSMTP_FROM=\nSMTP_USE_TLS=\nGA_MEASUREMENT_ID=\nGOOGLE_SITE_VERIFICATION=",
+      "after": "# ALFA LUBES - Variables de entorno\n# Copia este archivo a .env y completa los valores antes de ejecutar en producción.\n\nALFA_LUBES_SECRET_KEY=\nALFA_LUBES_DB=\nSUPABASE_URL=\nSUPABASE_KEY=\nSUPABASE_PUBLISHABLE_KEY=\nAI_API_KEY=\nAI_BASE_URL=\nAI_MODEL=\nMEAI_API_KEY=\nMEAI_BASE_URL=\nMEAI_MODEL=\nFLASK_DEBUG=\nPORT=\nBRAND_NAME=\nCONTACT_EMAIL=\nSALES_EMAIL=\nSUPPORT_EMAIL=\nADMIN_EMAIL=\nSITE_URL=\nSMTP_HOST=\nSMTP_PORT=\nSMTP_USER=\nSMTP_PASSWORD=\nSMTP_FROM=\nSMTP_USE_TLS=\nGA_MEASUREMENT_ID=\nGOOGLE_SITE_VERIFICATION=",
+      "diffPreview": "--- a/.env.example\n+++ b/.env.example\n@@\n-FLASK_DEBUG=\n+MEAI_API_KEY=\n-PORT=\n+MEAI_BASE_URL=\n-BRAND_NAME=\n+MEAI_MODEL=\n-CONTACT_EMAIL=\n+FLASK_DEBUG=\n-SALES_EMAIL=\n+PORT=\n-SUPPORT_EMAIL=\n+BRAND_NAME=\n-ADMIN_EMAIL=\n+CONTACT_EMAIL=\n-SITE_URL=\n+SALES_EMAIL=\n-SMTP_HOST=\n+SUPPORT_EMAIL=\n-SMTP_PORT=\n+ADMIN_EMAIL=\n-SMTP_USER=\n+SITE_URL=\n-SMTP_PASSWORD=\n+SMTP_HOST=\n-SMTP_FROM=\n+SMTP_PORT=\n-SMTP_USE_TLS=\n+SMTP_USER=\n-GA_MEASUREMENT_ID=\n+SMTP_PASSWORD=\n-GOOGLE_SITE_VERIFICATION=\n+SMTP_FROM=\n+SMTP_USE_TLS=\n+GA_MEASUREMENT_ID=\n+GOOGLE_SITE_VERIFICATION=",
+      "created": false,
+      "decidedAt": "2026-11-15T21:38:40.970Z"
+    },
+    {
       "id": "chg_mwgqjni6_22c5",
       "path": "app.py",
       "status": "accepted",
@@ -249,5 +262,5 @@
       "decidedAt": "2026-11-11T01:50:35.657Z"
     }
   ],
-  "updatedAt": "2026-11-15T21:32:58.372Z"
+  "updatedAt": "2026-11-16T19:46:27.327Z"
 }

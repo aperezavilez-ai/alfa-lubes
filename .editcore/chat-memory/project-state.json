@@ -2,7 +2,7 @@
   "version": 2,
   "objective": "",
   "style": "",
-  "workingOn": "AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del analisis previo quedan ANULADAS para esta corrida.\n\nPuedes usar write_file y replace_in_file sobre codigo real del proyecto abierto.\n\nNo uses .claude/*.md ni ROADMAP.md ni TODOs documentales como objetivo de correccion.\n\nSOLICITUD ORIGINAL (sanitizada):\nel proyecto esta conectado a github versel y supabase,.,,,. porq",
+  "workingOn": "Publica este proyecto",
   "decisions": [
     {
       "t": 1794175808598,
@@ -164,6 +164,10 @@
     {
       "t": 1794621677697,
       "text": "Verificado (captura del preview): OK — _check_env.py"
+    },
+    {
+      "t": 1794778823805,
+      "text": "Verificado (captura del preview): OK — .env.example"
     }
   ],
   "discarded": [],
@@ -322,18 +326,6 @@
       "asset": "pallet-alfalubes.jpg"
     },
     {
-      "kind": "read",
-      "file": ".env.example",
-      "t": 1794678275313
-    },
-    {
-      "kind": "section",
-      "file": "templates/ai_agent.html",
-      "t": 1794680856154,
-      "name": "py-6",
-      "relation": "contiene"
-    },
-    {
       "kind": "subagent",
       "file": "supabase_schema.sql",
       "t": 1794694186272,
@@ -377,12 +369,6 @@
     },
     {
       "kind": "read",
-      "file": "templates/ai_agent.html",
-      "t": 1794694211215,
-      "why": "pedido del turno: «Conecta el Asesor IA de verdad: en app.py, el endpoint /api/ai-chat debe responder con la IA configurada en el»"
-    },
-    {
-      "kind": "read",
       "file": "supabase_schema.sql",
       "t": 1794694211215
     },
@@ -395,15 +381,33 @@
     {
       "kind": "section",
       "file": "app.py",
-      "t": 1794694629640,
+      "t": 1794778824024,
       "name": "calling",
       "relation": "contiene"
     },
     {
       "kind": "read",
+      "file": ".env.example",
+      "t": 1794778824024,
+      "why": "pedido del turno: «AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del analisis previo quedan ANULA»"
+    },
+    {
+      "kind": "section",
+      "file": "templates/ai_agent.html",
+      "t": 1794778824025,
+      "name": "py-6",
+      "relation": "contiene"
+    },
+    {
+      "kind": "read",
+      "file": "templates/ai_agent.html",
+      "t": 1794778824025
+    },
+    {
+      "kind": "read",
       "file": "app.py",
-      "t": 1794694629640,
-      "why": "pedido del turno: «Corrección de datos: las variables sí están en el .env, con prefijo MEAI_ (MEAI_API_KEY, MEAI_BASE_URL, MEAI_M»"
+      "t": 1794778824025,
+      "why": "pedido del turno: «AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del analisis previo quedan ANULA»"
     }
   ],
   "fronts": [],
@@ -489,16 +493,6 @@
       "at": 1794621528179
     },
     {
-      "key": ".env.example#1-0",
-      "file": ".env.example",
-      "startLine": 1,
-      "endLine": 0,
-      "mtimeMs": 1794363223520.6926,
-      "size": 463,
-      "totalLines": 27,
-      "at": 1794678128787
-    },
-    {
       "key": ".env#1-0",
       "file": ".env",
       "startLine": 1,
@@ -507,16 +501,6 @@
       "size": 1789,
       "totalLines": 42,
       "at": 1794678516399
-    },
-    {
-      "key": "templates/ai_agent.html#1-0",
-      "file": "templates/ai_agent.html",
-      "startLine": 1,
-      "endLine": 0,
-      "mtimeMs": 1794540764234.3945,
-      "size": 21840,
-      "totalLines": 369,
-      "at": 1794680390050
     },
     {
       "key": "app.py#1-10",
@@ -647,14 +631,94 @@
       "size": 68803,
       "totalLines": 1445,
       "at": 1794694523921
+    },
+    {
+      "key": "app.py#1000-1150",
+      "file": "app.py",
+      "startLine": 1000,
+      "endLine": 1150,
+      "mtimeMs": 1794707003818.6885,
+      "size": 74600,
+      "totalLines": 1470,
+      "at": 1794778493076
+    },
+    {
+      "key": "app.py#1-80",
+      "file": "app.py",
+      "startLine": 1,
+      "endLine": 80,
+      "mtimeMs": 1794707003818.6885,
+      "size": 74600,
+      "totalLines": 1470,
+      "at": 1794778493110
+    },
+    {
+      "key": "app.py#1151-1470",
+      "file": "app.py",
+      "startLine": 1151,
+      "endLine": 1470,
+      "mtimeMs": 1794707003818.6885,
+      "size": 74600,
+      "totalLines": 1470,
+      "at": 1794778496449
+    },
+    {
+      "key": "templates/ai_agent.html#1-0",
+      "file": "templates/ai_agent.html",
+      "startLine": 1,
+      "endLine": 0,
+      "mtimeMs": 1794540764234.3945,
+      "size": 21840,
+      "totalLines": 369,
+      "at": 1794778507441
+    },
+    {
+      "key": "app.py#1260-1400",
+      "file": "app.py",
+      "startLine": 1260,
+      "endLine": 1400,
+      "mtimeMs": 1794707003818.6885,
+      "size": 74600,
+      "totalLines": 1470,
+      "at": 1794778557072
+    },
+    {
+      "key": "app.py#40-55",
+      "file": "app.py",
+      "startLine": 40,
+      "endLine": 55,
+      "mtimeMs": 1794707003818.6885,
+      "size": 74600,
+      "totalLines": 1470,
+      "at": 1794778557082
+    },
+    {
+      "key": "app.py#1270-1380",
+      "file": "app.py",
+      "startLine": 1270,
+      "endLine": 1380,
+      "mtimeMs": 1794707003818.6885,
+      "size": 74600,
+      "totalLines": 1470,
+      "at": 1794778566149
+    },
+    {
+      "key": "app.py#1015-1060",
+      "file": "app.py",
+      "startLine": 1015,
+      "endLine": 1060,
+      "mtimeMs": 1794707003818.6885,
+      "size": 74600,
+      "totalLines": 1470,
+      "at": 1794778634785
     }
   ],
-  "updatedAt": "2026-11-15T21:32:58.317Z",
+  "updatedAt": "2026-11-16T19:46:26.359Z",
   "orientationMap": {
     "version": 1,
-    "updatedAt": "2026-11-15T21:32:14.967Z",
+    "updatedAt": "2026-11-15T21:40:24.056Z",
     "purpose": "",
-    "state": "[2026-11-15] Aplicado: nada (el kernel no registró escrituras en este turno).",
+    "state": "[2026-11-15] Aplicado (hechos del kernel): .env.example · Verificación visual: 2 captura(s) con render OK, 0 sin render confirmado.",
     "decisions": [
       {
         "text": "subagente explorer · vercel.json · ¿Existe vercel.json en la raíz? Si no existe, ¿es necesario …: Nota: la ruta solicitada `vercel.json` no existe; se usó el mapa cognitivo.",
@@ -767,6 +831,10 @@
     ],
     "keyFiles": [
       {
+        "file": ".env.example",
+        "role": "pedido del turno: «AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del…"
+      },
+      {
         "file": ".env",
         "role": "pedido del turno: «Corrección de datos: las variables sí están en el .env, con prefijo MEAI_ (MEAI_A…"
       },
@@ -781,10 +849,6 @@
       {
         "file": "README.md",
         "role": "mapeado por subagente analyst · app.py endpoint /api/ai-chat + templates/ai_agent.html · Analiza la …"
-      },
-      {
-        "file": ".env.example",
-        "role": "leído"
       },
       {
         "file": "supabase_schema.sql",
@@ -808,13 +872,13 @@
       },
       {
         "file": "templates/ai_agent.html",
-        "role": "pedido del turno: «Conecta el Asesor IA de verdad: en app.py, el endpoint /api/ai-chat debe responde…"
+        "role": "leído"
       },
       {
         "file": "app.py",
-        "role": "pedido del turno: «Corrección de datos: las variables sí están en el .env, con prefijo MEAI_ (MEAI_A…"
+        "role": "pedido del turno: «AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del…"
       }
     ],
-    "_lastWorkingOn": "el proyecto esta conectado a github versel y supabase,.,,,. porque no aplicas lo que te solicito"
+    "_lastWorkingOn": "AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del analisis previo quedan ANULADAS para esta corrida. Puedes usar write_file y re…"
   }
 }
