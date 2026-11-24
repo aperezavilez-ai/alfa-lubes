@@ -15,6 +15,9 @@ from email.mime.text import MIMEText
 from urllib import request as urlrequest
 from urllib.error import HTTPError, URLError
 
+import re
+import time
+from werkzeug.utils import secure_filename
 from flask import Flask, Response, abort, flash, jsonify, redirect, render_template, request, send_from_directory, session, url_for
 
 
@@ -118,6 +121,47 @@ def _load_admins_from_file(conn) -> None:
                         adm.get("role", "admin"),
                         int(adm.get("active", 1)),
                         adm.get("created_at", datetime.now().isoformat(timespec="seconds")),
+                    ),
+                )
+    except Exception:
+        pass
+
+
+
+PRODUCTS_DATA_FILE = BASE_DIR / "products_data.json"
+
+
+def _sync_products_to_file() -> None:
+    """Guarda persistentemente todos los productos en products_data.json para Vercel."""
+    try:
+        with get_db() as conn:
+            rows = conn.execute("SELECT id, name, brand, viscosity, price, stock, image, description FROM products ORDER BY id").fetchall()
+            if rows:
+                data = [dict(r) for r in rows]
+                PRODUCTS_DATA_FILE.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _load_products_from_file(conn) -> None:
+    """Carga los productos desde products_data.json si la tabla está vacía o faltan productos."""
+    if not PRODUCTS_DATA_FILE.exists():
+        return
+    try:
+        products = json.loads(PRODUCTS_DATA_FILE.read_text(encoding="utf-8"))
+        count = conn.execute("SELECT COUNT(*) FROM products").fetchone()[0]
+        if count == 0:
+            for p in products:
+                conn.execute(
+                    "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        p.get("name", ""),
+                        p.get("brand", "ALFA LUBES"),
+                        p.get("viscosity", ""),
+                        float(p.get("price", 0.0)),
+                        int(p.get("stock", 0)),
+                        p.get("image", "aceite-1.jpg"),
+                        p.get("description", ""),
                     ),
                 )
     except Exception:
@@ -271,20 +315,22 @@ def init_db():
             pallets,
         )
 
-        # Actualizar catálogo de productos exclusivos ALFA LUBES
-        conn.execute("DELETE FROM products")
-        products = [
-            ("ALFA LUBES DCT/DSG Full Synthetic", "ALFA LUBES", "DCT/DSG", 380.00, 150, "alfa-dct-dsg.jpg", "Fluido sintético de alta tecnología para transmisiones de doble embrague DCT/DSG."),
-            ("ALFA LUBES Full Synthetic 5W-30", "ALFA LUBES", "5W-30", 299.00, 200, "aceite-1.jpg", "Aceite 100% sintético para máxima protección contra el desgaste en motores modernos."),
-            ("ALFA LUBES Full Synthetic 0W-20", "ALFA LUBES", "0W-20", 349.00, 120, "aceite-2.jpg", "Aceite sintético avanzado de baja viscosidad para economía de combustible y arranque en frío."),
-            ("ALFA LUBES Synthetic Protection 5W-40", "ALFA LUBES", "5W-40", 329.00, 180, "aceite-3.jpg", "Protección sintética superior para alta exigencia térmica en carretera y trabajo pesado."),
-            ("ALFA LUBES Multigrado Alto Kilometraje 10W-40", "ALFA LUBES", "10W-40", 199.00, 250, "aceite-4.jpg", "Fórmula con acondicionadores de sellos para motores con más de 100,000 km."),
-            ("ALFA LUBES Full Synthetic 5W-20", "ALFA LUBES", "5W-20", 289.00, 100, "aceite-5.jpg", "Aceite sintético para protección confiable y eficiente en vehículos livianos."),
-        ]
-        conn.executemany(
-            "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            products,
-        )
+        # Cargar catálogo de productos exclusivos ALFA LUBES preservando productos agregados
+        _load_products_from_file(conn)
+        if conn.execute("SELECT COUNT(*) FROM products").fetchone()[0] == 0:
+            default_products = [
+                ("ALFA LUBES DCT/DSG Full Synthetic", "ALFA LUBES", "DCT/DSG", 380.00, 150, "alfa-dct-dsg.jpg", "Fluido sintético de alta tecnología para transmisiones de doble embrague DCT/DSG."),
+                ("ALFA LUBES Full Synthetic 5W-30", "ALFA LUBES", "5W-30", 299.00, 200, "aceite-1.jpg", "Aceite 100% sintético para máxima protección contra el desgaste en motores modernos."),
+                ("ALFA LUBES Full Synthetic 0W-20", "ALFA LUBES", "0W-20", 349.00, 120, "aceite-2.jpg", "Aceite sintético avanzado de baja viscosidad para economía de combustible y arranque en frío."),
+                ("ALFA LUBES Synthetic Protection 5W-40", "ALFA LUBES", "5W-40", 329.00, 180, "aceite-3.jpg", "Protección sintética superior para alta exigencia térmica en carretera y trabajo pesado."),
+                ("ALFA LUBES Multigrado Alto Kilometraje 10W-40", "ALFA LUBES", "10W-40", 199.00, 250, "aceite-4.jpg", "Fórmula con acondicionadores de sellos para motores con más de 100,000 km."),
+                ("ALFA LUBES Full Synthetic 5W-20", "ALFA LUBES", "5W-20", 289.00, 100, "aceite-5.jpg", "Aceite sintético para protección confiable y eficiente en vehículos livianos."),
+            ]
+            conn.executemany(
+                "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                default_products,
+            )
+            _sync_products_to_file()
 
         # Cargar cuentas registradas desde admins_data.json asegurando persistencia total
         _load_admins_from_file(conn)
@@ -698,6 +744,111 @@ def admin_update_user_password(user_id: int):
     flash(f"Contraseña de '{target['name']}' ({target['email']}) actualizada correctamente.", "success")
     return redirect(url_for("admin_users"))
 
+
+
+
+@app.route("/admin/products", methods=["GET", "POST"])
+@admin_required
+def admin_products():
+    """Panel de administración para agregar productos con fotografía y gestionar inventario."""
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        brand = request.form.get("brand", "ALFA LUBES").strip() or "ALFA LUBES"
+        viscosity = request.form.get("viscosity", "").strip()
+        price_raw = request.form.get("price", "0").strip()
+        stock_raw = request.form.get("stock", "0").strip()
+        description = request.form.get("description", "").strip()
+
+        if not name:
+            flash("El nombre del producto es obligatorio.", "error")
+            return redirect(url_for("admin_products"))
+        if not viscosity:
+            flash("La viscosidad o tipo de lubricante es obligatoria.", "error")
+            return redirect(url_for("admin_products"))
+
+        try:
+            price = max(0.0, float(price_raw or 0))
+        except ValueError:
+            price = 0.0
+
+        try:
+            stock = max(0, int(stock_raw or 0))
+        except ValueError:
+            stock = 0
+
+        # Manejo de fotografía
+        image_filename = request.form.get("image_select", "").strip() or "aceite-1.jpg"
+        file = request.files.get("image_file")
+        if file and file.filename:
+            raw_filename = secure_filename(file.filename)
+            ext = os.path.splitext(raw_filename)[1].lower()
+            if ext in (".png", ".jpg", ".jpeg", ".webp"):
+                clean_name = re.sub(r"[^a-zA-Z0-9_-]", "_", name.lower())[:20]
+                saved_name = f"prod_{clean_name}_{int(time.time())}{ext}"
+                target_path = BASE_DIR / "static" / "images" / saved_name
+                try:
+                    file.save(str(target_path))
+                    image_filename = saved_name
+                except Exception:
+                    # En entornos de solo lectura (como Vercel lambda), usar imagen por defecto seleccionada
+                    pass
+
+        with get_db() as conn:
+            conn.execute(
+                "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (name, brand, viscosity, price, stock, image_filename, description),
+            )
+        _sync_products_to_file()
+        flash(f"Producto '{name}' agregado exitosamente al catálogo.", "success")
+        return redirect(url_for("admin_products"))
+
+    # GET: Mostrar lista de productos y formulario de alta
+    with get_db() as conn:
+        all_products = conn.execute("SELECT * FROM products ORDER BY id DESC").fetchall()
+
+    images_dir = BASE_DIR / "static" / "images"
+    available_images = []
+    if images_dir.exists():
+        available_images = sorted([
+            f.name for f in images_dir.glob("*")
+            if f.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp")
+            and not f.name.startswith("favicon") and not f.name.startswith("apple")
+        ])
+
+    return render_template("admin_products.html", products=all_products, available_images=available_images)
+
+
+@app.post("/admin/products/<int:pid>/stock")
+@admin_required
+def admin_update_product_stock(pid: int):
+    """Actualiza rápidamente la existencia en bodega de un producto."""
+    stock_raw = request.form.get("stock", "0").strip()
+    try:
+        new_stock = max(0, int(stock_raw))
+    except ValueError:
+        flash("La cantidad de stock no es válida.", "error")
+        return redirect(url_for("admin_products"))
+
+    with get_db() as conn:
+        conn.execute("UPDATE products SET stock = ? WHERE id = ?", (new_stock, pid))
+    _sync_products_to_file()
+    flash(f"Existencia actualizada correctamente a {new_stock} unidades.", "success")
+    return redirect(url_for("admin_products"))
+
+
+@app.post("/admin/products/<int:pid>/delete")
+@admin_required
+def admin_delete_product(pid: int):
+    """Elimina un producto del catálogo."""
+    with get_db() as conn:
+        product = conn.execute("SELECT name FROM products WHERE id = ?", (pid,)).fetchone()
+        if product:
+            conn.execute("DELETE FROM products WHERE id = ?", (pid,))
+            _sync_products_to_file()
+            flash(f"Producto '{product['name']}' eliminado del catálogo.", "success")
+        else:
+            flash("El producto no existe.", "error")
+    return redirect(url_for("admin_products"))
 
 
 @app.route("/")

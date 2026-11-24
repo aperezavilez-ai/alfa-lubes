@@ -1,0 +1,62 @@
+[
+  {
+    "id": 349,
+    "name": "ALFA LUBES DCT/DSG Full Synthetic",
+    "brand": "ALFA LUBES",
+    "viscosity": "DCT/DSG",
+    "price": 380.0,
+    "stock": 150,
+    "image": "alfa-dct-dsg.jpg",
+    "description": "Fluido sintético de alta tecnología para transmisiones de doble embrague DCT/DSG."
+  },
+  {
+    "id": 350,
+    "name": "ALFA LUBES Full Synthetic 5W-30",
+    "brand": "ALFA LUBES",
+    "viscosity": "5W-30",
+    "price": 299.0,
+    "stock": 200,
+    "image": "aceite-1.jpg",
+    "description": "Aceite 100% sintético para máxima protección contra el desgaste en motores modernos."
+  },
+  {
+    "id": 351,
+    "name": "ALFA LUBES Full Synthetic 0W-20",
+    "brand": "ALFA LUBES",
+    "viscosity": "0W-20",
+    "price": 349.0,
+    "stock": 120,
+    "image": "aceite-2.jpg",
+    "description": "Aceite sintético avanzado de baja viscosidad para economía de combustible y arranque en frío."
+  },
+  {
+    "id": 352,
+    "name": "ALFA LUBES Synthetic Protection 5W-40",
+    "brand": "ALFA LUBES",
+    "viscosity": "5W-40",
+    "price": 329.0,
+    "stock": 180,
+    "image": "aceite-3.jpg",
+    "description": "Protección sintética superior para alta exigencia térmica en carretera y trabajo pesado."
+  },
+  {
+    "id": 353,
+    "name": "ALFA LUBES Multigrado Alto Kilometraje 10W-40",
+    "brand": "ALFA LUBES",
+    "viscosity": "10W-40",
+    "price": 199.0,
+    "stock": 250,
+    "image": "aceite-4.jpg",
+    "description": "Fórmula con acondicionadores de sellos para motores con más de 100,000 km."
+  },
+  {
+    "id": 354,
+    "name": "ALFA LUBES Full Synthetic 5W-20",
+    "brand": "ALFA LUBES",
+    "viscosity": "5W-20",
+    "price": 289.0,
+    "stock": 100,
+    "image": "aceite-5.jpg",
+    "description": "Aceite sintético para protección confiable y eficiente en vehículos livianos."
+  }
+]

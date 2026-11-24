@@ -20,6 +20,9 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-2.5">
+        <a href="{{ url_for('admin_panel') }}" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2.5 rounded-xl font-semibold text-xs transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-left"></i> Volver al Panel
+        </a>
         <button onclick="openNewUserModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 shadow-lg">
           <i class="fa-solid fa-user-plus"></i> Dar de Alta Nuevo Usuario
         </button>

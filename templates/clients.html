@@ -2,7 +2,12 @@
 {% block title %}Clientes | ALFA LUBES{% endblock %}
 {% block content %}
 <section class="py-10"><div class="max-w-7xl mx-auto px-6">
-    <div class="flex justify-between items-center mb-8"><div><p class="gold text-sm font-bold tracking-widest mb-2">ADMINISTRACIÓN</p><h1 class="text-3xl font-bold">Clientes</h1></div><a href="{{ url_for('dashboard') }}" class="text-sky-300 hover:underline">← Panel de ventas</a></div>
+    <div class="flex justify-between items-center mb-8"><div><p class="gold text-sm font-bold tracking-widest mb-2">ADMINISTRACIÓN</p><h1 class="text-3xl font-bold">Clientes</h1></div><div class="flex items-center gap-3">
+        <a href="{{ url_for('admin_panel') }}" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-arrow-left"></i> Volver al Panel Admin
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="text-sky-400 hover:text-sky-300 text-xs font-medium">Panel de ventas</a>
+    </div></div>
     <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-x-auto"><table class="w-full min-w-[720px] text-sm"><thead class="bg-slate-800 text-left text-slate-300"><tr><th class="px-5 py-4">Nombre</th><th>Correo</th><th>Teléfono</th><th>Taller / empresa</th><th>Registro</th></tr></thead><tbody>
         {% for c in clients %}<tr class="border-t border-slate-800"><td class="px-5 py-4 font-medium">{{ c.name }}</td><td>{{ c.email }}</td><td>{{ c.phone or '—' }}</td><td>{{ c.company or '—' }}</td><td class="text-slate-400">{{ c.created_at[:10] }}</td></tr>{% else %}<tr><td colspan="5" class="px-5 py-10 text-center text-slate-400">Los clientes aparecerán aquí al enviar su primer pedido.</td></tr>{% endfor %}
     </tbody></table></div>

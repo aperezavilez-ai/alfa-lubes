@@ -9,7 +9,14 @@
         <h1 class="text-3xl font-bold">Panel de administración</h1>
         <p class="text-slate-400 mt-1">Bienvenido, {{ session.get('admin_name') }} ({{ session.get('admin_role') }})</p>
       </div>
-      <a href="{{ url_for('admin_logout') }}" class="bg-slate-800 hover:bg-slate-700 rounded-lg px-4 py-2 text-sm font-semibold">Cerrar sesión</a>
+      <div class="flex items-center gap-3">
+        <a href="{{ url_for('home') }}" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl px-4 py-2 text-sm font-semibold flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-arrow-left"></i> Volver a la Tienda
+        </a>
+        <a href="{{ url_for('admin_logout') }}" class="bg-red-950/70 hover:bg-red-900 border border-red-800 text-red-200 rounded-xl px-4 py-2 text-sm font-semibold transition">
+          Cerrar sesión
+        </a>
+      </div>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
@@ -80,10 +87,14 @@
         <h2 class="text-lg font-bold">Proveedores</h2>
         <p class="text-slate-400 text-sm mt-1">Gestión de proveedores.</p>
       </a>
-      <a href="{{ url_for('products') }}" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 card-hover block">
-        <i class="fa-solid fa-box text-2xl gold mb-3"></i>
-        <h2 class="text-lg font-bold">Productos</h2>
-        <p class="text-slate-400 text-sm mt-1">Catálogo y stock.</p>
+      <a href="{{ url_for('admin_products') }}" class="bg-slate-900 border-2 border-emerald-500/40 hover:border-emerald-400 rounded-2xl p-6 card-hover block shadow-xl relative overflow-hidden group">
+        <div class="absolute -right-3 -bottom-3 text-emerald-500/10 text-7xl font-black group-hover:scale-110 transition"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <i class="fa-solid fa-boxes-stacked text-2xl text-emerald-400 mb-3"></i>
+        <h2 class="text-lg font-bold text-white flex items-center justify-between">
+          <span>Productos y Stock</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold uppercase">+ Agregar</span>
+        </h2>
+        <p class="text-slate-400 text-xs mt-1">Agregar nuevos productos con fotografía e información técnica, y actualizar existencias.</p>
       </a>
       <a href="{{ url_for('ai_agent') }}" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 card-hover block">
         <i class="fa-solid fa-robot text-2xl gold mb-3"></i>

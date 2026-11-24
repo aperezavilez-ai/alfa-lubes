@@ -3,6 +3,11 @@
 {% block content %}
 <section class="py-12 sm:py-16">
   <div class="max-w-3xl mx-auto px-6">
+    <div class="mb-5">
+      <a href="{{ url_for('cart') }}" class="text-xs text-slate-400 hover:text-amber-400 font-medium inline-flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-arrow-left"></i> Volver al Carrito
+      </a>
+    </div>
     <p class="gold text-sm font-bold tracking-widest mb-2 uppercase">ÚLTIMO PASO</p>
     <h1 class="text-4xl font-bold mb-2">Datos de entrega y contacto</h1>
     <p class="text-slate-400 mb-6">Resumen del pedido: <span class="text-amber-400 font-bold text-lg">El equipo de ventas confirmará el total y condiciones de pago</span></p>

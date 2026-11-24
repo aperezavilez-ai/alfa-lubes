@@ -2,6 +2,11 @@
 {% block title %}Carrito de compra | ALFA LUBES{% endblock %}
 {% block content %}
 <section class="py-12 sm:py-16"><div class="max-w-5xl mx-auto px-6">
+    <div class="mb-5">
+        <a href="{{ url_for('products') }}" class="text-xs text-slate-400 hover:text-amber-400 font-medium inline-flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-arrow-left"></i> Seguir comprando / Volver al catálogo
+        </a>
+    </div>
     <p class="gold text-sm font-bold tracking-widest mb-2">TU PEDIDO</p><h1 class="text-4xl font-bold mb-8">Carrito de compra</h1>
     {% if items %}
     <form action="{{ url_for('update_cart') }}" method="post">
