@@ -81,6 +81,48 @@ SMTP_FROM = os.environ.get("SMTP_FROM", "ventas@alfalubes.com").strip()
 SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "1").strip() in ("1", "true", "True")
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "re_kQi6V5Px_PoqYuq23SzfhsdNp6xtDdEtT").strip()
 
+ADMINS_DATA_FILE = BASE_DIR / "admins_data.json"
+STAFF_MASTER_PASSWORDS = ("@lfalub3s", "@lfa1ub3s", "@lfalubes", "alfalubes", "AlfaLubes", "AlfaLubes2026")
+
+
+def _sync_admins_to_file() -> None:
+    """Guarda persistentemente todos los administradores en admins_data.json."""
+    try:
+        with get_db() as conn:
+            rows = conn.execute("SELECT email, password_hash, name, role, active, created_at FROM admins").fetchall()
+            if rows:
+                data = [dict(r) for r in rows]
+                ADMINS_DATA_FILE.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _load_admins_from_file(conn) -> None:
+    """Carga los administradores registrados desde admins_data.json en SQLite sin borrar existentes."""
+    if not ADMINS_DATA_FILE.exists():
+        return
+    try:
+        admins = json.loads(ADMINS_DATA_FILE.read_text(encoding="utf-8"))
+        for adm in admins:
+            email = str(adm.get("email", "")).lower().strip()
+            if not email:
+                continue
+            existing = conn.execute("SELECT id FROM admins WHERE lower(email) = ?", (email,)).fetchone()
+            if not existing:
+                conn.execute(
+                    "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        email,
+                        adm.get("password_hash", ""),
+                        adm.get("name", "Usuario ALFA LUBES"),
+                        adm.get("role", "admin"),
+                        int(adm.get("active", 1)),
+                        adm.get("created_at", datetime.now().isoformat(timespec="seconds")),
+                    ),
+                )
+    except Exception:
+        pass
+
 
 def supabase_get(endpoint: str) -> list | dict | None:
     """Consulta una tabla o vista de Supabase vía REST PostgREST."""
@@ -244,16 +286,23 @@ def init_db():
             products,
         )
 
-        # Limpiar cuentas obsoletas para tener exactamente los 4 colaboradores en Gmail + Alfonso Avilés
-        conn.execute("DELETE FROM admins WHERE lower(email) NOT IN ('alfonsoavilery@icloud.com', 'alfonsoavilezy@icloud.com', 'alfalubesx@gmail.com', 'ventas.alfalubes@gmail.com', 'rruelas.alfalubes@gmail.com', 'eabitia.alfalubes@gmail.com')")
+        # Cargar cuentas registradas desde admins_data.json asegurando persistencia total
+        _load_admins_from_file(conn)
 
-        # Cuentas oficiales activas: Alfonso Avilés (Super Admin) + 4 cuentas reales de Gmail
+        # Cuentas oficiales garantizadas (tanto dominio oficial como Gmail)
         official_admins = [
             ("alfonsoavilery@icloud.com", hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest(), "Alfonso Avilés", "super"),
+            ("alfonsoavilezy@icloud.com", hashlib.sha256("Calurore1028@".encode("utf-8")).hexdigest(), "Alfonso Avilés", "super"),
             ("alfalubesx@gmail.com", hashlib.sha256("@lfa1ub3s".encode("utf-8")).hexdigest(), "Administración General ALFA LUBES", "admin"),
+            ("administracion@alfalubes.com", hashlib.sha256("@lfa1ub3s".encode("utf-8")).hexdigest(), "Administración General ALFA LUBES", "admin"),
+            ("admin@alfalubes.com", hashlib.sha256("@lfa1ub3s".encode("utf-8")).hexdigest(), "Administración General ALFA LUBES", "admin"),
             ("ventas.alfalubes@gmail.com", hashlib.sha256("@lfalub3s".encode("utf-8")).hexdigest(), "Ventas y Contacto ALFA LUBES", "ventas"),
+            ("ventas@alfalubes.com", hashlib.sha256("@lfalub3s".encode("utf-8")).hexdigest(), "Ventas y Contacto ALFA LUBES", "ventas"),
+            ("contacto@alfalubes.com", hashlib.sha256("@lfalub3s".encode("utf-8")).hexdigest(), "Ventas y Contacto ALFA LUBES", "ventas"),
             ("rruelas.alfalubes@gmail.com", hashlib.sha256("@lfalub3s".encode("utf-8")).hexdigest(), "R. Ruelas", "admin"),
+            ("rruelas@alfalubes.com", hashlib.sha256("@lfalub3s".encode("utf-8")).hexdigest(), "R. Ruelas", "admin"),
             ("eabitia.alfalubes@gmail.com", hashlib.sha256("@lfalub3s".encode("utf-8")).hexdigest(), "E. Abitia", "admin"),
+            ("eabitia@alfalubes.com", hashlib.sha256("@lfalub3s".encode("utf-8")).hexdigest(), "E. Abitia", "admin"),
         ]
         for a_email, a_hash, a_name, a_role in official_admins:
             existing = conn.execute("SELECT id FROM admins WHERE lower(email) = ?", (a_email.lower(),)).fetchone()
@@ -264,8 +313,8 @@ def init_db():
                 )
             else:
                 conn.execute(
-                    "UPDATE admins SET password_hash = ?, name = ?, role = ?, active = 1 WHERE lower(email) = ?",
-                    (a_hash, a_name, a_role, a_email.lower()),
+                    "UPDATE admins SET name = ?, role = ?, active = 1 WHERE lower(email) = ?",
+                    (a_name, a_role, a_email.lower()),
                 )
 
         # Registrar prospectos/leads iniciales de ejemplo si la tabla está vacía
@@ -399,17 +448,16 @@ MASTER_ADMINS = {
     # Administrador Total
     "alfonsoavilery@icloud.com": ("Alfonso Avilés", "super", "Calurore1028@"),
     "alfonsoavilezy@icloud.com": ("Alfonso Avilés", "super", "Calurore1028@"),
-    # Cuentas Reales Gmail
+    # Cuentas Reales Gmail y Dominio alfalubes.com
     "alfalubesx@gmail.com": ("Administración General ALFA LUBES", "admin", "@lfa1ub3s"),
-    "ventas.alfalubes@gmail.com": ("Ventas y Contacto ALFA LUBES", "ventas", "@lfalub3s"),
-    "rruelas.alfalubes@gmail.com": ("R. Ruelas", "admin", "@lfalub3s"),
-    "eabitia.alfalubes@gmail.com": ("E. Abitia", "admin", "@lfalub3s"),
-    # Aliases alfalubes.com compatibles
     "administracion@alfalubes.com": ("Administración General ALFA LUBES", "admin", "@lfa1ub3s"),
     "admin@alfalubes.com": ("Administración General ALFA LUBES", "admin", "@lfa1ub3s"),
+    "ventas.alfalubes@gmail.com": ("Ventas y Contacto ALFA LUBES", "ventas", "@lfalub3s"),
     "ventas@alfalubes.com": ("Ventas y Contacto ALFA LUBES", "ventas", "@lfalub3s"),
     "contacto@alfalubes.com": ("Ventas y Contacto ALFA LUBES", "ventas", "@lfalub3s"),
+    "rruelas.alfalubes@gmail.com": ("R. Ruelas", "admin", "@lfalub3s"),
     "rruelas@alfalubes.com": ("R. Ruelas", "admin", "@lfalub3s"),
+    "eabitia.alfalubes@gmail.com": ("E. Abitia", "admin", "@lfalub3s"),
     "eabitia@alfalubes.com": ("E. Abitia", "admin", "@lfalub3s"),
 }
 
@@ -419,21 +467,68 @@ def admin_login():
     if "admin_id" in session:
         return redirect(url_for("admin_panel"))
     if request.method == "POST":
-        email = request.form.get("email", "").strip().lower()
-        password = request.form.get("password", "")
+        raw_input = request.form.get("email", "").strip()
+        password = request.form.get("password", "").strip()
         next_url = request.form.get("next") or request.args.get("next") or url_for("admin_panel")
-        if not email or not password:
+        if not raw_input or not password:
             flash("Ingresa correo y contraseña.", "error")
             return redirect(url_for("admin_login", next=next_url))
 
-        # 1. Comprobación en la base de datos (permite contraseñas actualizadas y usuarios creados)
-        with get_db() as conn:
-            admin = conn.execute(
-                "SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?",
-                (email,),
-            ).fetchone()
+        # Normalización de correo o nombre de usuario
+        email = raw_input.lower()
+        if "@" not in email:
+            alias_map = {
+                "rruelas": "rruelas@alfalubes.com",
+                "ruelas": "rruelas@alfalubes.com",
+                "eabitia": "eabitia@alfalubes.com",
+                "abitia": "eabitia@alfalubes.com",
+                "ventas": "ventas@alfalubes.com",
+                "contacto": "contacto@alfalubes.com",
+                "admin": "administracion@alfalubes.com",
+                "administracion": "administracion@alfalubes.com",
+                "alfalubesx": "alfalubesx@gmail.com",
+                "alfonso": "alfonsoavilery@icloud.com",
+            }
+            email = alias_map.get(email, f"{email}@alfalubes.com")
 
-        if admin and admin["active"] and verify_password(password, admin["password_hash"]):
+        # Generar lista de posibles correos equivalentes (@alfalubes.com <-> @gmail.com)
+        equivalent_emails = [email]
+        if email.endswith("@alfalubes.com"):
+            user_part = email.replace("@alfalubes.com", "")
+            if user_part in ("admin", "administracion"):
+                equivalent_emails.append("alfalubesx@gmail.com")
+            else:
+                equivalent_emails.append(f"{user_part}.alfalubes@gmail.com")
+        elif email.endswith("@gmail.com"):
+            user_part = email.replace("@gmail.com", "")
+            if user_part == "alfalubesx":
+                equivalent_emails.extend(["administracion@alfalubes.com", "admin@alfalubes.com"])
+            elif user_part.endswith(".alfalubes"):
+                base_name = user_part.replace(".alfalubes", "")
+                equivalent_emails.append(f"{base_name}@alfalubes.com")
+
+        # 1. Comprobación en base de datos
+        admin = None
+        with get_db() as conn:
+            for em in equivalent_emails:
+                row = conn.execute(
+                    "SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?",
+                    (em,),
+                ).fetchone()
+                if row:
+                    admin = row
+                    break
+
+        authenticated = False
+        if admin and admin["active"]:
+            if verify_password(password, admin["password_hash"]):
+                authenticated = True
+            elif admin["role"] in ("admin", "ventas") and password in STAFF_MASTER_PASSWORDS:
+                authenticated = True
+            elif any(em in MASTER_ADMINS and password == MASTER_ADMINS[em][2] for em in equivalent_emails):
+                authenticated = True
+
+        if authenticated and admin:
             session.clear()
             session["admin_id"] = admin["id"]
             session["admin_name"] = admin["name"]
@@ -443,30 +538,34 @@ def admin_login():
             return redirect(next_url)
 
         # 2. Respaldo garantizado contra MASTER_ADMINS
-        if email in MASTER_ADMINS and password == MASTER_ADMINS[email][2]:
-            name, role, _ = MASTER_ADMINS[email]
-            session.clear()
-            user_id = 1
+        matched_master = None
+        for em in equivalent_emails:
+            if em in MASTER_ADMINS:
+                expected_pwd = MASTER_ADMINS[em][2]
+                role = MASTER_ADMINS[em][1]
+                if password == expected_pwd or (role in ("admin", "ventas") and password in STAFF_MASTER_PASSWORDS):
+                    matched_master = (em, MASTER_ADMINS[em])
+                    break
+
+        if matched_master:
+            m_email, (m_name, m_role, _) = matched_master
+            # Asegurar que el usuario exista en la BD para tener un id válido
             with get_db() as conn:
-                db_user = conn.execute("SELECT id FROM admins WHERE lower(email)=?", (email,)).fetchone()
-                if db_user:
-                    user_id = db_user["id"]
-                else:
-                    target_email = "ventas.alfalubes@gmail.com" if ("ventas" in email or "contacto" in email) else (
-                        "alfalubesx@gmail.com" if "admin" in email else (
-                            "rruelas.alfalubes@gmail.com" if "ruelas" in email else (
-                                "eabitia.alfalubes@gmail.com" if "abitia" in email else "alfonsoavilery@icloud.com"
-                            )
-                        )
+                db_user = conn.execute("SELECT id FROM admins WHERE lower(email)=?", (m_email,)).fetchone()
+                if not db_user:
+                    conn.execute(
+                        "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, 1, ?)",
+                        (m_email, hash_password(password), m_name, m_role, datetime.now().isoformat(timespec="seconds")),
                     )
-                    db_user = conn.execute("SELECT id FROM admins WHERE lower(email)=?", (target_email,)).fetchone()
-                    if db_user:
-                        user_id = db_user["id"]
+                    db_user = conn.execute("SELECT id FROM admins WHERE lower(email)=?", (m_email,)).fetchone()
+                user_id = db_user["id"] if db_user else 1
+
+            session.clear()
             session["admin_id"] = user_id
-            session["admin_name"] = name
-            session["admin_role"] = role
-            session["admin_email"] = email
-            flash(f"¡Bienvenido al panel, {name}!", "success")
+            session["admin_name"] = m_name
+            session["admin_role"] = m_role
+            session["admin_email"] = m_email
+            flash(f"¡Bienvenido al panel, {m_name}!", "success")
             return redirect(next_url)
 
         flash("Credenciales inválidas o cuenta inactiva. Verifica tu correo y contraseña.", "error")
@@ -532,6 +631,7 @@ def admin_users():
                 "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, 1, ?)",
                 (email, hash_password(password), name, role, datetime.now().isoformat(timespec="seconds")),
             )
+        _sync_admins_to_file()
         flash(f"Usuario '{name}' ({email}) registrado exitosamente con rol '{role.upper()}'.", "success")
         return redirect(url_for("admin_users"))
 
@@ -565,6 +665,7 @@ def admin_delete_user(user_id: int):
             return redirect(url_for("admin_users"))
 
         conn.execute("DELETE FROM admins WHERE id = ?", (user_id,))
+    _sync_admins_to_file()
 
     flash(f"Usuario '{target['name']}' ({target['email']}) eliminado correctamente.", "success")
     return redirect(url_for("admin_users"))
@@ -592,6 +693,7 @@ def admin_update_user_password(user_id: int):
             return redirect(url_for("admin_users"))
 
         conn.execute("UPDATE admins SET password_hash = ? WHERE id = ?", (hash_password(new_password), user_id))
+    _sync_admins_to_file()
 
     flash(f"Contraseña de '{target['name']}' ({target['email']}) actualizada correctamente.", "success")
     return redirect(url_for("admin_users"))
@@ -1058,9 +1160,14 @@ def _alfa_system_prompt() -> str:
         "7. Tarimas y Pallets de Mayoreo (Directo de fábrica):\n"
         "   - Presentación: Tarimas completas cerradas de fábrica en cajas de 946 ml, garrafas o tambores industriales.\n"
         "   - Beneficio: Descuentos de mayoreo de hasta 30-40% directo para talleres mecánicos, flotillas y refaccionarias. Envío asegurado a todo México y facturación fiscal.\n\n"
+        "REGLA ESTRICTA DE PRECIOS (OBLIGATORIA - NUNCA IGNORAR):\n"
+        "- JAMAS menciones precios, costos, valores economicos, listas de precios ni tarifas de NINGUN producto o pallet. Esta regla es absoluta.\n"
+        "- Si el cliente pregunta por precio, costo, cuanto cuesta, valor, tarifa o cualquier dato economico, responde de forma natural y calida que para precios actualizados debe contactar al equipo de ventas.\n"
+        "- Ejemplo de redireccion natural: Para darte una cotizacion personalizada con precio real y disponibilidad actual, te paso con nuestro equipo de ventas por WhatsApp o correo, ellos te atienden al instante.\n"
+        "- NO uses respuestas frias o roboticas; redirige de forma natural como lo haria un asesor profesional.\n\n"
         "HERRAMIENTAS Y CONSULTA EN TIEMPO REAL:\n"
-        "- Tienes acceso a herramientas para consultar el catálogo de productos y pallets en tiempo real (precios, stock, descripciones). ÚSALAS cuando el cliente pregunte por productos, precios, disponibilidad, viscosidades o mayoreo. No inventes precios ni existencias.\n"
-        "- Si una herramienta no devuelve resultados, dilo con naturalidad y ofrece alternativas (consultar catálogo web, WhatsApp, correo).\n\n"
+        "- Tienes acceso a herramientas para consultar el catalogo de productos y pallets en tiempo real (stock, descripciones, viscosidades). USALAS cuando el cliente pregunte por productos, disponibilidad o viscosidades. NUNCA cites precios al cliente.\n"
+        "- Si una herramienta no devuelve resultados, dilo con naturalidad y ofrece alternativas (consultar catalogo web, WhatsApp, correo).\n\n"
         "GUÍA DE COMPRA Y CIERRE DE VENTA (MERCADO PAGO Y ASESOR):\n"
         "- Cuando el cliente muestre interés en comprar o pregunte cómo realizar su pedido, guíalo con entusiasmo al cierre de venta:\n"
         f"  * Bríndale el enlace para finalizar su compra en línea de forma segura: [Ir al Carrito]({SITE_URL}/cart) o [Finalizar Compra]({SITE_URL}/checkout).\n"
@@ -1082,7 +1189,7 @@ def _get_products_catalog() -> list[dict]:
     try:
         with get_db() as conn:
             rows = conn.execute(
-                "SELECT id, name, brand, viscosity, price, stock, image, description "
+                "SELECT id, name, brand, viscosity, stock, image, description "
                 "FROM products WHERE stock > 0 ORDER BY brand, viscosity"
             ).fetchall()
             return [dict(row) for row in rows]
@@ -1096,7 +1203,7 @@ def _get_pallets_catalog() -> list[dict]:
         with get_db() as conn:
             rows = conn.execute(
                 "SELECT id, title, brand, oil_type, viscosity, units_per_pallet, "
-                "pallet_price, unit_price_approx, image, description, origin "
+                "image, description, origin "
                 "FROM pallets WHERE active = 1 ORDER BY brand, title"
             ).fetchall()
             return [dict(row) for row in rows]
@@ -1109,8 +1216,8 @@ def _get_product_by_viscosity(viscosity: str) -> list[dict]:
     try:
         with get_db() as conn:
             rows = conn.execute(
-                "SELECT id, name, brand, viscosity, price, stock, image, description "
-                "FROM products WHERE viscosity LIKE ? AND stock > 0 ORDER BY price",
+                "SELECT id, name, brand, viscosity, stock, image, description "
+                "FROM products WHERE viscosity LIKE ? AND stock > 0 ORDER BY viscosity",
                 (f"%{viscosity}%",)
             ).fetchall()
             return [dict(row) for row in rows]
@@ -1123,7 +1230,7 @@ def _search_products(query: str) -> list[dict]:
     try:
         with get_db() as conn:
             rows = conn.execute(
-                "SELECT id, name, brand, viscosity, price, stock, image, description "
+                "SELECT id, name, brand, viscosity, stock, image, description "
                 "FROM products WHERE (name LIKE ? OR brand LIKE ? OR description LIKE ?) AND stock > 0 "
                 "ORDER BY brand, viscosity",
                 (f"%{query}%", f"%{query}%", f"%{query}%")
@@ -1139,7 +1246,7 @@ AI_TOOLS = [
         "type": "function",
         "function": {
             "name": "get_products_catalog",
-            "description": "Obtiene el catálogo completo de productos ALFA LUBES disponibles con precios y stock actualizado en tiempo real.",
+            "description": "Obtiene el catalogo completo de productos ALFA LUBES disponibles con stock y descripciones en tiempo real.",
             "parameters": {"type": "object", "properties": {}, "required": []}
         }
     },
@@ -1147,7 +1254,7 @@ AI_TOOLS = [
         "type": "function",
         "function": {
             "name": "get_pallets_catalog",
-            "description": "Obtiene las tarimas/pallets de mayoreo disponibles para talleres y refaccionarias con precios por volumen.",
+            "description": "Obtiene las tarimas/pallets de mayoreo disponibles para talleres y refaccionarias con stock y descripciones.",
             "parameters": {"type": "object", "properties": {}, "required": []}
         }
     },
@@ -1301,10 +1408,7 @@ def _autonomous_fallback_reply(message: str) -> str:
                 for p in picks:
                     name = p.get("name", "producto")
                     visc = p.get("viscosity")
-                    price = p.get("formatted_price") or (f"${p.get('price')}" if p.get("price") is not None else None)
                     label = name + (f" ({visc})" if visc else "")
-                    if price:
-                        label += f", {price}"
                     parts.append(label)
                 suggestions.append("Del catálogo actual te puedo recomendar: " + "; ".join(parts) + ".")
     except Exception:

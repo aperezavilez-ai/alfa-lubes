@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Los Mejores Aceites Importados | Venta por Pallets | ALFA LUBES{% endblock %}
 {% block og_title %}Los Mejores Aceites Importados | Venta por Pallets | ALFA LUBES{% endblock %}
-{% block og_desc %}Importación directa de lubricantes y aceites de motor por tarima y mayoreo. Tarimas oficiales ALFA LUBES y Pallets de Aceites Importados. Precios especiales para talleres y flotillas.{% endblock %}
+{% block og_desc %}Importación directa de lubricantes y aceites de motor por tarima y mayoreo. Tarimas oficiales ALFA LUBES y Pallets de Aceites Importados. Condiciones especiales para talleres y flotillas.{% endblock %}
 
 {% block content %}
 <!-- Banner Hero Llamativo: Los Mejores Aceites Importados -->
@@ -18,14 +18,14 @@
             </h1>
             <p class="text-xl font-bold text-amber-400 mb-4">Venta por Pallets y Mayoreo para Talleres, Refaccionarias y Flotillas</p>
             <p class="text-slate-300 text-base leading-relaxed mb-8 max-w-2xl">
-                Accede a precios de importador directo sin intermediarios. Tarimas completas selladas de fábrica con cajas de fluidos de transmisión <strong>DCT/DSG</strong>, aceites sintéticos premium <strong>0W-20, 5W-30</strong> y tambores industriales con flete seguro a todo México.
+                Accede a condiciones de importador directo sin intermediarios. Tarimas completas selladas de fábrica con cajas de fluidos de transmisión <strong>DCT/DSG</strong>, aceites sintéticos premium <strong>0W-20, 5W-30</strong> y tambores industriales con flete seguro a todo México.
             </p>
             <div class="flex flex-wrap gap-4">
                 <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-7 py-3.5 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2 transition transform hover:scale-105">
                     <i class="fa-brands fa-whatsapp text-lg"></i> Cotizar Pallet por WhatsApp
                 </a>
                 <a href="mailto:{{ sales_email }}?subject=Cotizaci%C3%B3n%20de%20Pallets%20de%20Aceite%20Importado" class="bg-gold text-slate-950 px-7 py-3.5 rounded-xl font-bold text-sm hover:brightness-110 shadow-xl transition">
-                    <i class="fa-solid fa-envelope mr-1.5"></i> Solicitar Lista de Precios
+                    <i class="fa-solid fa-envelope mr-1.5"></i> Solicitar Cotización Mayorista
                 </a>
             </div>
         </div>
@@ -70,7 +70,7 @@
             </div>
             <div class="flex items-center gap-2 text-xs text-slate-400">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Precios especiales para pedidos de 2 o más tarimas</span>
+                <span>Condiciones preferenciales para pedidos de 2 o más tarimas</span>
             </div>
         </div>
 
@@ -100,16 +100,9 @@
                         <h3 class="text-2xl font-bold text-white mb-3">{{ pallet.title }}</h3>
                         <p class="text-sm text-slate-300 leading-relaxed mb-6">{{ pallet.description }}</p>
 
-                        <div class="grid grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-950/70 border border-slate-800 mb-6">
-                            <div>
-                                <span class="text-[11px] text-slate-400 uppercase tracking-wider block">Precio por Tarima:</span>
-                                <span class="text-2xl font-black gold">{{ pallet.pallet_price|mxn }}</span>
-                            </div>
-                            <div class="border-l border-slate-800 pl-4">
-                                <span class="text-[11px] text-slate-400 uppercase tracking-wider block">Costo unitario aprox:</span>
-                                <span class="text-lg font-bold text-white">{{ pallet.unit_price_approx|mxn }}</span>
-                                <span class="text-[10px] text-slate-400 block">por envase/unidad</span>
-                            </div>
+                        <div class="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 mb-6 text-center">
+                            <span class="text-sm font-bold text-amber-400 block mb-1"><i class="fa-solid fa-tags mr-1.5"></i> Cotización personalizada por tarima</span>
+                            <span class="text-xs text-slate-400 block">Consulta precios y flete consolidado con nuestro equipo de ventas</span>
                         </div>
                     </div>
                 </div>
