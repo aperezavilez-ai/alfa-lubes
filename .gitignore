@@ -5,8 +5,16 @@ venv/
 alfa_lubes.db
 alfa_lubes.db-shm
 alfa_lubes.db-wal
+alfa-lubes.db
+alfa-lubes.db*
+*.db
+*.db-shm
+*.db-wal
 .env
 .vercel
 .editcore/
 *.log
 VIDEO-*.mp4
+*.pdf
+notas.txt
+

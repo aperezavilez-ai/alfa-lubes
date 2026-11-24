@@ -386,12 +386,6 @@
       "relation": "contiene"
     },
     {
-      "kind": "read",
-      "file": ".env.example",
-      "t": 1794778824024,
-      "why": "pedido del turno: «AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del analisis previo quedan ANULA»"
-    },
-    {
       "kind": "section",
       "file": "templates/ai_agent.html",
       "t": 1794778824025,
@@ -408,6 +402,17 @@
       "file": "app.py",
       "t": 1794778824025,
       "why": "pedido del turno: «AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del analisis previo quedan ANULA»"
+    },
+    {
+      "kind": "read",
+      "file": ".gitignore",
+      "t": 1794863432811,
+      "why": "pedido del turno: «haz commit push y deploy»"
+    },
+    {
+      "kind": "read",
+      "file": ".env.example",
+      "t": 1794863432811
     }
   ],
   "fronts": [],
@@ -733,12 +738,12 @@
       "at": 1794863320815
     }
   ],
-  "updatedAt": "2026-11-16T21:08:40.816Z",
+  "updatedAt": "2026-11-17T17:48:57.497Z",
   "orientationMap": {
     "version": 1,
-    "updatedAt": "2026-11-16T19:48:20.214Z",
+    "updatedAt": "2026-11-17T17:48:57.495Z",
     "purpose": "",
-    "state": "[2026-11-16]",
+    "state": "[2026-11-17] Aplicado: nada (el kernel no registró escrituras en este turno).",
     "decisions": [
       {
         "text": "subagente explorer · vercel.json · ¿Existe vercel.json en la raíz? Si no existe, ¿es necesario …: Nota: la ruta solicitada `vercel.json` no existe; se usó el mapa cognitivo.",
@@ -852,7 +857,11 @@
     "keyFiles": [
       {
         "file": ".env.example",
-        "role": "pedido del turno: «AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del…"
+        "role": "leído"
+      },
+      {
+        "file": ".gitignore",
+        "role": "pedido del turno: «haz commit push y deploy»"
       },
       {
         "file": ".env",
@@ -893,12 +902,8 @@
       {
         "file": "templates/ai_agent.html",
         "role": "leído"
-      },
-      {
-        "file": "app.py",
-        "role": "pedido del turno: «AUTORIZACION DE EJECUCION (PROCEDE): las reglas de DIAGNOSTICO / NO MODIFICAR del…"
       }
     ],
-    "_lastWorkingOn": "Publica este proyecto"
+    "_lastWorkingOn": "haz commit push y deploy"
   }
 }
