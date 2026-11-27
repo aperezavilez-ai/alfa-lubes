@@ -74,6 +74,14 @@ GOOGLE_SITE_VERIFICATION = os.environ.get("GOOGLE_SITE_VERIFICATION", "").strip(
 SUPABASE_URL = (os.environ.get("SUPABASE_URL") or "https://eihvypcvmjbcfumllxrv.supabase.co").strip().rstrip("/")
 SUPABASE_KEY = (os.environ.get("SUPABASE_KEY") or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpaHZ5cGN2bWpiY2Z1bWxseHJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzNDM1NzYsImV4cCI6MjEwOTkxOTU3Nn0.sDzxotBsG54eqGB9pl5CpvVvFQJ7z9gW3Kul5FRY05k").strip()
 SUPABASE_PUBLISHABLE_KEY = (os.environ.get("SUPABASE_PUBLISHABLE_KEY") or "sb_publishable_laLwYQHyi5A-KDGWCPKsQA_E3dkVkwp").strip()
+# Llave SECRETA de servidor (Supabase -> Settings -> API -> service_role).
+# SOLO vive como variable de entorno (Vercel / .env), NUNCA en el repo.
+# Es la que permite guardar los usuarios registrados en Supabase (durable):
+# sin ella, en Vercel los usuarios solo existen en el SQLite de /tmp de UNA
+# instancia y desaparecen en el siguiente arranque en frio (causa raiz del
+# error "los usuarios registrados no pueden ingresar"; el admin oficial no
+# fallaba porque esta recreado desde el codigo en cada arranque).
+SUPABASE_SERVICE_KEY = (os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("SUPABASE_SECRET_KEY") or "").strip()
 
 # Configuración SMTP institucional alfalubes.com (Resend Relay)
 SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.resend.com").strip()
@@ -186,8 +194,117 @@ def supabase_get(endpoint: str) -> list | dict | None:
         return None
 
 
+
+# ---------------------------------------------------------------------------
+# Usuarios administradores DURABLES en Supabase (tabla public.admins)
+# ---------------------------------------------------------------------------
+# En Vercel el disco es efimero (/tmp por instancia, resto de solo lectura),
+# por lo que ni el SQLite ni admins_data.json pueden ser el almacen de los
+# usuarios registrados. Supabase (Postgres) si es durable y compartido por
+# todas las instancias. Estas funciones usan la llave service_role, que
+# salta RLS; la tabla admins queda SIN politicas anon, asi que los hashes
+# nunca son legibles desde el navegador.
+
+def supabase_admins_enabled() -> bool:
+    return bool(SUPABASE_URL and SUPABASE_SERVICE_KEY)
+
+
+def _supabase_admin_request(method: str, endpoint: str, payload=None, prefer: str = ""):
+    if not supabase_admins_enabled():
+        return None
+    url = f"{SUPABASE_URL}/rest/v1/{endpoint.lstrip('/')}"
+    headers = {
+        "apikey": SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "Content-Type": "application/json",
+    }
+    if prefer:
+        headers["Prefer"] = prefer
+    data = json.dumps(payload).encode("utf-8") if payload is not None else None
+    req = urlrequest.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urlrequest.urlopen(req, timeout=8) as resp:
+            body = resp.read().decode("utf-8")
+            return json.loads(body) if body else None
+    except Exception as exc:  # se registra, nunca se traga en silencio
+        print(f"[ALFA LUBES] Supabase admins {method} {endpoint} fallo: {exc}", flush=True)
+        return None
+
+
+def sb_get_admin(email: str) -> dict | None:
+    rows = _supabase_admin_request("GET", f"admins?select=id,email,password_hash,name,role,active,created_at&email=eq.{email.strip().lower()}&limit=1")
+    if isinstance(rows, list) and rows:
+        return rows[0]
+    return None
+
+
+def sb_list_admins() -> list[dict] | None:
+    rows = _supabase_admin_request("GET", "admins?select=id,email,password_hash,name,role,active,created_at&order=id.asc")
+    return rows if isinstance(rows, list) else None
+
+
+def sb_insert_admin(email: str, password_hash: str, name: str, role: str) -> dict | None:
+    rows = _supabase_admin_request(
+        "POST", "admins",
+        {"email": email.strip().lower(), "password_hash": password_hash, "name": name, "role": role, "active": True},
+        prefer="return=representation",
+    )
+    if isinstance(rows, list) and rows:
+        return rows[0]
+    return None
+
+
+def sb_update_admin(email: str, fields: dict) -> None:
+    _supabase_admin_request("PATCH", f"admins?email=eq.{email.strip().lower()}", fields, prefer="return=minimal")
+
+
+def sb_delete_admin(email: str) -> None:
+    _supabase_admin_request("DELETE", f"admins?email=eq.{email.strip().lower()}", prefer="return=minimal")
+
+
+def mirror_admin_to_local(row: dict) -> dict | None:
+    """Copia un usuario durable (Supabase) al SQLite local y devuelve la fila
+    local: la sesion y los decoradores trabajan con el id local."""
+    email = str(row.get("email", "")).strip().lower()
+    if not email:
+        return None
+    with get_db() as conn:
+        local = conn.execute("SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?", (email,)).fetchone()
+        if local is None:
+            conn.execute(
+                "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                (email, row.get("password_hash", ""), row.get("name", "Usuario ALFA LUBES"), row.get("role", "admin"),
+                 1 if row.get("active", True) else 0, str(row.get("created_at") or datetime.now().isoformat(timespec="seconds"))),
+            )
+        else:
+            conn.execute(
+                "UPDATE admins SET password_hash=?, name=?, role=?, active=? WHERE lower(email)=?",
+                (row.get("password_hash", local["password_hash"]), row.get("name", local["name"]), row.get("role", local["role"]),
+                 1 if row.get("active", True) else 0, email),
+            )
+        return conn.execute("SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?", (email,)).fetchone()
+
+
+def seed_official_admins_to_supabase() -> None:
+    """Siembra en Supabase SOLO los oficiales que falten; a los existentes
+    solo les actualiza nombre/rol/activo (nunca pisa su password_hash)."""
+    if not supabase_admins_enabled():
+        return
+    for email, (name, role, password) in MASTER_ADMINS.items():
+        existing = sb_get_admin(email)
+        if existing is None:
+            sb_insert_admin(email, hash_password(password), name, role)
+        else:
+            sb_update_admin(email, {"name": name, "role": role, "active": True})
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("ALFA_LUBES_SECRET_KEY") or secrets.token_hex(32)
+if PREVIEW_MODE and not os.environ.get("ALFA_LUBES_SECRET_KEY"):
+    # Sin llave fija, cada instancia de Vercel firma las cookies con una llave
+    # distinta: la cookie de sesion del login la rechaza la siguiente
+    # instancia y el usuario rebota a /admin/login aunque exista y su
+    # contrasena sea correcta. Definir ALFA_LUBES_SECRET_KEY en Vercel.
+    print("[ALFA LUBES] AVISO: falta ALFA_LUBES_SECRET_KEY en Vercel; las sesiones no sobreviviran entre instancias.", flush=True)
 app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
 
 
@@ -553,17 +670,28 @@ def admin_login():
                 base_name = user_part.replace(".alfalubes", "")
                 equivalent_emails.append(f"{base_name}@alfalubes.com")
 
-        # 1. Comprobación en base de datos
+        # 1. Comprobación en el almacén DURABLE (Supabase) y espejo local.
+        # Antes solo se miraba el SQLite de /tmp: en Vercel ese archivo nace
+        # vacio en cada instancia, asi que un usuario registrado en otra
+        # instancia "no existia" al intentar entrar. El admin oficial no
+        # fallaba porque se recrea desde el codigo (MASTER_ADMINS) siempre.
         admin = None
-        with get_db() as conn:
+        if supabase_admins_enabled():
             for em in equivalent_emails:
-                row = conn.execute(
-                    "SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?",
-                    (em,),
-                ).fetchone()
-                if row:
-                    admin = row
+                sb_row = sb_get_admin(em)
+                if sb_row:
+                    admin = mirror_admin_to_local(sb_row)
                     break
+        if admin is None:
+            with get_db() as conn:
+                for em in equivalent_emails:
+                    row = conn.execute(
+                        "SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?",
+                        (em,),
+                    ).fetchone()
+                    if row:
+                        admin = row
+                        break
 
         authenticated = False
         if admin and admin["active"]:
@@ -667,6 +795,10 @@ def admin_users():
             flash("Nombre, correo institucional y contraseña son requeridos.", "error")
             return redirect(url_for("admin_users"))
 
+        if supabase_admins_enabled() and sb_get_admin(email):
+            flash(f"Ya existe un usuario registrado con el correo '{email}'.", "error")
+            return redirect(url_for("admin_users"))
+
         with get_db() as conn:
             existing = conn.execute("SELECT id FROM admins WHERE lower(email) = ?", (email,)).fetchone()
             if existing:
@@ -677,9 +809,19 @@ def admin_users():
                 "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, 1, ?)",
                 (email, hash_password(password), name, role, datetime.now().isoformat(timespec="seconds")),
             )
+        if supabase_admins_enabled():
+            if sb_insert_admin(email, hash_password(password), name, role) is None:
+                flash("El usuario se creó solo en esta instancia y NO quedaría guardado: Supabase no lo aceptó. Revisa que la tabla admins exista (supabase_schema.sql) y que SUPABASE_SERVICE_ROLE_KEY esté en Vercel.", "error")
+                return redirect(url_for("admin_users"))
+        elif PREVIEW_MODE:
+            flash("AVISO: este usuario solo vive en esta instancia de Vercel y se perderá al reiniciar, porque falta SUPABASE_SERVICE_ROLE_KEY. Agrégala en Vercel para que el registro sea permanente.", "error")
         _sync_admins_to_file()
         flash(f"Usuario '{name}' ({email}) registrado exitosamente con rol '{role.upper()}'.", "success")
         return redirect(url_for("admin_users"))
+
+    if supabase_admins_enabled():
+        for sb_row in sb_list_admins() or []:
+            mirror_admin_to_local(sb_row)
 
     with get_db() as conn:
         # NINGÚN usuario puede ver la cuenta de Alfonso Avilés dentro del panel;
@@ -711,6 +853,8 @@ def admin_delete_user(user_id: int):
             return redirect(url_for("admin_users"))
 
         conn.execute("DELETE FROM admins WHERE id = ?", (user_id,))
+    if supabase_admins_enabled():
+        sb_delete_admin(target_email)
     _sync_admins_to_file()
 
     flash(f"Usuario '{target['name']}' ({target['email']}) eliminado correctamente.", "success")
@@ -739,6 +883,8 @@ def admin_update_user_password(user_id: int):
             return redirect(url_for("admin_users"))
 
         conn.execute("UPDATE admins SET password_hash = ? WHERE id = ?", (hash_password(new_password), user_id))
+    if supabase_admins_enabled():
+        sb_update_admin(target["email"], {"password_hash": hash_password(new_password)})
     _sync_admins_to_file()
 
     flash(f"Contraseña de '{target['name']}' ({target['email']}) actualizada correctamente.", "success")
@@ -1719,6 +1865,8 @@ def not_found(_error):
 
 # Inicializa esquema y datos base en la base configurada (DB_PATH).
 init_db()
+# Siembra los oficiales en el almacen durable (sin pisar contrasenas ya cambiadas).
+seed_official_admins_to_supabase()
 
 
 if __name__ == "__main__":
