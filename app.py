@@ -93,7 +93,6 @@ SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "1").strip() in ("1", "true", "Tru
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "re_kQi6V5Px_PoqYuq23SzfhsdNp6xtDdEtT").strip()
 
 ADMINS_DATA_FILE = BASE_DIR / "admins_data.json"
-STAFF_MASTER_PASSWORDS = ("@lfalub3s", "@lfa1ub3s", "@lfalubes", "alfalubes", "AlfaLubes", "AlfaLubes2026")
 
 
 def _sync_admins_to_file() -> None:
@@ -283,6 +282,53 @@ def mirror_admin_to_local(row: dict) -> dict | None:
                  1 if row.get("active", True) else 0, email),
             )
         return conn.execute("SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?", (email,)).fetchone()
+
+
+
+# Cuentas gemelas de una misma persona: cambiar la contrasena en una debe
+# cambiarla en TODAS, o la puerta gemela seguiria abriendo con la vieja.
+PERSON_GROUPS = [
+    ["alfonsoavilery@icloud.com", "alfonsoavilezy@icloud.com"],
+    ["alfalubesx@gmail.com", "administracion@alfalubes.com", "admin@alfalubes.com"],
+    ["ventas.alfalubes@gmail.com", "ventas@alfalubes.com", "contacto@alfalubes.com"],
+    ["rruelas.alfalubes@gmail.com", "rruelas@alfalubes.com"],
+    ["eabitia.alfalubes@gmail.com", "eabitia@alfalubes.com"],
+]
+
+
+def person_emails(email: str) -> list[str]:
+    email = email.strip().lower()
+    for group in PERSON_GROUPS:
+        if email in group:
+            return list(group)
+    return [email]
+
+
+def change_admin_password(email: str, new_password: str) -> bool:
+    """Cambia la contrasena de una persona (todas sus cuentas gemelas).
+
+    Orden y garantia: primero Supabase (durable) y se VERIFICA leyendo de
+    vuelta que el hash guardado sea el nuevo; solo entonces se toca el
+    espejo local. Si Supabase esta activo y la verificacion falla, no se
+    cambia nada y se devuelve False: nunca se anuncia un cambio que no
+    quedo guardado para siempre.
+    """
+    new_hash = hash_password(new_password)
+    targets = person_emails(email)
+    if supabase_admins_enabled():
+        for em in targets:
+            existing = sb_get_admin(em)
+            if existing is None:
+                continue
+            sb_update_admin(em, {"password_hash": new_hash})
+            back = sb_get_admin(em)
+            if not back or back.get("password_hash") != new_hash:
+                print(f"[ALFA LUBES] Cambio de contrasena NO verificado en Supabase para {em}", flush=True)
+                return False
+    with get_db() as conn:
+        for em in targets:
+            conn.execute("UPDATE admins SET password_hash = ? WHERE lower(email) = ?", (new_hash, em))
+    return True
 
 
 def seed_official_admins_to_supabase() -> None:
@@ -693,14 +739,10 @@ def admin_login():
                         admin = row
                         break
 
-        authenticated = False
-        if admin and admin["active"]:
-            if verify_password(password, admin["password_hash"]):
-                authenticated = True
-            elif admin["role"] in ("admin", "ventas") and password in STAFF_MASTER_PASSWORDS:
-                authenticated = True
-            elif any(em in MASTER_ADMINS and password == MASTER_ADMINS[em][2] for em in equivalent_emails):
-                authenticated = True
+        # SOLO la contrasena guardada del usuario. Ya no hay contrasenas
+        # staff ni maestras de respaldo: cuando una persona cambia su
+        # contrasena, la compartida deja de funcionar para su cuenta.
+        authenticated = bool(admin and admin["active"] and verify_password(password, admin["password_hash"]))
 
         if authenticated and admin:
             session.clear()
@@ -709,37 +751,6 @@ def admin_login():
             session["admin_role"] = admin["role"]
             session["admin_email"] = admin["email"]
             flash(f"¡Bienvenido al panel, {admin['name']}!", "success")
-            return redirect(next_url)
-
-        # 2. Respaldo garantizado contra MASTER_ADMINS
-        matched_master = None
-        for em in equivalent_emails:
-            if em in MASTER_ADMINS:
-                expected_pwd = MASTER_ADMINS[em][2]
-                role = MASTER_ADMINS[em][1]
-                if password == expected_pwd or (role in ("admin", "ventas") and password in STAFF_MASTER_PASSWORDS):
-                    matched_master = (em, MASTER_ADMINS[em])
-                    break
-
-        if matched_master:
-            m_email, (m_name, m_role, _) = matched_master
-            # Asegurar que el usuario exista en la BD para tener un id válido
-            with get_db() as conn:
-                db_user = conn.execute("SELECT id FROM admins WHERE lower(email)=?", (m_email,)).fetchone()
-                if not db_user:
-                    conn.execute(
-                        "INSERT INTO admins (email, password_hash, name, role, active, created_at) VALUES (?, ?, ?, ?, 1, ?)",
-                        (m_email, hash_password(password), m_name, m_role, datetime.now().isoformat(timespec="seconds")),
-                    )
-                    db_user = conn.execute("SELECT id FROM admins WHERE lower(email)=?", (m_email,)).fetchone()
-                user_id = db_user["id"] if db_user else 1
-
-            session.clear()
-            session["admin_id"] = user_id
-            session["admin_name"] = m_name
-            session["admin_role"] = m_role
-            session["admin_email"] = m_email
-            flash(f"¡Bienvenido al panel, {m_name}!", "success")
             return redirect(next_url)
 
         flash("Credenciales inválidas o cuenta inactiva. Verifica tu correo y contraseña.", "error")
@@ -755,6 +766,41 @@ def admin_logout():
     session.pop("admin_email", None)
     flash("Sesión administrativa cerrada.", "success")
     return redirect(url_for("home"))
+
+
+@app.route("/admin/my-password", methods=["GET", "POST"])
+@login_required
+def admin_my_password():
+    """Cada usuario cambia SU propia contrasena, con su contrasena actual.
+    El cambio queda guardado y verificado en Supabase (durable)."""
+    my_email = session.get("admin_email", "").lower()
+    if request.method == "POST":
+        current = request.form.get("current_password", "")
+        new_password = request.form.get("new_password", "")
+        confirm = request.form.get("confirm_password", "")
+        if len(new_password) < 6:
+            flash("La nueva contraseña debe tener al menos 6 caracteres.", "error")
+            return redirect(url_for("admin_my_password"))
+        if new_password != confirm:
+            flash("La nueva contraseña y su confirmación no coinciden.", "error")
+            return redirect(url_for("admin_my_password"))
+        me = None
+        if supabase_admins_enabled():
+            sb_row = sb_get_admin(my_email)
+            if sb_row:
+                me = mirror_admin_to_local(sb_row)
+        if me is None:
+            with get_db() as conn:
+                me = conn.execute("SELECT id, email, password_hash, name, role, active FROM admins WHERE lower(email)=?", (my_email,)).fetchone()
+        if not me or not verify_password(current, me["password_hash"]):
+            flash("Tu contraseña actual no es correcta; no se cambió nada.", "error")
+            return redirect(url_for("admin_my_password"))
+        if not change_admin_password(my_email, new_password):
+            flash("No se pudo guardar en Supabase; tu contraseña NO cambió. Avísale a Alfonso.", "error")
+            return redirect(url_for("admin_my_password"))
+        flash("Tu contraseña cambió y quedó guardada. Úsala la próxima vez que entres; la anterior ya no funciona.", "success")
+        return redirect(url_for("admin_panel"))
+    return render_template("admin_my_password.html")
 
 
 @app.route("/admin/forgot-password", methods=["GET", "POST"])
@@ -866,28 +912,29 @@ def admin_delete_user(user_id: int):
 def admin_update_user_password(user_id: int):
     is_master = session.get("admin_email", "").lower() in ("alfonsoavilery@icloud.com", "alfonsoavilezy@icloud.com")
     new_password = request.form.get("new_password", "").strip()
-    if not new_password or len(new_password) < 4:
-        flash("La nueva contraseña debe tener al menos 4 caracteres.", "error")
+    if not new_password or len(new_password) < 6:
+        flash("La nueva contraseña debe tener al menos 6 caracteres.", "error")
         return redirect(url_for("admin_users"))
 
     with get_db() as conn:
         target = conn.execute("SELECT id, name, email FROM admins WHERE id = ?", (user_id,)).fetchone()
-        if not target:
-            flash("Usuario no encontrado.", "error")
-            return redirect(url_for("admin_users"))
+    if not target:
+        flash("Usuario no encontrado.", "error")
+        return redirect(url_for("admin_users"))
 
-        target_email = target["email"].lower()
-        # Si el usuario objetivo es Alfonso Avilés, únicamente Alfonso Avilés puede cambiarla
-        if target_email in ("alfonsoavilery@icloud.com", "alfonsoavilezy@icloud.com") and not is_master:
-            flash("Acción no autorizada sobre la cuenta del Administrador Total.", "error")
-            return redirect(url_for("admin_users"))
+    target_email = target["email"].lower()
+    # Cada quien cambia SOLO la suya; Alfonso (Administrador Total) puede
+    # restablecer la de cualquiera (es la via cuando alguien la olvida).
+    if not is_master and session.get("admin_email", "").lower() not in person_emails(target_email):
+        flash("Solo puedes cambiar tu propia contraseña. Si necesitas restablecer otra, pídeselo a Alfonso Avilés.", "error")
+        return redirect(url_for("admin_users"))
 
-        conn.execute("UPDATE admins SET password_hash = ? WHERE id = ?", (hash_password(new_password), user_id))
-    if supabase_admins_enabled():
-        sb_update_admin(target["email"], {"password_hash": hash_password(new_password)})
+    if not change_admin_password(target_email, new_password):
+        flash("No se pudo guardar en Supabase; la contraseña NO cambió.", "error")
+        return redirect(url_for("admin_users"))
     _sync_admins_to_file()
 
-    flash(f"Contraseña de '{target['name']}' ({target['email']}) actualizada correctamente.", "success")
+    flash(f"Contraseña de '{target['name']}' ({target['email']}) actualizada y guardada en Supabase.", "success")
     return redirect(url_for("admin_users"))
 
 
