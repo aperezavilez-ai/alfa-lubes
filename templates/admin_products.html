@@ -215,7 +215,7 @@
               <!-- Foto -->
               <td class="py-4 px-6">
                 <div class="w-16 h-16 bg-white rounded-xl p-2 flex items-center justify-center overflow-hidden border border-slate-700 shadow-sm">
-                  <img src="{{ url_for('static', filename='images/' + p.image) }}" alt="{{ p.name }}" class="w-full h-full object-contain" onerror="this.src='{{ url_for('static', filename='images/aceite-1.jpg') }}'">
+                  <img src="{{ product_image_url(p.image) }}" alt="{{ p.name }}" class="w-full h-full object-contain" onerror="this.src='{{ url_for('static', filename='images/aceite-1.jpg') }}'">
                 </div>
               </td>
 
@@ -247,6 +247,9 @@
               <!-- Acciones -->
               <td class="py-4 px-6 text-right">
                 <div class="flex items-center justify-end gap-2">
+                  <a href="{{ url_for('admin_edit_product', pid=p.id) }}" title="Editar producto" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 p-2 rounded-xl text-xs border border-slate-700 transition">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </a>
                   <a href="{{ url_for('products') }}" target="_blank" title="Ver en tienda" class="bg-slate-800 hover:bg-slate-700 text-sky-400 p-2 rounded-xl text-xs border border-slate-700 transition">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                   </a>

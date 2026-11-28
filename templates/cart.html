@@ -13,7 +13,7 @@
         <div class="space-y-4">
             {% for item in items %}
             <article class="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800">
-                <div class="w-20 h-20 shrink-0 bg-white rounded-xl p-2"><img src="{{ url_for('static', filename='images/' + item.product.image) }}" alt="{{ item.product.name }}" class="w-full h-full object-contain"></div>
+                <div class="w-20 h-20 shrink-0 bg-white rounded-xl p-2"><img src="{{ product_image_url(item.product.image) }}" alt="{{ item.product.name }}" class="w-full h-full object-contain"></div>
                 <div class="flex-1 min-w-[170px]"><h2 class="font-bold">{{ item.product.name }}</h2><p class="text-sm text-slate-400">{{ item.product.brand }}</p></div>
                 <label class="text-sm text-slate-400">Cantidad <input type="number" name="qty_{{ item.product.id }}" value="{{ item.qty }}" min="0" max="{{ item.product.stock }}" class="block w-24 mt-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-center text-white"></label>
                 <p class="w-full sm:w-auto sm:min-w-32 sm:text-right font-semibold text-amber-400 text-sm">Cotizar pedido</p>

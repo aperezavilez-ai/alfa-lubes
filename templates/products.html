@@ -31,7 +31,7 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {% for p in products %}
             <article class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 card-hover flex flex-col">
-                <div class="h-64 bg-white flex items-center justify-center p-6"><img src="{{ url_for('static', filename='images/' + p.image) }}" alt="{{ p.name }}" class="w-full h-full object-contain" loading="lazy"></div>
+                <div class="h-64 bg-white flex items-center justify-center p-6"><img src="{{ product_image_url(p.image) }}" alt="{{ p.name }}" class="w-full h-full object-contain" loading="lazy"></div>
                 <div class="p-5 flex flex-col flex-1">
                     <p class="text-xs text-sky-300 font-bold tracking-widest">{{ p.brand }} · {{ p.viscosity }}</p>
                     <h2 class="font-bold text-lg mt-2">{{ p.name }}</h2>

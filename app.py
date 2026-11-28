@@ -331,6 +331,209 @@ def change_admin_password(email: str, new_password: str) -> bool:
     return True
 
 
+# ---------------------------------------------------------------------------
+# Productos DURABLES en Supabase (tabla public.products) + fotos en Storage
+# ---------------------------------------------------------------------------
+# Misma enfermedad que tenian los usuarios: los productos vivian en el
+# SQLite de UNA instancia y _sync_products_to_file() intentaba reescribir
+# products_data.json en disco de solo lectura (fallaba en silencio), y la
+# foto nueva ni siquiera podia guardarse. Ahora Supabase es la fuente
+# unica: el panel escribe ahi primero y VERIFICA leyendo de vuelta; el
+# SQLite local queda como espejo que se refresca desde Supabase, y las
+# paginas publicas leen ese espejo ya sincronizado. Las fotos nuevas se
+# suben al bucket publico "products" de Supabase Storage y el producto
+# guarda la URL publica.
+
+PRODUCTS_BUCKET = "products"
+_PRODUCTS_LAST_SYNC = 0.0
+
+
+def supabase_products_enabled() -> bool:
+    return supabase_admins_enabled()
+
+
+def _supabase_products_request(method: str, endpoint: str, payload=None, prefer: str = ""):
+    if not supabase_products_enabled():
+        return None
+    url = f"{SUPABASE_URL}/rest/v1/{endpoint.lstrip('/')}"
+    headers = {
+        "apikey": SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "Content-Type": "application/json",
+    }
+    if prefer:
+        headers["Prefer"] = prefer
+    data = json.dumps(payload).encode("utf-8") if payload is not None else None
+    req = urlrequest.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urlrequest.urlopen(req, timeout=8) as resp:
+            body = resp.read().decode("utf-8")
+            return json.loads(body) if body else None
+    except Exception as exc:  # se registra, nunca se traga en silencio
+        print(f"[ALFA LUBES] Supabase productos {method} {endpoint} fallo: {exc}", flush=True)
+        return None
+
+
+def sb_list_products() -> list[dict] | None:
+    rows = _supabase_products_request(
+        "GET", "products?select=id,name,brand,viscosity,price,stock,image,description&order=id.asc"
+    )
+    return rows if isinstance(rows, list) else None
+
+
+def sb_get_product(pid: int) -> dict | None:
+    rows = _supabase_products_request(
+        "GET", f"products?select=id,name,brand,viscosity,price,stock,image,description&id=eq.{int(pid)}&limit=1"
+    )
+    if isinstance(rows, list) and rows:
+        return rows[0]
+    return None
+
+
+def sb_insert_product(fields: dict) -> dict | None:
+    rows = _supabase_products_request("POST", "products", fields, prefer="return=representation")
+    if isinstance(rows, list) and rows:
+        return rows[0]
+    return None
+
+
+def sb_update_product(pid: int, fields: dict) -> None:
+    _supabase_products_request("PATCH", f"products?id=eq.{int(pid)}", fields, prefer="return=minimal")
+
+
+def sb_delete_product(pid: int) -> None:
+    _supabase_products_request("DELETE", f"products?id=eq.{int(pid)}", prefer="return=minimal")
+
+
+def _mirror_product_upsert(row: dict) -> None:
+    """Copia un producto durable (Supabase) al espejo SQLite local."""
+    try:
+        pid = int(row.get("id"))
+    except (TypeError, ValueError):
+        return
+    with get_db() as conn:
+        conn.execute(
+            "INSERT INTO products (id, name, brand, viscosity, price, stock, image, description) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(id) DO UPDATE SET name=excluded.name, brand=excluded.brand, "
+            "viscosity=excluded.viscosity, price=excluded.price, stock=excluded.stock, "
+            "image=excluded.image, description=excluded.description",
+            (
+                pid,
+                str(row.get("name", "")),
+                str(row.get("brand", "ALFA LUBES")),
+                str(row.get("viscosity", "")),
+                float(row.get("price", 0.0) or 0.0),
+                int(row.get("stock", 0) or 0),
+                str(row.get("image", "aceite-1.jpg")),
+                str(row.get("description", "")),
+            ),
+        )
+
+
+def _mirror_product_delete(pid: int) -> None:
+    try:
+        with get_db() as conn:
+            conn.execute("DELETE FROM products WHERE id = ?", (int(pid),))
+    except Exception:
+        # Si una orden vieja referencia el producto (FK), el espejo lo
+        # conserva; en Supabase ya no existe y dejara de sincronizarse.
+        pass
+
+
+def sync_products_from_supabase(force: bool = False) -> bool:
+    """Refresca el espejo local desde Supabase (la fuente unica).
+
+    Con freno de 30 s por instancia para no consultar en cada visita; si
+    Supabase no responde, el espejo conserva lo ultimo bueno y la tienda
+    nunca se queda vacia por un fallo de red.
+    """
+    global _PRODUCTS_LAST_SYNC
+    if not supabase_products_enabled():
+        return False
+    now = time.time()
+    if not force and (now - _PRODUCTS_LAST_SYNC) < 30:
+        return False
+    rows = sb_list_products()
+    if rows is None:
+        return False
+    _PRODUCTS_LAST_SYNC = now
+    remote_ids = set()
+    for row in rows:
+        try:
+            remote_ids.add(int(row.get("id")))
+        except (TypeError, ValueError):
+            continue
+        _mirror_product_upsert(row)
+    with get_db() as conn:
+        local_ids = [r[0] for r in conn.execute("SELECT id FROM products").fetchall()]
+    for lid in local_ids:
+        if lid not in remote_ids:
+            _mirror_product_delete(lid)
+    return True
+
+
+def seed_products_to_supabase_if_empty() -> None:
+    """Migracion unica: si la tabla durable esta vacia y el catalogo local
+    ya tiene productos (del archivo o de fabrica), los sube tal cual."""
+    if not supabase_products_enabled():
+        return
+    existing = sb_list_products()
+    if existing is None or len(existing) > 0:
+        return
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT name, brand, viscosity, price, stock, image, description FROM products ORDER BY id"
+        ).fetchall()
+    for r in rows:
+        sb_insert_product({
+            "name": r["name"], "brand": r["brand"], "viscosity": r["viscosity"],
+            "price": float(r["price"]), "stock": int(r["stock"]),
+            "image": r["image"], "description": r["description"],
+        })
+
+
+def _upload_product_photo(file_storage, base_name: str) -> str | None:
+    """Sube la foto al bucket publico de Supabase Storage y devuelve su
+    URL publica; None si no se pudo (el llamador NO guarda el producto
+    con una foto rota: avisa y no anuncia un guardado falso)."""
+    if not supabase_products_enabled():
+        return None
+    raw_filename = secure_filename(file_storage.filename or "")
+    ext = os.path.splitext(raw_filename)[1].lower()
+    if ext not in (".png", ".jpg", ".jpeg", ".webp"):
+        return None
+    clean_name = re.sub(r"[^a-zA-Z0-9_-]", "_", (base_name or "producto").lower())[:20] or "producto"
+    saved_name = f"prod_{clean_name}_{int(time.time())}{ext}"
+    url = f"{SUPABASE_URL}/storage/v1/object/{PRODUCTS_BUCKET}/{saved_name}"
+    headers = {
+        "apikey": SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "Content-Type": file_storage.mimetype or "application/octet-stream",
+        "x-upsert": "true",
+    }
+    try:
+        data = file_storage.read()
+        req = urlrequest.Request(url, data=data, headers=headers, method="POST")
+        with urlrequest.urlopen(req, timeout=20) as resp:
+            resp.read()
+    except Exception as exc:
+        print(f"[ALFA LUBES] Subida de foto de producto fallo: {exc}", flush=True)
+        return None
+    return f"{SUPABASE_URL}/storage/v1/object/public/{PRODUCTS_BUCKET}/{saved_name}"
+
+
+def product_image_url(image) -> str:
+    """URL final de la foto de un producto: si ya es una URL (Storage),
+    va tal cual; si es nombre de archivo, es la imagen estatica de siempre."""
+    img = str(image or "").strip()
+    if img.startswith("http://") or img.startswith("https://"):
+        return img
+    if not img:
+        img = "aceite-1.jpg"
+    return url_for("static", filename=f"images/{img}")
+
+
 def seed_official_admins_to_supabase() -> None:
     """Siembra en Supabase SOLO los oficiales que falten; a los existentes
     solo les actualiza nombre/rol/activo (nunca pisa su password_hash)."""
@@ -352,6 +555,7 @@ if PREVIEW_MODE and not os.environ.get("ALFA_LUBES_SECRET_KEY"):
     # contrasena sea correcta. Definir ALFA_LUBES_SECRET_KEY en Vercel.
     print("[ALFA LUBES] AVISO: falta ALFA_LUBES_SECRET_KEY en Vercel; las sesiones no sobreviviran entre instancias.", flush=True)
 app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
+app.jinja_env.globals["product_image_url"] = product_image_url
 
 
 @contextmanager
@@ -943,7 +1147,9 @@ def admin_update_user_password(user_id: int):
 @app.route("/admin/products", methods=["GET", "POST"])
 @admin_required
 def admin_products():
-    """Panel de administración para agregar productos con fotografía y gestionar inventario."""
+    """Panel de administración: alta de productos con fotografía y gestión
+    de inventario. Todo escribe primero en Supabase (durable) y se verifica
+    leyendo de vuelta; el SQLite local es solo el espejo."""
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         brand = request.form.get("brand", "ALFA LUBES").strip() or "ALFA LUBES"
@@ -969,33 +1175,53 @@ def admin_products():
         except ValueError:
             stock = 0
 
-        # Manejo de fotografía
+        # Fotografía: subida nueva (a Storage si Supabase esta activo) o
+        # una existente del catalogo estatico.
         image_filename = request.form.get("image_select", "").strip() or "aceite-1.jpg"
         file = request.files.get("image_file")
         if file and file.filename:
-            raw_filename = secure_filename(file.filename)
-            ext = os.path.splitext(raw_filename)[1].lower()
-            if ext in (".png", ".jpg", ".jpeg", ".webp"):
-                clean_name = re.sub(r"[^a-zA-Z0-9_-]", "_", name.lower())[:20]
-                saved_name = f"prod_{clean_name}_{int(time.time())}{ext}"
-                target_path = BASE_DIR / "static" / "images" / saved_name
-                try:
-                    file.save(str(target_path))
-                    image_filename = saved_name
-                except Exception:
-                    # En entornos de solo lectura (como Vercel lambda), usar imagen por defecto seleccionada
-                    pass
+            if supabase_products_enabled():
+                uploaded_url = _upload_product_photo(file, name)
+                if not uploaded_url:
+                    flash("La fotografía no se pudo subir al almacenamiento. El producto NO se guardó; inténtalo de nuevo.", "error")
+                    return redirect(url_for("admin_products"))
+                image_filename = uploaded_url
+            else:
+                raw_filename = secure_filename(file.filename)
+                ext = os.path.splitext(raw_filename)[1].lower()
+                if ext in (".png", ".jpg", ".jpeg", ".webp"):
+                    clean_name = re.sub(r"[^a-zA-Z0-9_-]", "_", name.lower())[:20]
+                    saved_name = f"prod_{clean_name}_{int(time.time())}{ext}"
+                    target_path = BASE_DIR / "static" / "images" / saved_name
+                    try:
+                        file.save(str(target_path))
+                        image_filename = saved_name
+                    except Exception:
+                        pass
 
-        with get_db() as conn:
-            conn.execute(
-                "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (name, brand, viscosity, price, stock, image_filename, description),
-            )
+        fields = {
+            "name": name, "brand": brand, "viscosity": viscosity,
+            "price": price, "stock": stock, "image": image_filename,
+            "description": description,
+        }
+        if supabase_products_enabled():
+            row = sb_insert_product(fields)
+            if not row:
+                flash("No se pudo guardar el producto en la base duradera (Supabase). No quedó registrado; inténtalo de nuevo.", "error")
+                return redirect(url_for("admin_products"))
+            _mirror_product_upsert(row)
+        else:
+            with get_db() as conn:
+                conn.execute(
+                    "INSERT INTO products (name, brand, viscosity, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (name, brand, viscosity, price, stock, image_filename, description),
+                )
         _sync_products_to_file()
         flash(f"Producto '{name}' agregado exitosamente al catálogo.", "success")
         return redirect(url_for("admin_products"))
 
-    # GET: Mostrar lista de productos y formulario de alta
+    # GET: refrescar el espejo desde la fuente durable y mostrar
+    sync_products_from_supabase()
     with get_db() as conn:
         all_products = conn.execute("SELECT * FROM products ORDER BY id DESC").fetchall()
 
@@ -1011,41 +1237,158 @@ def admin_products():
     return render_template("admin_products.html", products=all_products, available_images=available_images)
 
 
+@app.route("/admin/products/<int:pid>/edit", methods=["GET", "POST"])
+@admin_required
+def admin_edit_product(pid: int):
+    """Edición COMPLETA de un producto: nombre, marca, viscosidad, precio,
+    stock, descripción y fotografía. Guarda primero en Supabase y verifica
+    leyendo de vuelta; solo entonces toca el espejo local."""
+    sync_products_from_supabase()
+    with get_db() as conn:
+        product = conn.execute("SELECT * FROM products WHERE id = ?", (pid,)).fetchone()
+    if product is None:
+        flash("El producto no existe.", "error")
+        return redirect(url_for("admin_products"))
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        brand = request.form.get("brand", "ALFA LUBES").strip() or "ALFA LUBES"
+        viscosity = request.form.get("viscosity", "").strip()
+        price_raw = request.form.get("price", "0").strip()
+        stock_raw = request.form.get("stock", "0").strip()
+        description = request.form.get("description", "").strip()
+
+        if not name:
+            flash("El nombre del producto es obligatorio.", "error")
+            return redirect(url_for("admin_edit_product", pid=pid))
+        if not viscosity:
+            flash("La viscosidad o tipo de lubricante es obligatoria.", "error")
+            return redirect(url_for("admin_edit_product", pid=pid))
+
+        try:
+            price = max(0.0, float(price_raw or 0))
+        except ValueError:
+            price = 0.0
+        try:
+            stock = max(0, int(stock_raw or 0))
+        except ValueError:
+            stock = 0
+
+        # Fotografía: si suben una nueva, esa manda; si eligen una del
+        # catalogo, esa; si no tocan nada, se conserva la actual.
+        image_value = product["image"]
+        file = request.files.get("image_file")
+        image_select = request.form.get("image_select", "").strip()
+        if file and file.filename:
+            if supabase_products_enabled():
+                uploaded_url = _upload_product_photo(file, name)
+                if not uploaded_url:
+                    flash("La fotografía nueva no se pudo subir al almacenamiento. NO se guardó ningún cambio; inténtalo de nuevo.", "error")
+                    return redirect(url_for("admin_edit_product", pid=pid))
+                image_value = uploaded_url
+            else:
+                raw_filename = secure_filename(file.filename)
+                ext = os.path.splitext(raw_filename)[1].lower()
+                if ext in (".png", ".jpg", ".jpeg", ".webp"):
+                    clean_name = re.sub(r"[^a-zA-Z0-9_-]", "_", name.lower())[:20]
+                    saved_name = f"prod_{clean_name}_{int(time.time())}{ext}"
+                    target_path = BASE_DIR / "static" / "images" / saved_name
+                    try:
+                        file.save(str(target_path))
+                        image_value = saved_name
+                    except Exception:
+                        pass
+        elif image_select:
+            image_value = image_select
+
+        fields = {
+            "name": name, "brand": brand, "viscosity": viscosity,
+            "price": price, "stock": stock, "image": image_value,
+            "description": description,
+        }
+        if supabase_products_enabled():
+            sb_update_product(pid, fields)
+            back = sb_get_product(pid)
+            if (
+                not back
+                or back.get("name") != name
+                or back.get("viscosity") != viscosity
+                or back.get("image") != image_value
+                or int(back.get("stock", -1)) != stock
+            ):
+                flash("El cambio NO se pudo verificar en la base duradera (Supabase); no se aplicó. Inténtalo de nuevo.", "error")
+                return redirect(url_for("admin_edit_product", pid=pid))
+            _mirror_product_upsert(back)
+        else:
+            with get_db() as conn:
+                conn.execute(
+                    "UPDATE products SET name = ?, brand = ?, viscosity = ?, price = ?, stock = ?, image = ?, description = ? WHERE id = ?",
+                    (name, brand, viscosity, price, stock, image_value, description, pid),
+                )
+        _sync_products_to_file()
+        flash(f"Producto '{name}' actualizado: los cambios ya están en la tienda pública.", "success")
+        return redirect(url_for("admin_products"))
+
+    images_dir = BASE_DIR / "static" / "images"
+    available_images = []
+    if images_dir.exists():
+        available_images = sorted([
+            f.name for f in images_dir.glob("*")
+            if f.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp")
+            and not f.name.startswith("favicon") and not f.name.startswith("apple")
+        ])
+    return render_template("admin_product_edit.html", product=product, available_images=available_images)
+
+
 @app.post("/admin/products/<int:pid>/stock")
 @admin_required
 def admin_update_product_stock(pid: int):
     """Actualiza rápidamente la existencia en bodega de un producto."""
-    stock_raw = request.form.get("stock", "0").strip()
     try:
-        new_stock = max(0, int(stock_raw))
-    except ValueError:
-        flash("La cantidad de stock no es válida.", "error")
+        new_stock = int(request.form.get("stock", "0"))
+        if new_stock < 0:
+            raise ValueError
+    except (TypeError, ValueError):
+        flash("La existencia debe ser un número entero mayor o igual a cero.", "error")
         return redirect(url_for("admin_products"))
-
-    with get_db() as conn:
-        conn.execute("UPDATE products SET stock = ? WHERE id = ?", (new_stock, pid))
+    if supabase_products_enabled():
+        sb_update_product(pid, {"stock": new_stock})
+        back = sb_get_product(pid)
+        if not back or int(back.get("stock", -1)) != new_stock:
+            flash("La existencia NO se pudo verificar en la base duradera (Supabase); no se aplicó. Inténtalo de nuevo.", "error")
+            return redirect(url_for("admin_products"))
+        _mirror_product_upsert(back)
+    else:
+        with get_db() as conn:
+            conn.execute("UPDATE products SET stock = ? WHERE id = ?", (new_stock, pid))
     _sync_products_to_file()
-    flash(f"Existencia actualizada correctamente a {new_stock} unidades.", "success")
+    flash("Existencia actualizada correctamente.", "success")
     return redirect(url_for("admin_products"))
 
 
 @app.post("/admin/products/<int:pid>/delete")
 @admin_required
 def admin_delete_product(pid: int):
-    """Elimina un producto del catálogo."""
+    """Elimina un producto del catálogo (primero de la base durable)."""
     with get_db() as conn:
         product = conn.execute("SELECT name FROM products WHERE id = ?", (pid,)).fetchone()
-        if product:
-            conn.execute("DELETE FROM products WHERE id = ?", (pid,))
-            _sync_products_to_file()
-            flash(f"Producto '{product['name']}' eliminado del catálogo.", "success")
-        else:
-            flash("El producto no existe.", "error")
+    if not product:
+        flash("El producto no existe.", "error")
+        return redirect(url_for("admin_products"))
+    if supabase_products_enabled():
+        sb_delete_product(pid)
+        if sb_get_product(pid) is not None:
+            flash("El producto NO se pudo eliminar de la base duradera (Supabase); sigue en el catálogo. Inténtalo de nuevo.", "error")
+            return redirect(url_for("admin_products"))
+    _mirror_product_delete(pid)
+    _sync_products_to_file()
+    flash(f"Producto '{product['name']}' eliminado del catálogo.", "success")
     return redirect(url_for("admin_products"))
 
 
 @app.route("/")
 def home():
+    sync_products_from_supabase()
     with get_db() as conn:
         products = conn.execute("SELECT * FROM products WHERE stock > 0 ORDER BY id LIMIT 4").fetchall()
     pallets = get_all_pallets()
@@ -1060,6 +1403,7 @@ def pallets():
 
 @app.route("/products")
 def products():
+    sync_products_from_supabase()
     search = request.args.get("q", "").strip()
     with get_db() as conn:
         if search:
@@ -1093,6 +1437,7 @@ def add_to_cart(pid):
 
 @app.route("/cart")
 def cart():
+    sync_products_from_supabase()
     items = []
     total = 0
     with get_db() as conn:
@@ -1461,9 +1806,9 @@ def ai_agent():
     return render_template("ai_agent.html")
 
 
-def _alfa_system_prompt() -> str:
+def _alfa_system_prompt(catalog_text: str = "") -> str:
     """Construye el prompt de sistema para un Asesor Técnico y Comercial experto de ALFA LUBES."""
-    return (
+    prompt = (
         f"Eres el asesor técnico y comercial de {BRAND_NAME} ({SITE_URL}). "
         "Eres un profesional automotriz experto en lubricación de alto rendimiento: aceites de motor, viscosidades SAE, normas API/ILSAC/ACEA, "
         "transmisiones (automática, manual, CVT, DCT/DSG) y mantenimiento vehicular. Atiendes con igual excelencia a conductores particulares, "
@@ -1526,6 +1871,9 @@ def _alfa_system_prompt() -> str:
         f"- Web oficial: {SITE_URL}\n\n"
         "Siempre verifica que la recomendación coincida con el manual del fabricante del vehículo cuando el cliente exprese dudas específicas."
     )
+    if catalog_text:
+        prompt += "\n" + catalog_text
+    return prompt
 
 
 def _get_products_catalog() -> list[dict]:
@@ -1553,6 +1901,39 @@ def _get_pallets_catalog() -> list[dict]:
             return [dict(row) for row in rows]
     except Exception:
         return []
+
+
+def _catalog_context_text() -> str:
+    """Catálogo REAL y actual de la tienda, listo para el prompt: es la
+    verdad sobre qué hay y cuánto hay al momento de la conversación. Se
+    lee del espejo local, que el panel mantiene sincronizado desde
+    Supabase: si el panel edita un producto, el asesor lo sabe."""
+    lines = ["CATÁLOGO EN VIVO DE LA TIENDA (datos reales al momento de esta conversación):"]
+    products = _get_products_catalog()
+    if products:
+        lines.append("PRODUCTOS CON STOCK:")
+        for p in products:
+            lines.append(
+                f"- {p.get('name', '')} — viscosidad {p.get('viscosity', '')} — "
+                f"{p.get('description', '')} — Stock actual: {p.get('stock', 0)} unidades."
+            )
+    else:
+        lines.append("PRODUCTOS CON STOCK: ninguno registrado en este momento.")
+    pallets = _get_pallets_catalog()
+    if pallets:
+        lines.append("PALLETS / TARIMAS DE MAYOREO ACTIVOS:")
+        for pl in pallets:
+            lines.append(
+                f"- {pl.get('title', '')} — {pl.get('units_per_pallet', '')} unidades por pallet — "
+                f"{pl.get('description', '')}"
+            )
+    lines.append(
+        "REGLA DE CATÁLOGO: recomienda SOLO productos de esta lista cuando hables de disponibilidad "
+        "y stock; si algo no está en la lista, dilo con naturalidad y ofrece la alternativa más "
+        "cercana de la lista o canaliza a ventas. Los precios NO están en esta lista a propósito: "
+        "la regla de precios sigue vigente."
+    )
+    return "\n".join(lines)
 
 
 def _get_product_by_viscosity(viscosity: str) -> list[dict]:
@@ -1584,82 +1965,25 @@ def _search_products(query: str) -> list[dict]:
         return []
 
 
-# Definición de herramientas (function calling) para la IA
-AI_TOOLS = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_products_catalog",
-            "description": "Obtiene el catalogo completo de productos ALFA LUBES disponibles con stock y descripciones en tiempo real.",
-            "parameters": {"type": "object", "properties": {}, "required": []}
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "get_pallets_catalog",
-            "description": "Obtiene las tarimas/pallets de mayoreo disponibles para talleres y refaccionarias con stock y descripciones.",
-            "parameters": {"type": "object", "properties": {}, "required": []}
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "get_product_by_viscosity",
-            "description": "Busca productos por viscosidad SAE específica (ej: 5W-30, 0W-20, 10W-40).",
-            "parameters": {
-                "type": "object",
-                "properties": {"viscosity": {"type": "string", "description": "Viscosidad SAE a buscar (ej: 5W-30)"}},
-                "required": ["viscosity"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "search_products",
-            "description": "Busca productos por nombre, marca o palabra clave en la descripción.",
-            "parameters": {
-                "type": "object",
-                "properties": {"query": {"type": "string", "description": "Término de búsqueda (ej: sintético, transmisión, alto kilometraje)"}},
-                "required": ["query"]
-            }
-        }
-    }
-]
-
-
-def _execute_tool_call(name: str, arguments: dict) -> str:
-    """Ejecuta una llamada a herramienta y devuelve el resultado como JSON string."""
-    try:
-        if name == "get_products_catalog":
-            result = _get_products_catalog()
-        elif name == "get_pallets_catalog":
-            result = _get_pallets_catalog()
-        elif name == "get_product_by_viscosity":
-            result = _get_product_by_viscosity(arguments.get("viscosity", ""))
-        elif name == "search_products":
-            result = _search_products(arguments.get("query", ""))
-        else:
-            result = {"error": f"Herramienta desconocida: {name}"}
-        return json.dumps(result, ensure_ascii=False)
-    except Exception as e:
-        return json.dumps({"error": str(e)}, ensure_ascii=False)
-
-
 def _call_ai_service(history: list[dict]) -> str | None:
-    """Llama a la API de IA con function calling para consultar catálogo real en tiempo real."""
+    """Llama a la API de IA UNA sola vez, con el catálogo real de la tienda
+    dentro del prompt de sistema.
+
+    Diseño: el catálogo es chico (productos con stock + pallets), así que
+    viaja completo en el prompt y el modelo responde con datos exactos en
+    una sola llamada. El diseño anterior hacía DOS llamadas con
+    herramientas cuando el modelo decidía consultar (medido en vivo:
+    hasta 17 s por respuesta) y dependía de esa decisión. Si la IA falla,
+    el error queda REGISTRADO en el log del servidor — nada se traga en
+    silencio — y responde el respaldo basado en el mismo catálogo real.
+    """
     if not AI_API_KEY:
+        print("[ALFA LUBES] Asesor IA sin AI_API_KEY configurada; responde el respaldo de catálogo.", flush=True)
         return None
     url = f"{AI_BASE_URL}/chat/completions"
-    
-    # Primera llamada: el modelo decide si usar herramientas
     payload = json.dumps({
         "model": AI_MODEL,
-        "messages": [{"role": "system", "content": _alfa_system_prompt()}] + history,
-        "tools": AI_TOOLS,
-        "tool_choice": "auto",
-        "reasoning_effort": "low",
+        "messages": [{"role": "system", "content": _alfa_system_prompt(_catalog_context_text())}] + history[-12:],
         "temperature": 0.4,
         "max_tokens": 1200,
     }).encode("utf-8")
@@ -1671,104 +1995,143 @@ def _call_ai_service(history: list[dict]) -> str | None:
     try:
         with urlrequest.urlopen(req, timeout=45) as resp:
             body = json.loads(resp.read().decode("utf-8"))
-        choices = body.get("choices") or []
-        if not choices:
-            return None
-        msg = choices[0].get("message") or {}
-        
-        # Si el modelo quiere usar herramientas, ejecutarlas y hacer segunda llamada
-        tool_calls = msg.get("tool_calls")
-        if tool_calls:
-            # Ejecutar cada herramienta
-            tool_messages = []
-            for tc in tool_calls:
-                fn_name = tc.get("function", {}).get("name")
-                fn_args = json.loads(tc.get("function", {}).get("arguments", "{}"))
-                result = _execute_tool_call(fn_name, fn_args)
-                tool_messages.append({
-                    "role": "tool",
-                    "tool_call_id": tc.get("id"),
-                    "name": fn_name,
-                    "content": result
-                })
-            
-            # Segunda llamada con resultados de herramientas
-            second_payload = json.dumps({
-                "model": AI_MODEL,
-                "messages": [{"role": "system", "content": _alfa_system_prompt()}] + history + [msg] + tool_messages,
-                "reasoning_effort": "low",
-                "temperature": 0.4,
-                "max_tokens": 1200,
-            }).encode("utf-8")
-            second_req = urlrequest.Request(url, data=second_payload, headers=headers, method="POST")
-            with urlrequest.urlopen(second_req, timeout=45) as resp2:
-                body2 = json.loads(resp2.read().decode("utf-8"))
-            choices2 = body2.get("choices") or []
-            if choices2:
-                msg2 = choices2[0].get("message") or {}
-                content2 = msg2.get("content")
-                if isinstance(content2, str) and content2.strip():
-                    return content2.strip()
-        
-        # Respuesta directa sin herramientas
-        content = msg.get("content")
-        if isinstance(content, str) and content.strip():
-            return content.strip()
-        reasoning = msg.get("reasoning")
-        if isinstance(reasoning, str) and len(reasoning.strip()) > 20:
-            return reasoning.strip()
-        if isinstance(body.get("response"), str) and body["response"].strip():
-            return body["response"].strip()
-        if isinstance(body.get("content"), str) and body["content"].strip():
-            return body["content"].strip()
-    except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, KeyError, ValueError, OSError):
+    except HTTPError as exc:
+        detail = ""
+        try:
+            detail = exc.read().decode("utf-8", "replace")[:200]
+        except Exception:
+            pass
+        print(f"[ALFA LUBES] Asesor IA: el proveedor respondió HTTP {exc.code}: {detail}", flush=True)
         return None
+    except (URLError, TimeoutError, json.JSONDecodeError, OSError) as exc:
+        print(f"[ALFA LUBES] Asesor IA: fallo de red o de lectura: {exc}", flush=True)
+        return None
+    choices = body.get("choices") or []
+    if not choices:
+        print("[ALFA LUBES] Asesor IA: respuesta sin choices.", flush=True)
+        return None
+    msg = choices[0].get("message") or {}
+    content = msg.get("content")
+    if isinstance(content, str) and content.strip():
+        return content.strip()
+    print("[ALFA LUBES] Asesor IA: respuesta sin contenido útil.", flush=True)
     return None
 
 
 def _autonomous_fallback_reply(message: str) -> str:
-    """Respaldo natural basado en catálogo real cuando la IA configurada no responde."""
+    """Respaldo natural basado en el catálogo REAL cuando la IA no responde.
+
+    No es un guion fijo: lee el mensaje y el catálogo actual y responde al
+    caso concreto (precio, viscosidad, transmisión, alto kilometraje,
+    pallets, saludo) con datos verdaderos de la tienda, en el mismo tono
+    y con la misma regla de no dar precios.
+    """
     text = (message or "").strip()
     lower = text.lower()
-
-    # Intentar orientar con datos reales del catálogo
-    suggestions = []
+    wa = f"[{WHATSAPP_NUMBER}]({WHATSAPP_URL})"
     try:
-        if any(k in lower for k in ("pallet", "tarima", "mayoreo", "flotilla", "distribuidor")):
-            pallets = _get_pallets_catalog()
-            if pallets:
-                top = pallets[:2]
-                names = ", ".join(p.get("name", "tarima") for p in top)
-                suggestions.append(f"Para mayoreo puedo orientarte con opciones como {names}.")
-        # Búsqueda simple por términos del mensaje
-        terms = [t for t in lower.replace(",", " ").split() if len(t) >= 3][:4]
-        if terms:
-            products = _search_products(" ".join(terms))
-            if not products:
-                products = _get_products_catalog()
-            if products:
-                picks = products[:3]
-                parts = []
-                for p in picks:
-                    name = p.get("name", "producto")
-                    visc = p.get("viscosity")
-                    label = name + (f" ({visc})" if visc else "")
-                    parts.append(label)
-                suggestions.append("Del catálogo actual te puedo recomendar: " + "; ".join(parts) + ".")
+        catalog = _get_products_catalog()
     except Exception:
-        suggestions = []
+        catalog = []
+    by_visc = {}
+    for p in catalog:
+        by_visc[str(p.get("viscosity", "")).upper().replace(" ", "")] = p
 
-    if suggestions:
+    def describe(p: dict) -> str:
         return (
-            "Con gusto te ayudo. " + " ".join(suggestions) + " "
-            "Si me compartes tu vehículo, año y kilometraje te digo cuál es la opción más adecuada para cuidarlo. "
-            f"Para cerrar tu pedido o cotización rápida también puedes escribirme por WhatsApp: [{WHATSAPP_NUMBER}]({WHATSAPP_URL})."
+            f"**{p.get('name', '')}** ({p.get('viscosity', '')}): {p.get('description', '')} "
+            f"Tenemos {p.get('stock', 0)} unidades en stock."
         )
 
+    # Precio: la regla de la casa es no dar precios; a ventas, con naturalidad.
+    if any(k in lower for k in ("precio", "cuesta", "cuanto", "cuánto", "cotiz", "vale")):
+        return (
+            "Para darte el precio real y actualizado con disponibilidad, te paso con nuestro "
+            f"equipo de ventas: por WhatsApp {wa} o al correo {SALES_EMAIL}; te atienden al instante. "
+            "Y si me dices tu vehículo y año, te confirmo de una vez si la viscosidad que buscas "
+            "es la correcta según el manual."
+        )
+
+    # Viscosidad SAE mencionada: ese producto exacto del catálogo.
+    m = re.search(r"(\d{1,2})\s*w\s*[- ]\s*(\d{2})", lower)
+    if m:
+        key = f"{m.group(1)}W-{m.group(2)}"
+        p = by_visc.get(key)
+        if p:
+            return (
+                f"Claro, lo tenemos: {describe(p)} "
+                f"Puedes pedirlo en línea desde el carrito ({SITE_URL}/cart) con pago seguro por Mercado Pago, "
+                f"o si prefieres te atiende ventas por WhatsApp: {wa}."
+            )
+        avail = ", ".join(sorted(by_visc.keys()))
+        return (
+            f"En este momento no veo {key} en el catálogo con stock. Las viscosidades disponibles hoy son: {avail}. "
+            f"Si me dices tu vehículo, año y kilometraje, te digo cuál de estas te conviene; "
+            f"o ventas te confirma disponibilidad por WhatsApp: {wa}."
+        )
+
+    # Transmisión DCT/DSG.
+    if any(k in lower for k in ("dsg", "dct", "transmisi", "caja autom", "mecatronic")):
+        p = by_visc.get("DCT/DSG")
+        if p:
+            return (
+                f"Para tu transmisión tenemos el indicado: {describe(p)} "
+                f"Si me dices la marca y modelo de tu auto te confirmo compatibilidad, "
+                f"o ventas te atiende por WhatsApp: {wa}."
+            )
+
+    # Alto kilometraje.
+    if any(k in lower for k in ("alto kilometraje", "100,000", "100000", "muchos kil", "kilometraje alto")):
+        p = by_visc.get("10W-40")
+        if p:
+            return (
+                f"Para motores con alto kilometraje la opción de la casa es: {describe(p)} "
+                f"Cuéntame qué vehículo es y cuántos kilómetros trae y te confirmo si es el ideal "
+                f"para tu caso, o escríbenos por WhatsApp: {wa}."
+            )
+
+    # Pallets / mayoreo: títulos REALES de la tabla de pallets.
+    if any(k in lower for k in ("pallet", "tarima", "mayoreo", "flotilla", "distribuidor")):
+        try:
+            pallets = _get_pallets_catalog()
+        except Exception:
+            pallets = []
+        if pallets:
+            names = "; ".join(str(pl.get("title", "")) for pl in pallets[:3])
+            return (
+                f"Claro, manejamos tarimas de mayoreo directo de fábrica. Activas hoy: {names}. "
+                f"Para cotización por volumen y flete te atiende ventas por WhatsApp: {wa} "
+                f"o al correo {SALES_EMAIL}."
+            )
+        return (
+            "Manejamos tarimas de mayoreo directo de fábrica para talleres y flotillas. "
+            f"Para los lotes disponibles del momento y cotización, ventas te atiende por WhatsApp: {wa}."
+        )
+
+    # Saludo.
+    if len(lower) < 30 and any(k in lower for k in ("hola", "buenas", "buen d", "qué tal", "que tal")):
+        return (
+            "¡Hola! Bienvenido a ALFA LUBES. Cuéntame qué vehículo tienes (marca, modelo, año y "
+            "kilometraje) y te recomiendo el aceite ideal de nuestro catálogo; también te puedo "
+            "orientar en mayoreo por tarimas."
+        )
+
+    # General: catálogo real resumido y la pregunta que avanza la venta.
+    if catalog:
+        parts = "; ".join(
+            f"{p.get('name', '')} ({p.get('viscosity', '')}, {p.get('stock', 0)} en stock)"
+            for p in catalog[:6]
+        )
+        return (
+            f"Con gusto te ayudo. Esto es lo que tenemos hoy en la tienda: {parts}. "
+            "Si me compartes tu vehículo, año y kilometraje te digo cuál es la opción más "
+            f"adecuada para cuidarlo. Para cerrar tu pedido o una cotización rápida, también "
+            f"estoy por WhatsApp: {wa}."
+        )
     return (
-        "Con gusto te ayudo a elegir el aceite ideal. "
-        "Cuéntame qué vehículo tienes (marca, modelo, año y kilometraje) y con qué uso lo manejas, y te recomiendo la mejor opción del catálogo de Alfa Lubes. "
-        f"Si prefieres, también puedo atenderte por WhatsApp para cotizar y cerrar tu pedido: [{WHATSAPP_NUMBER}]({WHATSAPP_URL})."
+        "Con gusto te ayudo a elegir el aceite ideal. Cuéntame qué vehículo tienes (marca, "
+        "modelo, año y kilometraje) y cómo lo usas, y te recomiendo la mejor opción. "
+        f"También te atiendo por WhatsApp: {wa}."
     )
 
 
@@ -1810,7 +2173,7 @@ def ai_chat():
     reply = _call_ai_service(history)
     source = "alfa_ai"
     if not reply:
-        source = "alfa_ai"
+        source = "catalogo_local"
         reply = _autonomous_fallback_reply(message)
 
     suggest_pallet = any(k in (message + " " + reply).lower() for k in ["pallet", "pallets", "tarima", "tarimas", "mayoreo", "flotilla", "cajas de aceite", "cotizar pallet", "precio por tarima", "distribuidor"])
@@ -1914,6 +2277,10 @@ def not_found(_error):
 init_db()
 # Siembra los oficiales en el almacen durable (sin pisar contrasenas ya cambiadas).
 seed_official_admins_to_supabase()
+# Productos durables: migra el catalogo local si Supabase esta vacio y
+# deja el espejo local igual a la fuente durable.
+seed_products_to_supabase_if_empty()
+sync_products_from_supabase(force=True)
 
 
 if __name__ == "__main__":
